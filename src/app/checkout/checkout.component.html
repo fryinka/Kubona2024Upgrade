@@ -1,0 +1,331 @@
+<div class="md:pb-8 py-5 md:px-0 px-3 mt-3">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-12 md:gap-x-5 gap-y-2 gap-x-2">
+      <div class="col-span-12">
+        <h5 class="md:text-[24px] text-[20px] montserrat-600 mb-5">
+          Total Due Amount: ₦{{
+            totalPrice.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })
+          }}
+          ({{ priceToWords(totalPrice) }})
+        </h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto" *ngIf="!checkoutSuccess">
+    <form [formGroup]="checkoutForm" (ngSubmit)="onCheckoutWhatsapp()">
+      <div class="bg-[#F2F2F2] md:px-6 md:py-10 p-4 rounded-[5px]">
+        <div class="mb-4">
+          <div class="flex flex-row w-full justify-between">
+            <span class="montserrat-600">WhatsApp Number</span>
+            <span>
+              <img
+                src="assets/images/checkout-whatsapp.png"
+                class="w-[28px]"
+                alt="WhatsApp"
+              />
+            </span>
+          </div>
+          <input
+            id="phoneNumber"
+            formControlName="phoneNumber"
+            placeholder="WhatsApp Number"
+            type="text"
+            class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]"
+            maxlength="11"
+            pattern="^0(70|80|81|90|91)\d{7}$"
+            title="Enter a valid Nigerian phone number starting with 070, 080, 081, 090, or 091"
+            required
+          />
+          <div
+            class="text-[#cf1d25]"
+            *ngIf="
+              checkoutForm.get('phoneNumber')?.touched &&
+              checkoutForm.get('phoneNumber')?.invalid
+            "
+          >
+            <small *ngIf="checkoutForm.get('phoneNumber')?.errors?.['required']"
+              >Phone number is required.</small
+            >
+            <small *ngIf="checkoutForm.get('phoneNumber')?.errors?.['pattern']"
+              >Invalid phone number.</small
+            >
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="flex flex-row w-full justify-between">
+            <span class="montserrat-600">Email Address</span>
+            <span>
+              <img
+                src="assets/images/checkout-email.png"
+                class="w-[28px]"
+                alt="Email"
+              />
+            </span>
+          </div>
+          <input
+            id="userEmail"
+            formControlName="userEmail"
+            placeholder="Email Address"
+            type="email"
+            class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]"
+          />
+          <div
+            class="text-[#cf1d25]"
+            *ngIf="
+              checkoutForm.get('userEmail')?.touched &&
+              checkoutForm.get('userEmail')?.invalid
+            "
+          >
+            <small *ngIf="checkoutForm.get('userEmail')?.errors?.['required']"
+              >Email is required.</small
+            >
+            <small *ngIf="checkoutForm.get('userEmail')?.errors?.['email']"
+              >Invalid email address.</small
+            >
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="flex flex-row w-full justify-between">
+            <span class="montserrat-600">Delivery State</span>
+          </div>
+          <select
+            id="deliveryState"
+            formControlName="deliveryState"
+            class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]"
+          >
+            <option value="">Select state</option>
+            <option value="Lagos">Lagos</option>
+            <option value="Abuja">Abuja</option>
+            <option value="Rivers">Rivers</option>
+            <option value="Abia">Abia</option>
+            <option value="Adamawa">Adamawa</option>
+            <option value="AkwaIbom">AkwaIbom</option>
+            <option value="Anambra">Anambra</option>
+            <option value="Bauchi">Bauchi</option>
+            <option value="Bayelsa">Bayelsa</option>
+            <option value="Benue">Benue</option>
+            <option value="Borno">Borno</option>
+            <option value="Cross Rivers">Cross Rivers</option>
+            <option value="Delta">Delta</option>
+            <option value="Ebonyi">Ebonyi</option>
+            <option value="Edo">Edo</option>
+            <option value="Ekiti">Ekiti</option>
+            <option value="Enugu">Enugu</option>
+            <option value="Gombe">Gombe</option>
+            <option value="Imo">Imo</option>
+            <option value="Jigawa">Jigawa</option>
+            <option value="Kaduna">Kaduna</option>
+            <option value="Kano">Kano</option>
+            <option value="Katsina">Katsina</option>
+            <option value="Kebbi">Kebbi</option>
+            <option value="Kogi">Kogi</option>
+            <option value="Kwara">Kwara</option>
+            <option value="Niger">Niger</option>
+            <option value="Nasarawa">Nasarawa</option>
+            <option value="Ogun">Ogun</option>
+            <option value="Ondo">Ondo</option>
+            <option value="Osun">Osun</option>
+            <option value="Oyo">Oyo</option>
+            <option value="Plateau">Plateau</option>
+            <option value="Sokoto">Sokoto</option>
+            <option value="Taraba">Taraba</option>
+            <option value="Yobe">Yobe</option>
+            <option value="Zamfara">Zamfara</option>
+          </select>
+          <div
+            class="text-[#cf1d25]"
+            *ngIf="
+              checkoutForm.get('deliveryState')?.touched &&
+              checkoutForm.get('deliveryState')?.invalid
+            "
+          >
+            <small>State is required.</small>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="flex flex-row w-full justify-between">
+            <span class="montserrat-600">Typical Size</span>
+          </div>
+          <select
+            id="typicalSize"
+            formControlName="typicalSize"
+            class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]"
+          >
+            <option value="">Select size</option>
+            <option value="39">39</option>
+            <option value="40">40</option>
+            <option value="41">41</option>
+            <option value="42">42</option>
+            <option value="43">43</option>
+            <option value="44">44</option>
+            <option value="45">45</option>
+            <option value="46">46</option>
+            <option value="47">47</option>
+          </select>
+          <div
+            class="text-[#cf1d25]"
+            *ngIf="
+              checkoutForm.get('typicalSize')?.touched &&
+              checkoutForm.get('typicalSize')?.invalid
+            "
+          >
+            <small>Size is required.</small>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <div class="flex flex-row w-full justify-between">
+            <span class="montserrat-600">Payment Options</span>
+          </div>
+          <select
+            id="paymentOption"
+            formControlName="paymentOption"
+            class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]"
+          >
+            <option value="">Select payment option</option>
+            <option value="cod">Cash on Delivery</option>
+            <option value="online">Online Payment</option>
+          </select>
+          <div
+            class="text-[#cf1d25]"
+            *ngIf="
+              checkoutForm.get('paymentOption')?.touched &&
+              checkoutForm.get('paymentOption')?.invalid
+            "
+          >
+            <small>Payment option is required.</small>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="bg-[#78E146] py-3 rounded-[3px] w-full flex flex-row items-center justify-center gap-x-2"
+        >
+          <img
+            src="assets/images/checkout-whatsapp.png"
+            class="w-[34px]"
+            alt="WhatsApp"
+          />
+          <div class="text-[18px] montserrat-600">Checkout Via WhatsApp</div>
+        </button>
+      </div>
+    </form>
+
+    <!-- <form [formGroup]="checkoutForm" (ngSubmit)="onCheckoutWhatsapp()">
+            <div class="bg-[#F2F2F2] md:px-6 md:py-10 p-4 rounded-[5px]">
+                <div class="grid grid-cols-12 md:gap-y-5 gap-y-2">
+                    <div class="col-span-12">
+                        <div class="flex flex-row w-full justify-between">
+                            <span class="montserrat-600">WhatsApp Number</span>
+                            <span>
+                                <img src="assets/images/checkout-whatsapp.png" class="w-[28px]" alt="WhatsApp">
+                            </span>
+                        </div>
+                        <input type="number" formControlName="phoneNumber" placeholder="009-77787-11156-44" class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]">
+                        <span *ngIf="checkoutForm.get('phoneNumber').hasError('required')">Phone number is required.</span>
+  <span *ngIf="checkoutForm.get('phoneNumber').hasError('pattern')">Please enter a valid Nigerian phone number.</span>
+                    </div>
+
+                    <div class="col-span-12">
+                        
+                        <input type="email" placeholder="abcxyz123@gmail.com" formControlName="userEmail" class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]">
+                        <div *ngIf="checkoutForm.get('userEmail').invalid && checkoutForm.get('userEmail').touched">
+                            <span *ngIf="checkoutForm.get('userEmail').hasError('email')">Please enter a valid email address.</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12">
+                        <div class="flex flex-row w-full justify-between">
+                            <span class="montserrat-600">Delivery State</span>
+                        </div>
+                        <select formControlName="deliveryState" class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]">
+                            <option value="">Select State</option>
+                            <option value="state1">State 1</option>
+                            <option value="state2">State 2</option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-12">
+                        <div class="flex flex-row w-full justify-between">
+                            <span class="montserrat-600">Your Typical Size</span>
+                        </div>
+                        <select formControlName="typicalSize" class="w-full bg-transparent h-[50px] border-b-[1px] border-t-0 border-r-0 border-l-0 border-[#000]">
+                            <option value="">Select Size</option>
+                            <option value="size1">Size 1</option>
+                            <option value="size2">Size 2</option>
+                        </select>
+                    </div>
+
+                    <div class="col-span-12">
+                        <div class="flex flex-col w-full">
+                            <span class="montserrat-600 mb-2">Payment Option</span>
+                            <div class="flex flex-row items-center mb-2">
+                                <input type="radio" formControlName="paymentOption" value="pricePayment" id="pricePayment" class="mr-2">
+                                <label for="pricePayment" class="montserrat-500">How much is it? Is it ₦{{totalPrice}} assist please</label>
+                            </div>
+                            <div class="flex flex-row items-center mb-2">
+                                <input type="radio" formControlName="paymentOption" value="interestedLate" id="interestedLate" class="mr-2">
+                                <label for="interestedLate" class="montserrat-500">I am interested but will buy late</label>
+                            </div>
+                            <div class="flex flex-row items-center mb-2">
+                                <input type="radio" formControlName="paymentOption" value="needMoreInfo" id="needMoreInfo" class="mr-2">
+                                <label for="needMoreInfo" class="montserrat-500">I need information on something else</label>
+                            </div>
+                            <div class="flex flex-row items-center mb-2">
+                                <input type="radio" formControlName="paymentOption" value="payOnDelivery" id="payOnDelivery" class="mr-2">
+                                <label for="payOnDelivery" class="montserrat-500">I will pay ₦{{totalPrice}} on delivery</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-span-12">
+                        <button type="submit" class="bg-[#78E146] py-3 rounded-[3px] w-full flex flex-row items-center justify-center gap-x-2">
+                            <img src="assets/images/checkout-whatsapp.png" class="w-[34px]" alt="WhatsApp">
+                            <div class="text-[18px] montserrat-600">Checkout Via WhatsApp</div>
+                        </button>
+                    </div>
+
+                    <div class="col-span-12">
+                        <p class="text-[#2b2b2b] montserrat-500 mt-3" *ngIf="orderNotPlaced">Order not placed successfully!</p>
+                    </div>
+                </div>
+            </div>
+        </form> -->
+  </div>
+
+  <div class="max-w-6xl mx-auto" *ngIf="checkoutSuccess">
+    <div class="bg-[#F2F2F2] md:px-6 md:py-10 p-4 rounded-[5px]">
+      <div class="grid grid-cols-12 md:gap-y-5 gap-y-2">
+        <div class="col-span-12">
+          <span class="block text-[32px] montserrat-600 mb-5"
+            >THANK YOU FOR YOUR PURCHASE</span
+          >
+          <hr class="bg-[#e2e2e2] h-[2px] mb-3" />
+          <span class="block mb-3">Your Order Details are:</span>
+          <span class="block montserrat-700 mb-2"
+            >ORDER ID: #{{ orderId }}</span
+          >
+          <span class="block montserrat-700 mb-2"
+            >TRANSACTION ID: {{ transactionId }}</span
+          >
+          <span class="block montserrat-700"
+            >EXPRESS CODE: {{ expressCode }}</span
+          >
+          <hr class="bg-[#e2e2e2] h-[2px] mt-3" />
+          <p
+            class="text-[#2b2b2b] montserrat-500 mt-3"
+            *ngIf="redirectingToWhatsAPP"
+          >
+            Redirecting to WhatsApp...
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+html, body{
+    font-family: 'Montserrat',sans-serif !important;
+}
+/* Mobile Menu Styles */
+#mobile-menu {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    width: 90%;
+    background-color: #fff;
+    border: 1px solid #121116;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  /* Menu Items */
+  #mobile-menu a {
+    display: block;
+    padding: 10px 15px;
+    color: #000;
+    text-decoration: none;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  #mobile-menu a:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Sub-menu styles */
+  #mobile-menu ul {
+    padding-left: 15px;
+  }
+  
+  #mobile-menu ul li {
+    padding-left: 10px;
+  }
+  
+  #mobile-menu ul li a {
+    padding: 5px 0;
+    border-bottom: none;
+  }
+  
+  #mobile-menu ul li a:hover {
+    background-color: #e0e0e0;
+  }
+  
+  /* Desktop Menu Styles */
+  .group:hover .group-hover\:block {
+    display: block;
+  }
+  
+  .group-hover\:block {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 10;
+  }
+  
+  /* Dropdown Menu Styles */
+  .group:hover .group-hover\:block {
+    display: block;
+  }
+  
+  .group-hover\:block li {
+    list-style: none;
+  }
+  
+  .group-hover\:block li a {
+    padding: 10px 15px;
+    color: #000;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .group-hover\:block li a:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Animation for Mobile Menu */
+  #mobile-menu {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  
+  #mobile-menu.hidden {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  
+  #mobile-menu:not(.hidden) {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  
+
+  

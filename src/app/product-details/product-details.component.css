@@ -1,0 +1,56 @@
+/* button {
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #333;
+  } */
+
+  #carousel-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  #sync1 {
+    width: 100%; /* Main carousel width */
+    margin-bottom: 1px; /* Space between main and thumbnail carousel */
+  }
+  
+  #sync2 {
+    width: 70%; 
+  }
+  
+  .out-of-stock-container {
+    position: relative; 
+    display: inline-block; 
+  }
+  
+  .out-of-stock-container::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: 0;
+    width: 100%; 
+    height: 100%; 
+    border-top: 3px solid white; 
+    transform: rotate(30deg); 
+    transform-origin: center; 
+    z-index: 1000; 
+  }
+  
+  .disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    filter: grayscale(80%); /* Optional: Adds a slight gray tint */
+  }  
+
+  .out-of-stock-container span {
+    position: relative; /* Ensures the text stays above the line */
+    z-index: 2;
+  }  
+
+ 
+  
+  

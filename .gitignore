@@ -1,0 +1,45 @@
+# Node modules
+node_modules/
+
+# Build output
+/dist/
+/out-tsc/
+/coverage/
+
+# Angular CLI project configuration
+.angular/
+
+# IDE and editor files
+/.idea/
+/.vscode/
+/*.sublime-workspace
+/*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+/src/environments/*.ts
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Temporary files
+*.swp
+*.swo
+
+# Angular and NPM lock files (Optional, for shared environments)
+package-lock.json
+yarn.lock
+
+# .angular/cache (Angular 13 and later)
+.angular/cache/
+
+# TSLint (if used)
+tslint.json

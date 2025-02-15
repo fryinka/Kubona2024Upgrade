@@ -1,0 +1,604 @@
+<div class="overflow-x-clip md:h-[600px] h-[350px]">
+  <div class="grid grid-cols-12 h-full items-center" *ngIf="isLoadingSlider">
+    <div class="col-span-12 text-center my-5">
+      <div class="loader"></div>
+      <p>Loading...</p>
+    </div>
+  </div>
+  <div
+    class="owl-carousel owl-home-banner"
+    data-aos="fade-up"
+    *ngIf="!isLoadingSlider && isSlider"
+  >
+    <div class="item" *ngFor="let item of slideShowImages">
+      <div
+        class="relative md:h-[600px] h-[350px] flex flex-col items-center justify-center md:gap-x-4 gap-x-2 md:gap-y-0 gap-y-2 relative lg:px-0 px-3"
+      >
+        <div
+          class="absolute left-0 top-0 w-full h-full bg-[#000]/50 z-[1]"
+        ></div>
+        <img
+          src="{{ item.imageUrl }}"
+          alt="Image 1"
+          class="absolute w-full left-0 top-0 h-full object-cover"
+        />
+        <div class="z-[1] block md:mb-8 mb-5 text-center">
+          <h6 class="md:text-[45px] text-[30px] font-[600] text-[#fff]">
+            {{ item.title }}
+          </h6>
+          <p class="md:text-[20px] text-[16px] text-[#fff]">
+            {{ item.description }}
+          </p>
+        </div>
+        <div class="block">
+          <a
+            (click)="goToCategoryMen()"
+            class="mr-2 md:text-[24px] text-[18px] relative z-[1] text-[#fff] montserrat-600 border-[#fff] md:text-[24px] capitalize border-[1px] rounded-[3px] md:px-[60px] md:py-[10px] px-5 py-2 cursor-pointer"
+            >MEN</a
+          >
+          <a
+            (click)="goToCategoryWomen()"
+            class="md:text-[24px] text-[18px] relative z-[1] text-[#fff] montserrat-600 border-[#fff] md:text-[24px] capitalize border-[1px] rounded-[3px] md:px-[60px] md:py-[10px] px-5 py-2 cursor-pointer"
+            >WOMEN</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overflow-x-clip md:py-12 py-5 lg:px-0 px-3">
+  <div class="max-w-6xl mx-auto" data-aos="fade-up">
+    <div class="grid grid-cols-12">
+      <div class="col-span-12">
+        <h5 class="md:text-[34px] text-[28px] montserrat-600 mb-0">Featured</h5>
+        <p
+          class="capitalize md:text-[16px] text-[14px] md:block hidden md:mb-3 md:w-[90%]"
+        >
+          Explore our handpicked selection of standout pieces that combine
+          quality and style. These featured items are must-haves for your
+          wardrobe, offering timeless appeal and exceptional craftsmanship.
+        </p>
+      </div>
+      <div class="col-span-12 mt-3">
+        <div class="owl-carousel owl-featured">
+          <div
+            class="item"
+            *ngFor="let item of allCategories"
+            (click)="viewShopByDepartments(item.routeId)"
+          >
+            <div
+              class="relative group cursor-pointer rounded-[10px] overflow-hidden"
+            >
+              <div
+                class="bg-[#000]/60 absolute left-0 top-0 w-full h-full rounded-[5px]"
+              ></div>
+              <span
+                class="md:text-[24px] text-[18px] absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] block text-white text-center montserrat-600 capitalize"
+              >
+                {{ item.imageTitle }}
+              </span>
+              <!-- Adjusted the heights here -->
+              <img
+                src="{{ item.imageurl }}"
+                class="desktop-rectangle md:min-h-[350px] min-h-[250px] object-cover"
+                alt="Image 1"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overflow-x-clip py-5 lg:px-0 px-3">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-12">
+      <div class="col-span-12">
+        <h5 class="md:text-[34px] text-[28px] montserrat-600 mb-0 capitalize">
+          shop by style
+        </h5>
+      </div>
+      <div class="col-span-12 mt-3 mb-5" data-aos="fade-left">
+        <div class="owl-carousel owl-style">
+          <div
+            class="item"
+            *ngFor="let item of allStyles"
+            (click)="viewShopByStyle(item.styleId)"
+          >
+            <img
+              src="{{ item.styleImageUrl }}"
+              class="rounded-full shadow-md object-cover"
+              alt="Image 2"
+            />
+            <span class="capitalize md:text-[20px] mt-2 block text-center">{{
+              item.styleDesc
+            }}</span>
+          </div>
+          <div
+            class="item"
+            *ngFor="let item of allStylesWomen"
+            (click)="viewShopByStyle(item.styleId)"
+          >
+            <img
+              src="{{ item.styleImageUrl }}"
+              class="rounded-full shadow-md object-cover border-[3px] border-[#000]"
+              alt="Image 2"
+            />
+            <span class="capitalize md:text-[20px] mt-2 block text-center">{{
+              item.styleDesc
+            }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-x-clip">
+    <div class="video-container w-full relative" data-aos="fade-up">
+      <video
+        #videoPlayer
+        class="w-full object-cover max-h-[600px]"
+        muted
+        autoplay
+      >
+        <source src="assets/images/wearing-shoe-video.mp4" type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      <div class="controls">
+        <button (click)="playPause()">
+          <div
+            *ngIf="!isPlaying"
+            class="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[9] bg-[#fff] flex flex-row items-center justify-center md:w-[90px] md:h-[90px] w-[50px] h-[50px] rounded-full"
+          >
+            <img
+              src="assets/images/icon-play.png"
+              class="invert-[1] md:w-auto w-5"
+              alt=""
+            />
+          </div>
+          <div
+            *ngIf="isPlaying"
+            class="absolute left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] z-[9] bg-[#fff] flex flex-row items-center justify-center md:w-[90px] md:h-[90px] w-[50px] h-[50px] rounded-full"
+          >
+            <img
+              src="assets/images/icon-pause.png"
+              class="invert-[1] md:w-auto w-5"
+              alt=""
+            />
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-x-clip md:py-12 py-5 lg:px-0 px-3">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-12">
+        <div class="col-span-12" data-aos="fade-left">
+          <h5 class="md:text-[34px] text-[28px] montserrat-600 mb-0">
+            Shop By Size
+          </h5>
+        </div>
+        <div class="col-span-12 mt-3">
+          <div class="flex justify-left">
+            <div class="rounded-full p-3">
+              <!-- Men Section -->
+              <span
+                (click)="switchToMen()"
+                [ngClass]="{ active: showMen }"
+                class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] relative underline-active"
+              >
+                Men
+              </span>
+
+              <span class="divider mx-2">|</span>
+
+              <!-- Women Section -->
+              <span
+                (click)="switchToWomen()"
+                [ngClass]="{ active: showWomen }"
+                class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] relative underline-active"
+              >
+                Women
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-12 mt-3">
+          <div class="grid grid-cols-12">
+            <div class="col-span-12 mt-8" *ngIf="loader">
+              <div class="loader"></div>
+            </div>
+
+            <!-- Men Sizes Section -->
+            <div class="col-span-12 mt-4" *ngIf="showMen && !loader">
+              <h6 class="md:text-[28px] text-[22px] montserrat-600 mb-2"></h6>
+              <ul
+                class="max-w-[100%] w-full flex gap-x-3"
+                style="overflow: scroll hidden"
+              >
+                <li
+                  class="flex-shrink-0 mb-2"
+                  *ngFor="let item of allSizes"
+                  (click)="viewShopBySizeMen(item?.sizeCode, 'sizemen')"
+                >
+                  <span
+                    class="block md:text-[22px] text-[16px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 cursor-pointer"
+                  >
+                    {{ item.sizeDesc?.split(" ")[1] }}
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Women Sizes Section -->
+            <div class="col-span-12 mt-8" *ngIf="showWomen && !loader">
+              <h6 class="md:text-[28px] text-[22px] montserrat-600 mb-2"></h6>
+              <ul
+                class="max-w-[100%] w-full flex gap-x-3"
+                style="overflow: scroll hidden"
+              >
+                <li
+                  class="flex-shrink-0 mb-2"
+                  *ngFor="let item of allSizesWomen"
+                  (click)="viewShopBySizeWomen(item?.sizeCode, 'sizewomen')"
+                >
+                  <span
+                    class="block md:text-[22px] text-[16px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 cursor-pointer"
+                  >
+                    {{ item.sizeDesc?.split(" ")[1] }}
+                  </span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="col-span-12 mt-8">
+              <hr class="border-[#000000]" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-x-clip pb-5 lg:px-0 px-3">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-12">
+        <div class="col-span-12" data-aos="fade-left">
+          <h5 class="md:text-[34px] text-[28px] montserrat-600 mb-0">
+            New Arrivals
+          </h5>
+          <p
+            class="capitalize md:text-[16px] text-[14px] md:block hidden md:w-[95%]"
+          >
+            Discover the latest additions to our collection, featuring stylish
+            and innovative designs crafted to elevate your everyday look. Shop
+            now and stay ahead of the trends with our exclusive new arrivals.
+          </p>
+        </div>
+        <div class="col-span-12 mt-3">
+          <div class="owl-carousel owl-new-arrival" data-aos="fade-up">
+            <div
+              *ngFor="let item of menRelatedProducts"
+              class="item relative cursor-pointer"
+              (click)="viewProduct(item.itemGroupId, item.destinationUrl)"
+            >
+              <div
+                class="relative overflow-hidden bg-white shadow-lg rounded-lg h-full flex flex-col"
+              >
+                <!-- Responsive Image -->
+                <img
+                  *ngIf="item.image1Url"
+                  src="{{ item.image1Url }}"
+                  alt="Image 1"
+                  class="w-full h-auto object-cover md:px-6 px-3"
+                />
+
+                <img
+                  *ngIf="!item.image1Url"
+                  src="assets/images/placeholder.png"
+                  alt="Placeholder Image"
+                  class="w-full h-auto object-cover md:px-6 px-3"
+                />
+
+                <div
+                  class="md:px-6 py-2 px-3 flex-1 flex flex-col justify-between"
+                >
+                  <h5 class="montserrat-500 text-[14px] mt-2 capitalize-nowrap">
+                    {{ item.title }}
+                  </h5>
+                  <div class="mt-3">
+                    <span
+                      class="text-[20px] text-[#000] font-bold md:inline block md:mr-2"
+                      >₦{{
+                        item.internetPrice.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })
+                      }}
+                    </span>
+                    <span class="text-[14px] line-through text-[#a0a0a0]"
+                      >₦{{
+                        item.storePrice.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })
+                      }}</span
+                    >
+                  </div>
+                  <div class="mt-3 flex flex-row justify-between">
+                    <ul class="flex flex-row gap-x-2 mt-1">
+                      <li>
+                        <a
+                          href=""
+                          class="block w-[20px] h-[20px] border-[1px] border-[#e2e2e2] rounded-full"
+                          [ngStyle]="{ 'background-color': item.colorDesc }"
+                        ></a>
+                      </li>
+                    </ul>
+                    <span
+                      class="flex justify-between items-center text-[13px] capitalize"
+                    >
+                      <span>
+                        <span></span>
+                        <span [ngStyle]="{ color: item.colorDesc }"></span>
+                      </span>
+                      <span
+                        ><img
+                          src="assets/images/buy-cart.png"
+                          class="max-w-[40px]"
+                          alt="Cart Icon"
+                      /></span>
+                    </span>
+                  </div>
+                  <div class="mt-4 hidden">
+                    <ul class="flex flex-wrap justify-between">
+                      <li
+                        *ngFor="let size of allSizes; let i = index"
+                        class="m-1 w-[20%]"
+                      >
+                        <span
+                          [ngClass]="{
+                            'font-bold': size.sizeCode === selectedSize,
+                            'text-black-400': !size.available
+                          }"
+                          class="text-[14px] cursor-pointer"
+                          (click)="selectedSizeClick(size.sizeCode)"
+                        >
+                          {{ extractSizeNumber(size.sizeDesc) }}
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-12 mt-3">
+          <div class="owl-carousel owl-new-arrival2">
+            <div
+              *ngFor="let item of womenRelatedProducts"
+              class="item relative cursor-pointer"
+              (click)="viewProduct(item.itemGroupId, item.destinationUrl)"
+            >
+              <div
+                class="relative overflow-hidden bg-white shadow-lg rounded-lg h-full flex flex-col"
+              >
+                <!-- Responsive Image -->
+                <img
+                  *ngIf="item.image1Url"
+                  src="{{ item.image1Url }}"
+                  alt="Image 1"
+                  class="w-full h-auto object-cover md:px-6 px-3"
+                />
+
+                <img
+                  *ngIf="!item.image1Url"
+                  src="assets/images/placeholder.png"
+                  alt="Placeholder Image"
+                  class="w-full h-auto object-cover md:px-6 px-3"
+                />
+
+                <div
+                  class="md:px-6 py-2 px-3 flex-1 flex flex-col justify-between"
+                >
+                  <h5 class="montserrat-500 text-[14px] mt-2 capitalize-nowrap">
+                    {{ item.title }}
+                  </h5>
+                  <div class="mt-3">
+                    <span
+                      class="text-[20px] text-[#000] font-bold md:inline block md:mr-2"
+                      >₦{{
+                        item.internetPrice.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })
+                      }}
+                    </span>
+                    <span class="text-[16px] line-through text-[#a0a0a0]"
+                      >₦{{
+                        item.storePrice.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })
+                      }}</span
+                    >
+                  </div>
+                  <div class="mt-3 flex flex-row justify-between">
+                    <ul class="flex flex-row gap-x-2 mt-1">
+                      <li>
+                        <a
+                          href=""
+                          class="block w-[20px] h-[20px] border-[1px] border-[#e2e2e2] rounded-full"
+                          [ngStyle]="{ 'background-color': item.colorDesc }"
+                        ></a>
+                      </li>
+                    </ul>
+                    <span
+                      class="flex justify-between items-center text-[13px] capitalize"
+                    >
+                      <span>
+                        <span></span>
+                        <span [ngStyle]="{ color: item.colorDesc }"></span>
+                      </span>
+                      <span
+                        ><img
+                          src="assets/images/buy-cart.png"
+                          class="max-w-[40px]"
+                          alt="Cart Icon"
+                      /></span>
+                    </span>
+                  </div>
+                  <div class="mt-4 hidden">
+                    <ul class="flex flex-wrap justify-between">
+                      <li
+                        *ngFor="let size of allSizes; let i = index"
+                        class="m-1 w-[20%]"
+                      >
+                        <span
+                          [ngClass]="{
+                            'font-bold': size.sizeCode === selectedSize,
+                            'text-black-400': !size.available
+                          }"
+                          class="text-[14px] cursor-pointer"
+                          (click)="selectedSizeClick(size.sizeCode)"
+                        >
+                          {{ extractSizeNumber(size.sizeDesc) }}
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overflow-x-clip md:py-12 py-5 lg:px-0 px-3">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-12">
+      <div class="col-span-12" data-aos="fade-left">
+        <h5 class="md:text-[34px] text-[28px] montserrat-600 md:mb-0 mb-4">
+          Testimonials
+        </h5>
+      </div>
+      <div class="md:col-span-2 md:block hidden"></div>
+      <div class="md:col-span-8 col-span-12">
+        <div class="owl-carousel owl-testimonials" data-aos="fade-up">
+          <div class="item text-center" *ngFor="let item of allReviews">
+            <img
+              src="{{ item.customerImageUrl }}"
+              class="mx-auto md:!max-w-[400px] !max-w-[180px]"
+              alt=""
+            />
+            <p
+              class="text-[16px] capitalize mt-4 mb-6 md:max-w-[500px] max-w-[250px] mx-auto relative"
+            >
+              <img
+                src="assets/images/quote-left.png"
+                class="absolute left-[-25px] top-[-25px] !max-w-[30px]"
+                alt=""
+              />
+              <img
+                src="assets/images/quote-right.png"
+                class="absolute right-[-15px] bottom-[-15px] !max-w-[30px]"
+                alt=""
+              />
+              {{ item.reviewText }}
+            </p>
+            <h5 class="text-[20px] montserrat-700">{{ item.customerName }}</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="overflow-x-clip md:py-16 py-5 lg:px-0 px-3">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-12 md:gap-x-4 md:gap-y-0 gap-y-4">
+      <div class="lg:col-span-3 col-span-12 group">
+        <div
+          class="w-full border-[2px] group-hover:text-[#fff] group-hover:bg-[#000] transition duration-300 ease-in-out cursor-pointer rounded-[5px] border-[#000] flex flex-row px-2 py-5 gap-x-2 gap-y-0 items-center justify-center"
+          data-aos="fade-right"
+        >
+          <div>
+            <img
+              src="assets/images/quick-1.png"
+              class="w-[50px] group-hover:invert-[1]"
+              alt=""
+            />
+          </div>
+          <div>
+            <span class="block capitalize montserrat-700">Free Shipping</span>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-3 col-span-12 group">
+        <div
+          class="w-full border-[2px] group-hover:text-[#fff] group-hover:bg-[#000] transition duration-300 ease-in-out cursor-pointer rounded-[5px] border-[#000] flex flex-row px-2 py-5 gap-x-2 gap-y-0 items-center justify-center"
+          data-aos="fade-up"
+        >
+          <div>
+            <img
+              src="assets/images/quick-2.png"
+              class="w-[50px] group-hover:invert-[1]"
+              alt=""
+            />
+          </div>
+          <div>
+            <span class="block capitalize montserrat-700"
+              >Cash on delivery</span
+            >
+            <span class="block text-[12px]"></span>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-3 col-span-12 group">
+        <div
+          class="w-full border-[2px] group-hover:text-[#fff] group-hover:bg-[#000] transition duration-300 ease-in-out cursor-pointer rounded-[5px] border-[#000] flex flex-row px-2 py-5 gap-x-2 gap-y-0 items-center justify-center"
+          data-aos="fade-up"
+        >
+          <div>
+            <img
+              src="assets/images/quick-3.png"
+              class="w-[50px] group-hover:invert-[1]"
+              alt=""
+            />
+          </div>
+          <div>
+            <span class="block capitalize montserrat-700">Best Offers</span>
+            <!-- <span class="block text-[12px]">BEST OFFERS & PRICES</span> -->
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-3 col-span-12 group">
+        <div
+          class="w-full border-[2px] group-hover:text-[#fff] group-hover:bg-[#000] transition duration-300 ease-in-out cursor-pointer rounded-[5px] border-[#000] flex flex-row px-2 py-5 gap-x-2 gap-y-0 items-center justify-center"
+          data-aos="fade-left"
+        >
+          <div>
+            <img
+              src="assets/images/quick-4.png"
+              class="w-[50px] group-hover:invert-[1]"
+              alt=""
+            />
+          </div>
+          <div>
+            <span class="block capitalize montserrat-700">Easy Return</span>
+            <!-- <span class="block text-[12px]">MONEY BACK GUARANTEE</span> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

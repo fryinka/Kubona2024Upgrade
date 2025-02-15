@@ -1,0 +1,19 @@
+:host ::ng-deep .owl-prev, 
+:host ::ng-deep .owl-next {
+    display: none !important; /* Hide the next/previous arrows */
+}
+
+.owl-carousel {
+  margin-top: -30px;
+  overflow: hidden; /* Ensures items don't exceed the carousel's height */
+}
+.image-fit {
+    border-radius: 50%;
+    width: 88% !important;
+    height: 62%; /* Makes the image fill the carousel height */
+    object-fit: cover; /* Ensures the image doesn't distort */
+  }
+  
+  
+
+  

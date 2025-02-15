@@ -1,0 +1,7 @@
+.image-fit {
+    border-radius: 50%;
+    width: 88% !important;
+    height: 62%; /* Makes the image fill the carousel height */
+    object-fit: cover; /* Ensures the image doesn't distort */
+  }
+  

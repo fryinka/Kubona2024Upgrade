@@ -1,0 +1,159 @@
+<div class="md:pb-0 pt-5 lg:px-0 px-3 md:min-h-[480px]">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-12 items-center">
+            <!-- Loading Indicator -->
+            <div *ngIf="isCategoryLoading" class="col-span-12 text-center my-5">
+                <div class="loader"></div>
+                <p>Loading Sub categories...</p>
+            </div>
+            <!-- Main Content -->
+            <div *ngIf="!isCategoryLoading && subCategories.length > 0" class="col-span-12 mt-3" data-aos="fade-right">
+              <div class="owl-carousel owl-style">
+                  <div class="item cursor-pointer" *ngFor="let item of subCategories" (click)="selectedCategoryClick(item.departmentId,item.description)">
+                      <ng-container *ngIf="item.imageUrl">
+                          <img 
+                              src="{{ item.imageUrl }}"  
+                              [ngClass]="{
+                                  'border-[0px] border-[#e2e2e2]': item.departmentId === selectedCategory,
+                                  'border-[0px] border-[#000]': item.departmentId !== selectedCategory
+                              }"
+                              class="rounded-full shadow-md object-cover" 
+                              alt="{{ item.description }}">
+                          <span class="text md:text-[24px] mt-2 block text-center">
+                              {{ item.description.replace('Men', '').replace('Shoes', '').trim() }}
+                          </span>
+                      </ng-container>
+                  </div>
+              </div>
+          </div>
+          
+             
+        </div>
+    </div>
+  </div>
+
+
+<div class="md:pb-8 md;pb-0 py-5 lg:px-0 px-3">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-12 md:gap-x-5 md:gap-y-4 gap-y-2 gap-x-2">
+            <div class="col-span-12">
+                <h5 class="md:text-[20px] text-[16px] montserrat-500 italic">HOME/<span class="capitalize">{{ subCategoryName }}/{{categoryData.categoryDesc}}</span></h5>  
+                <h5 class="md:text-[24px] text-[20px] montserrat-600 mb-0 mb-5 italic">{{ categoryData.categoryDesc }}({{ products.length }})</h5>  
+            </div>
+            <div class="lg:col-span-6 col-span-12" data-aos="fade-right">
+                <button id="dropdownDelayButton2" data-dropdown-toggle="dropdownDelay2" data-dropdown-delay="500" data-dropdown-trigger="hover" class="border-[2px] montserrat-600 rounded-[5px] border-[#000] justify-between px-5 py-2.5 text-center inline-flex w-full items-center text-[#000]" type="button">
+                    FILTER
+                    <img src="assets/images/icon-filters.png" class="max-w-[35px] max-h-[26px]" alt="">
+                </button>
+                <div id="dropdownDelay2" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 right-0">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDelayButton2">
+                    <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Size 31</a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Size 32</a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Size 33</a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Size 34</a>
+                    </li>
+                    </ul>
+                </div>    
+            </div>
+            <div class="lg:col-span-6 col-span-12" data-aos="fade-left">
+                <button id="dropdownDelayButton" data-dropdown-toggle="dropdownDelay" data-dropdown-delay="500" data-dropdown-trigger="hover" class="montserrat-600 border-[2px] rounded-[5px] border-[#000] justify-between px-5 py-2.5 text-center inline-flex w-full items-center text-[#000]" type="button">
+                    SORT
+                    <img src="assets/images/icon-sort.png" class="max-w-[35px] max-h-[26px]" alt="">
+                </button>
+                <div id="dropdownDelay" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDelayButton">
+                    <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Low To High</a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">High To Low</a>
+                    </li>
+                    <li>
+                        <a href="#" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Top Latest</a>
+                    </li>
+                    </ul>
+                </div>    
+            </div>
+        </div>
+    </div>
+</div>
+<div class="md:pb-12 pb-5 lg:px-0 px-3">
+    <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-12">
+            
+            <div class="col-span-12 mt-3">
+                <div class="grid grid-cols-12 md:gap-y-5 gap-y-3">
+                    <div class="col-span-12" data-aos="fade-up" >
+                        <div class="owl-carousel owl-new-arrival-category">
+                            <div class="item cursor-pointer" *ngFor="let item of products" (click)="viewProduct(item.itemGroupId)">
+                                <div class="grid grid-cols-12 items-center">
+                                    <div class="md:col-span-12 col-span-12">
+                                        <div class="grid grid-cols-12">
+                                            <div class="lg:col-span-12 col-span-12">
+                                        <div class="relative">
+                                            <img src="assets/images/buy-cart.png" class="absolute right-[-20px] bottom-[-15px] max-w-[50px]" alt="">
+                                            <img src="{{item.image1Url}}" alt="Image 1">
+                                        </div>
+                                        <h5 class="montserrat-500 text-[20px] mt-1 capitalize">{{ item.title }}</h5>
+                                    </div>
+                                    <div class="col-span-6">
+                                        <span class="text-[13px] capitalize"></span>
+                                    </div>
+                                    <div class="col-span-6 text-right">
+                                        <span class="text-[18px] montserrat-600">₦{{ item.internetPrice }}</span>
+                                    </div>
+                                    <div class="col-span-12 mb-1">
+                                        <span class="text-[13px] capitalize">COLOR: <span class="text-[#b3e247]"></span></span>
+                                    </div>
+                                    <div class="col-span-12 mb-1">
+                                        <ul class="flex flex-row gap-x-2">
+                                            <li>
+                                                <a href="">
+                                                    <div class="w-[20px] h-[20px] border-[1px] border-[#e2e2e2] p-[4px] rounded-full" [ngStyle]="{ 'background-color': item.colorDesc }"></div>
+                                                    <!-- <img src="assets/images/icon-blu.png" class="!max-w-[30px]" alt=""> -->
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <!-- <div class="col-span-12 mt-1">
+                                        <ul class="flex flex-row gap-x-2">
+                                            <li>
+                                                
+                                                <a href="" class="text-[13px] px-2 text-center border-[1px] border-[#000] block leading-[30px]">
+                                                    {{ item.sizeDesc }}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div> -->
+                                        </div>
+
+                                    </div>
+                                    
+                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-12 text-center mt-5">
+                        <button class="bg-[#000] text-[#fff] montserrat-700 py-2 md:px-10 px-3 rounded-[5px]">
+                            LOAD MORE
+                        </button>
+                    </div>
+                </div>
+
+
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>

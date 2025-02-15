@@ -1,0 +1,80 @@
+.owl-carousel .owl-nav {
+  display: none !important; /* This will hide both the next/previous arrows */
+}
+
+/* ::ng-deep .owl-item{
+    width: 85px !important;
+  } */
+
+.image-fit {
+  border-radius: 50%;
+  width: 88% !important;
+  height: 62%; /* Makes the image fill the carousel height */
+  object-fit: cover; /* Ensures the image doesn't distort */
+}
+
+/* Filter and Sort Container */
+.filter-sort-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* Filter Section */
+.filter-section {
+  flex: 1;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.filter-title,
+.sort-title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.filter-group {
+  margin-bottom: 1rem;
+}
+
+.filter-group-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Sort Section */
+.sort-section {
+  flex: 1;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.sort-section select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Product Card */
+.products-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.product-card {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+}
+
+.product-card img {
+  max-width: 100%;
+  height: auto;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 0.5rem;
+}

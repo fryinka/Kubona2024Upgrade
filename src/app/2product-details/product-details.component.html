@@ -1,0 +1,424 @@
+<div class="md:py-12 py-5 lg:px-0 px-3 bg-[#f5f5f5]">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-12 md:gap-x-10 items-center">
+      <div class="lg:col-span-6 col-span-12 relative">
+        <div id="carousel-container">
+          <ul class="flex flex-row nowrap w-full overflow-scroll gap-x-3">
+            <li *ngFor="let item of productImages">
+              <a href="{{ item.image }}" data-fancybox="gallery">
+                <img
+                  src="{{ item.image }}"
+                  class="!max-w-[450px] mx-auto cursor-pointer"
+                  alt="Image 1"
+                />
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="lg:col-span-6 col-span-12 md:mt-0 mt-5">
+        <div class="grid grid-cols-12 items-center md:gap-y-0">
+          <div class="mb-3 col-span-12">
+            <span
+              class="md:text-[24px] text-[18px] capitalize montserrat-600 md:mt-0 mt-5 max-w-[400px] block"
+              >{{ productDetails?.title }}</span
+            >
+          </div>
+
+          <!-- Price Section -->
+          <div class="mb-3 col-span-12">
+            <div class="text-left">
+              <span class="block md:text-[24px] text-[20px] font-bold"
+                >₦{{
+                  productDetails?.internetPrice.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })
+                }}</span
+              >
+              <span
+                class="block md:text-[18px] text-[16px] line-through text-red-500"
+                >₦{{
+                  productDetails?.storePrice.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })
+                }}</span
+              >
+            </div>
+          </div>
+
+          <!-- 5-Star Rating Section -->
+          <div class="col-span-12">
+            <div class="flex items-center">
+              <div class="text-yellow-500">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <span class="ml-2 text-gray-600">(4.5/5)</span>
+              <!-- Example rating -->
+            </div>
+          </div>
+
+          <div class="mb-3 col-span-12 mb-1">
+            <span class="md:text-[20px] text-[16px] capitalize">
+              <span [ngStyle]="{ color: productDetails?.colorDesc }"></span
+            ></span>
+          </div>
+
+          <div class="mb-3 col-span-12 mb-1">
+            <ul class="flex flex-row gap-x-2" *ngIf="isSimilarId">
+              <li *ngFor="let item of productColors">
+                <div
+                  class="w-[30px] h-[30px] border-[2px] p-[4px] rounded-full cursor-pointer"
+                  (click)="
+                    selectColors(item?.title, item?.urlId, item?.productId)
+                  "
+                  [ngClass]="{
+                    'border-[#000000]': selectedColorId === item.title,
+                    'border-[#ffffff]': selectedColorId !== item.title
+                  }"
+                  [ngStyle]="{ 'background-color': item.title }"
+                ></div>
+              </li>
+            </ul>
+            <ul class="flex flex-row gap-x-2" *ngIf="!isSimilarId">
+              <li>
+                <div
+                  class="w-[30px] h-[30px] border-[2px] p-[4px] rounded-full cursor-pointer"
+                  (click)="selectColor(productDetails?.colorDesc)"
+                  [ngClass]="{
+                    'border-[#000000]':
+                      selectedColorId === productDetails?.colorDesc,
+                    'border-[#ffffff]':
+                      selectedColorId !== productDetails?.colorDesc
+                  }"
+                  [ngStyle]="{ 'background-color': productDetails?.colorDesc }"
+                ></div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="mb-3 col-span-12 text-left mt-3">
+            <!-- Check if loading state is not active -->
+            <div class="col-span-12 mt-0" *ngIf="showWomen">
+              <ul
+                *ngIf="productSizes?.length > 0"
+                class="flex flex-wrap gap-x-2 gap-y-3"
+              >
+                <li
+                  class="mb-2"
+                  *ngFor="let item of productSizes"
+                  (click)="
+                    selectSize(item?.sizeDesc, item?.sizeDesc.toString())
+                  "
+                >
+                  <div *ngIf="item.quantity == 0">
+                    <span
+                      class="text-[14px] border-[2px] px-3 py-2 rounded-[5px] bg-[#555] text-[#fff] border-[#555]"
+                    >
+                      {{ item?.sizeDesc?.split(" ")[1] }} (
+                      {{ item.trackingId }} )
+                    </span>
+                  </div>
+                  <div *ngIf="item.quantity > 0">
+                    <span
+                      class="text-[14px] border-[2px] px-3 py-2 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 cursor-pointer"
+                      [ngClass]="{
+                        'bg-[#000] text-[#fff]': selectedSize === item.sizeDesc
+                      }"
+                    >
+                      {{ item?.sizeDesc?.split(" ")[1] }} (
+                      {{ item.trackingId }} )
+                    </span>
+                  </div>
+                </li>
+              </ul>
+
+              <!-- <ul class="flex flex-wrap gap-x-2">
+                                <li *ngFor="let item of SizesWomen">
+                                    <a 
+                                        href="javascript:void(0);" 
+                                        class="text-[15px] montserrat-600 w-[70px] h-[30px] md:w-[70px] md:h-[50px] text-center border-[2px] border-[#000] block leading-[30px] md:leading-[50px]"
+                                        [ngClass]="{
+                                            'bg-[#000] text-[#fff]': selectedSize === item.sizeDesc, 
+                                            'hover:bg-[#000] hover:text-[#fff] cursor-pointer': isSizeAvailable(item.sizeDesc),
+                                            'opacity-50 cursor-not-allowed': !isSizeAvailable(item.sizeDesc)
+                                        }"
+                                        [class.pointer-events-none]="!isSizeAvailable(item.sizeDesc)" 
+                                        (click)="isSizeAvailable(item.sizeDesc) ? selectSize(item.sizeDesc, item.sizeDesc.toString()) : null"
+                                    >   
+                                        {{ item.sizeDesc }}
+                                    </a>
+                                </li>
+                            </ul> -->
+            </div>
+            <div class="col-span-12">
+              <button
+                *ngIf="productSizes.length > 0"
+                (click)="addToCartOld()"
+                class="bg-[#000] rounded-[5px] text-[#fff] py-4 md:py-4 md:text-[16px] montserrat-700 mt-5 w-full"
+              >
+                Add To Bag
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="md:py-12 py-5 lg:px-0 px-3">
+      <div class="max-w-6xl mx-auto">
+        <!-- Accordion for Product Details -->
+        <div class="grid grid-cols-12">
+          <div class="col-span-12 mt-0">
+            <div
+              id="accordion-collapse5"
+              data-accordion="collapse"
+              class="pt-0"
+            >
+              <!-- Details Section -->
+              <div class="mb-5">
+                <h2 id="accordion-collapse5-heading-1">
+                  <button
+                    type="button"
+                    class="aria-expanded:bg-transparent bg-[#FFFFFF] shadow-md aria-expanded:shadow-none flex flex-col justify-start w-full md:items-center overflow-hidden group relative z-[0] aria-expanded:border-none"
+                    data-accordion-target="#accordion-collapse5-body-1"
+                    aria-expanded="true"
+                    aria-controls="accordion-collapse5-body-1"
+                  >
+                    <div
+                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5"
+                    >
+                      <span
+                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0"
+                      >
+                        Details Section
+                      </span>
+                      <img
+                        width=""
+                        height=""
+                        src="assets/images/plus.png"
+                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden"
+                        alt="arrow"
+                      />
+                      <img
+                        width=""
+                        height=""
+                        src="assets/images/minus.png"
+                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block"
+                        alt="arrow"
+                      />
+                    </div>
+                    <div
+                      id="accordion-collapse5-body-1"
+                      class="hidden w-full"
+                      aria-labelledby="accordion-collapse5-heading-1"
+                    >
+                      <div class="">
+                        <p
+                          class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4"
+                        >
+                          Kubona is a Premium fashion retail brand that serves
+                          as the recommended source of Premium items that
+                          empower our customers to express their life
+                          aspirations and accomplishments through fashion.
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </h2>
+              </div>
+              <!-- Shipping Section -->
+              <div class="mb-5">
+                <h2 id="accordion-collapse5-heading-2">
+                  <button
+                    type="button"
+                    class="aria-expanded:bg-transparent bg-[#FFFFFF] shadow-md aria-expanded:shadow-none flex flex-col justify-start w-full md:items-center overflow-hidden group relative z-[0] aria-expanded:border-none"
+                    data-accordion-target="#accordion-collapse5-body-2"
+                    aria-expanded="true"
+                    aria-controls="accordion-collapse5-body-2"
+                  >
+                    <div
+                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5"
+                    >
+                      <span
+                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0"
+                      >
+                        Shippings
+                      </span>
+                      <img
+                        width=""
+                        height=""
+                        src="assets/images/plus.png"
+                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden"
+                        alt="arrow"
+                      />
+                      <img
+                        width=""
+                        height=""
+                        src="assets/images/minus.png"
+                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block"
+                        alt="arrow"
+                      />
+                    </div>
+                    <div
+                      id="accordion-collapse5-body-2"
+                      class="hidden w-full"
+                      aria-labelledby="accordion-collapse5-heading-2"
+                    >
+                      <div class="">
+                        <p
+                          class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4"
+                        >
+                          You can buy at our Oniru, Lekki, Lagos Warehouse.
+                          Please Click here for the address.
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </h2>
+              </div>
+              <!-- Returns Section -->
+              <div class="mb-5">
+                <h2 id="accordion-collapse5-heading-3">
+                  <button
+                    type="button"
+                    class="aria-expanded:bg-transparent bg-[#FFFFFF] shadow-md aria-expanded:shadow-none flex flex-col justify-start w-full md:items-center overflow-hidden group relative z-[0] aria-expanded:border-none"
+                    data-accordion-target="#accordion-collapse5-body-3"
+                    aria-expanded="true"
+                    aria-controls="accordion-collapse5-body-3"
+                  >
+                    <div
+                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5"
+                    >
+                      <span
+                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0"
+                      >
+                        Returns
+                      </span>
+                      <img
+                        width=""
+                        height=""
+                        src="assets/images/plus.png"
+                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden"
+                        alt="arrow"
+                      />
+                      <img
+                        width=""
+                        height=""
+                        src="assets/images/minus.png"
+                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block"
+                        alt="arrow"
+                      />
+                    </div>
+                    <div
+                      id="accordion-collapse5-body-3"
+                      class="hidden w-full"
+                      aria-labelledby="accordion-collapse5-heading-3"
+                    >
+                      <div class="">
+                        <p
+                          class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4"
+                        >
+                          You can return the product to our Lagos Warehouse
+                          within 30 days. Click here for the address.
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                </h2>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-12 overflow-hidden">
+            <h2 class="md:text-[24px] text-[20px] font-bold mb-5">
+              Recently Viewed Products
+            </h2>
+            <div *ngIf="isRecentlyViewed">
+              <div class="flex flex-row overflow-x-auto gap-x-3">
+                <div
+                  class="bg-white p-4 border rounded-lg min-w-[50%] max-w-[50%] md:min-w-[20%] md:max-w-[20%] shadow-lg cursor-pointer"
+                  *ngFor="let item of recentlyViewed"
+                  (click)="viewProduct(item.urlId)"
+                >
+                  <div class="relative">
+                    <img
+                      src="{{ item.imageUrl }}"
+                      alt="Product Image"
+                      class="w-full md:h-48 object-cover mb-3 rounded"
+                    />
+                  </div>
+                  <h5
+                    class="montserrat-500 text-[16px] mb-2 capitalize truncate"
+                  >
+                    {{ item.title }}
+                  </h5>
+                  <div class="flex justify-between items-center">
+                    <span class="text-[14px] capitalize">Price</span>
+                    <span class="text-[16px] montserrat-600"
+                      >₦{{
+                        item.internetPrice.toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })
+                      }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!isRecentlyViewed">
+              <div class="bg-[#f5f5f5] md:p-16 p-5 text-center">
+                <span class="montserrat-600"
+                  >NO PRODUCTS FOUND THIS MOMENT</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="col-span-12 mt-4">
+            <h2 class="md:text-[24px] text-[20px] font-bold mb-5">
+              Recommended Products
+            </h2>
+
+            <div class="flex flex-row overflow-x-auto gap-x-3">
+              <div
+                class="bg-white p-4 border rounded-lg min-w-[50%] max-w-[50%] md:min-w-[20%] md:max-w-[20%] shadow-lg cursor-pointer"
+                *ngFor="let item of recommendedProducts"
+                (click)="viewProduct(item.urlId)"
+              >
+                <div class="relative">
+                  <img
+                    src="{{ item.imageUrl }}"
+                    alt="Product Image"
+                    class="w-full md:h-48 object-cover mb-3 rounded"
+                  />
+                </div>
+                <h5 class="montserrat-500 text-[16px] mb-2 capitalize truncate">
+                  {{ item.title }}
+                </h5>
+                <div class="flex justify-between items-center">
+                  <span class="text-[14px] capitalize">Price</span>
+                  <span class="text-[16px] montserrat-600"
+                    >₦{{
+                      item.internetPrice.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

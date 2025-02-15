@@ -1,0 +1,357 @@
+<div class="container mx-auto py-5 px-4 mt-3">
+  <div class="max-w-6xl mx-auto">
+    <!-- Shopping Bag Header -->
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12">
+        <h2 class="text-2xl font-semibold">Your Shopping Bag</h2>
+        <div *ngIf="hasItemsInCart()">
+          <h5 class="text-lg font-medium mb-2">ORDER ID: {{ orderId }}</h5>
+          <h5 class="text-lg font-medium">
+            TOTAL: ₦{{
+              totalPrice.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })
+            }}
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart Items Section -->
+  <div class="max-w-6xl mx-auto">
+    <div *ngIf="hasItemsInCart()">
+      <div
+        class="grid grid-cols-1 gap-6"
+        *ngFor="let item of cartItems; let i; as: index"
+      >
+        <!-- Cart Item Web -->
+        <div
+          class="hidden sm:flex md:flex-row bg-white shadow-md rounded-lg p-4"
+        >
+          <!-- Product Image -->
+          <div class="md:w-1/3 w-full">
+            <img
+              [src]="item.productImage"
+              alt="Product Image"
+              class="w-full h-auto rounded-md"
+            />
+          </div>
+
+          <!-- Product Details -->
+          <div class="md:w-2/3 w-full md:pl-5 flex flex-col justify-between">
+            <div class="flex justify-between items-start">
+              <h4 class="text-xl font-semibold">{{ item.productTitle }}</h4>
+              <button
+                (click)="removeFromCart(item.id, i)"
+                class="text-red-500 text-sm"
+              >
+                Remove
+              </button>
+            </div>
+            <div class="flex justify-between mt-2">
+              <p>
+                Color: <span class="font-medium">{{ item.productColor }}</span>
+              </p>
+              <p>
+                Size: <span class="font-medium">{{ item.productSize }}</span>
+              </p>
+            </div>
+            <div class="flex justify-between mt-2">
+              <p>
+                Price:
+                <span class="font-semibold"
+                  >₦{{
+                    item.productPrice.toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })
+                  }}</span
+                >
+              </p>
+              <div class="flex items-center">
+                <button
+                  (click)="decreaseQuantity(item.id)"
+                  class="bg-gray-200 p-2 rounded-l-md"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 12H4"
+                    />
+                  </svg>
+                </button>
+                <input
+                  type="text"
+                  value="{{ item.productQty }}"
+                  class="w-10 text-center border-t border-b h-[30px]"
+                />
+                <button
+                  (click)="increaseQuantity(item.id)"
+                  class="bg-gray-200 p-2 rounded-r-md"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cart Item Mobile -->
+        <div
+          class="flex flex-col sm:hidden md:flex-row bg-white shadow-md rounded-lg p-4"
+        >
+          <div class="flex sm:hidden gap-3 md:flex-row">
+            <!-- Product Image -->
+            <div class="md:w-1/3 w-full">
+              <img
+                [src]="item.productImage"
+                alt="Product Image"
+                class="w-full h-auto rounded-md"
+              />
+            </div>
+
+            <!-- Product Details -->
+            <div class="md:w-2/3 w-full md:pl-5 flex flex-col justify-between">
+              <div class="flex justify-between items-start">
+                <h4 class="text-xl font-semibold">{{ item.productTitle }}</h4>
+              </div>
+              <div class="flex flex-col justify-between mt-2">
+                <p>
+                  Color:
+                  <span class="font-medium">{{
+                    item.productColor || "N/A"
+                  }}</span>
+                </p>
+                <p>
+                  Size:
+                  <span class="font-medium">{{
+                    item.productSize || "N/A"
+                  }}</span>
+                </p>
+              </div>
+              <div class="flex justify-between mt-2">
+                <p>
+                  Price:
+                  <span class="font-semibold"
+                    >₦{{
+                      item.productPrice.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    }}</span
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-row items-center justify-between">
+            <div class="flex items-center">
+              <button
+                (click)="decreaseQuantity(item.id)"
+                class="bg-gray-200 p-2 rounded-l-md"
+              >
+                <svg
+                  class="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M20 12H4"
+                  />
+                </svg>
+              </button>
+              <input
+                type="text"
+                value="{{ item.productQty }}"
+                class="w-10 text-center border-t border-b h-[30px]"
+              />
+              <button
+                (click)="increaseQuantity(item.id)"
+                class="bg-gray-200 p-2 rounded-r-md"
+              >
+                <svg
+                  class="w-4 h-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <button
+              (click)="removeFromCart(item.id, i)"
+              class="text-red-500 text-sm"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="w-full border-t my-4"></div>
+      </div>
+    </div>
+
+    <!-- Empty Cart Message -->
+    <div *ngIf="isCartEmpty()" class="text-center py-10">
+      <p class="text-xl font-medium">Your cart is empty.</p>
+    </div>
+  </div>
+
+  <!-- Order Summary Section -->
+  <div
+    *ngIf="hasItemsInCart()"
+    class="max-w-6xl mx-auto bg-gray-100 p-6 rounded-lg mt-5"
+  >
+    <h4 class="text-lg font-semibold">Order Summary</h4>
+    <div class="mt-4">
+      <div class="flex justify-between mb-2">
+        <p class="font-medium">Subtotal</p>
+        <p>
+          ₦{{
+            totalPrice.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })
+          }}
+        </p>
+      </div>
+      <div class="flex justify-between mb-2">
+        <p class="font-medium">Free Shipping</p>
+        <p>Free</p>
+      </div>
+      <div class="flex justify-between border-t pt-2">
+        <p class="font-medium">Estimated Total</p>
+        <p class="flex flex-col w-1/2 self-end items-end">
+          ₦{{
+            totalPrice.toLocaleString("en-US", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })
+          }}
+          <span class="text-sm text-gray-500">
+            ({{ numToWords(totalPrice) }})
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Checkout Buttons -->
+  <div class="max-w-6xl mx-auto mt-5">
+    <button
+      (click)="navigateToCheckout()"
+      class="w-full py-3 bg-green-500 text-white font-medium rounded-lg mb-3 flex justify-center items-center gap-2"
+    >
+      <img
+        src="assets/images/checkout-whatsapp.png"
+        alt="WhatsApp Icon"
+        class="w-5 h-5"
+      />
+      Checkout via WhatsApp
+    </button>
+    <button
+      (click)="addMoreToBuy()"
+      class="w-full py-3 bg-gray-200 text-gray-800 font-medium rounded-lg"
+    >
+      Add More to Buy
+    </button>
+  </div>
+
+  <!-- Recommended Products Section -->
+  <div class="md:pb-12 pb-5 lg:px-0 px-3 mt-5 hidden">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-12">
+        <div class="col-span-12">
+          <h2 class="text-[24px] font-bold mb-5">Recommended Products</h2>
+        </div>
+        <div class="col-span-12">
+          <div class="overflow-x-auto">
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+            >
+              <div
+                class="flex-shrink-0 cursor-pointer"
+                *ngFor="let item of recommendedProducts"
+                (click)="viewProduct(item.itemgroupId)"
+              >
+                <div
+                  class="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col"
+                >
+                  <div class="relative flex-1">
+                    <img
+                      src="assets/images/buy-cart.png"
+                      class="absolute right-4 bottom-4 max-w-[50px]"
+                      alt="Buy Cart"
+                    />
+                    <img
+                      *ngIf="item.imageUrl"
+                      [src]="item.imageUrl"
+                      alt="Product Image"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div class="p-4 flex flex-col flex-1">
+                    <h5 class="montserrat-500 text-[18px] capitalize truncate">
+                      {{ item.title }}
+                    </h5>
+                    <div class="mt-2 flex justify-between items-center">
+                      <div class="text-[16px] line-through text-[#a0a0a0]">
+                        {{ item.storePrice }}
+                      </div>
+                      <div class="text-[18px] text-[#000] font-bold">
+                        ₦{{
+                          item.internetPrice.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          })
+                        }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

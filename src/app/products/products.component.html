@@ -1,0 +1,298 @@
+<div class="md:pb-8 md:mt-5 pb-5 lg:px-0 px-3">
+  <div class="overflow-x-clip md:py-12 py-5 lg:px-0 px-3">
+    <div class="max-w-6xl mx-auto" data-aos="fade-up">
+      <div class="grid grid-cols-12">
+        <div class="col-span-12 mt-3">
+          <!-- Owl Carousel Section -->
+          <div
+            *ngIf="!isCategoryLoading && crouselData.length > 0"
+            class="col-span-12 mt-0"
+            data-aos="fade-right"
+          >
+            <div class="owl-carousel owl-style">
+              <div
+                class="item"
+                *ngFor="let item of crouselData"
+                (click)="
+                  getClickData(
+                    item.id,
+                    item.title,
+                    item.imageUrl,
+                    item.count,
+                    item.url
+                  )
+                "
+              >
+                <div class="p-2">
+                  <!-- This class used in bottom img to show carousel differently in mob -->
+                  <!-- class="desktop-rectangle image-fit h-full object-cover" -->
+
+                  <img
+                    src="{{ item.imageUrl }}"
+                    [ngClass]="{
+                      'border-[0px] border-[#e2e2e2]':
+                        item.departmentId === selectedCategory,
+                      'border-[0px] border-[#000]':
+                        item.departmentId !== selectedCategory
+                    }"
+                    class="md:max-w-[90%] max-w-full image-fit mx-auto shadow-md object-cover"
+                    alt="Image 1"
+                  />
+                </div>
+
+                <!-- Text positioned outside the image with black color -->
+                <!-- This class used in bottom span to show carousel differently in mob  -->
+                <!-- class="md:text-[12px] text-[18px] block text-black text-center montserrat-600 capitalize mt-0 absolute bottom-12 left-1/2 transform -translate-x-1/2" -->
+                <span
+                  class="capitalize text-[12px] md:text-[16px] mt-2 block text-center"
+                  style="width: 100%"
+                >
+                  {{ item.title }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pb-5 lg:px-0 px-3">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-12 items-center">
+        <div class="col-span-12" data-aos="fade-left">
+          <h5 class="md:text-[34px] text-[28px] montserrat-600 mb-0"></h5>
+        </div>
+        <!-- Loading Indicator -->
+        <div *ngIf="isSizeLoading" class="col-span-12 text-center mt-5">
+          <div class="loader"></div>
+          <p>Loading sizes...</p>
+        </div>
+        <!-- Main Content -->
+        <Span class="font-bold">Sizes: </Span>
+        <div
+          class="col-span-12 md:mt-6 mt-2"
+          *ngIf="!isSizeLoading && sizes.length > 0"
+        >
+          <ul
+            class="max-w-[100%] w-full flex gap-x-3"
+            style="overflow: scroll hidden"
+          >
+            <li
+              class="flex-shrink-0 mb-2"
+              (click)="filterProductsForSizes('All')"
+            >
+              <span
+                class="block md:text-[15px] text-[14px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 cursor-pointer"
+              >
+                All Sizes
+              </span>
+            </li>
+
+            <li
+              class="flex-shrink-0 mb-2"
+              *ngFor="let item of sizes"
+              (click)="filterProductsForSizes(item.sizeCode)"
+            >
+              <span
+                class="block md:text-[15px] text-[14px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 cursor-pointer"
+              >
+                {{ item.sizeDesc?.split(" ")[1] }}
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto mt-[0px]">
+    <div class="grid grid-cols-12 md:gap-x-5 gap-y-2 gap-x-2">
+      <div class="col-span-12">
+        <!-- <h5 class="md:text-[24px] text-[20px] montserrat-600 italic">
+          {{ categoryData.categoryDesc }} ({{ products.length }} PCS)
+        </h5> -->
+      </div>
+      <div class="lg:col-span-3 col-span-6">
+        <div class="custom-select-wrapper">
+          <select
+            [(ngModel)]="selectedColors"
+            (change)="onColorChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
+          >
+            <option value="0">Select Color</option>
+            <option *ngFor="let item of colors" [value]="item.colorId">
+              {{ item.colorDesc }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="lg:col-span-3 col-span-6">
+        <div class="custom-select-wrapper">
+          <select
+            [(ngModel)]="selectedStyles"
+            (change)="onStyleChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
+          >
+            <option value="0">Select Style</option>
+            <option *ngFor="let item of styles" [value]="item.styleId">
+              {{ item.styleDesc }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="lg:col-span-3 col-span-6">
+        <div class="custom-select-wrapper">
+          <select
+            [(ngModel)]="selectedMaterial"
+            (change)="onMaterialChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
+          >
+            <option value="0">Select Material</option>
+            <option *ngFor="let item of materials" [value]="item.materialId">
+              {{ item.materialDesc }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="lg:col-span-3 col-span-6">
+        <div class="custom-select-wrapper">
+          <select
+            [(ngModel)]="selectedSort"
+            (change)="onSortChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
+          >
+            <option value="0">Sort By</option>
+            <option *ngFor="let item of sorts" [value]="item.sortId">
+              {{ item.sortName }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="isProducts" class="md:pb-8 pb-5 lg:px-0 px-3">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-12 md:gap-x-6 gap-x-4 md:gap-y-6">
+      <!-- Products Grid -->
+      <div class="col-span-12 mt-3">
+        <div *ngIf="isProductLoading" class="col-span-12 text-center my-5">
+          <div class="loader"></div>
+          <p>Loading Products...</p>
+        </div>
+        <div
+          class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+          *ngIf="isProducts"
+          id="products"
+          style="overflow-y: auto; max-height: 1200px"
+          (scroll)="onScroll($event)"
+        >
+          <div
+            *ngFor="let item of displayedProducts"
+            class="relative cursor-pointer"
+            (click)="viewProduct(item.itemGroupId)"
+          >
+            <div
+              class="relative overflow-hidden bg-white shadow-lg rounded-lg h-full flex flex-col"
+            >
+              <!-- Responsive Image -->
+              <img
+                *ngIf="item.image1Url"
+                src="{{ item.image1Url }}"
+                alt="Image 1"
+                class="w-full h-full object-contain"
+              />
+
+              <img
+                *ngIf="!item.image1Url"
+                src="assets/images/placeholder.png"
+                alt="Placeholder Image"
+                class="w-full h-auto object-cover"
+              />
+
+              <div class="px-4 pb-3 flex-1 flex flex-col justify-between">
+                <h5 class="montserrat-500 text-[14px] mt-2 capitalize-nowrap">
+                  {{ item.title }}
+                </h5>
+                <div class="mt-2">
+                  <span
+                    class="text-[20px] text-[#000] font-bold md:inline block md:mr-2"
+                    >₦{{
+                      item.internetPrice.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    }}</span
+                  >
+                  <span class="text-[16px] line-through text-[#a0a0a0]"
+                    >₦{{
+                      item.storePrice.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })
+                    }}</span
+                  >
+                </div>
+                <div class="mt-2 flex justify-between items-center">
+                  <ul class="flex flex-row gap-x-2 mt-1">
+                    <li>
+                      <a
+                        href=""
+                        class="block w-[20px] h-[20px] border-[1px] border-[#e2e2e2] rounded-full"
+                        [ngStyle]="{ 'background-color': item.colorDesc }"
+                      ></a>
+                    </li>
+                  </ul>
+                  <span
+                    class="flex justify-between items-center text-[13px] capitalize"
+                  >
+                    <span>
+                      <span></span>
+                      <span [ngStyle]="{ color: item.colorDesc }"></span>
+                    </span>
+                    <span
+                      ><img
+                        src="assets/images/buy-cart.png"
+                        class="max-w-[40px]"
+                        alt="Cart Icon"
+                    /></span>
+                  </span>
+                </div>
+                <ul class="flex flex-wrap gap-x-2 md:mt-0 mt-1">
+                  <ul class="flex flex-wrap gap-x-2 md:mt-0 mt-1">
+                    <li *ngFor="let i of getSizes(item.sizeDesc)">
+                      <span class="text-[14px] cursor-pointer text-black-400">{{
+                        i
+                      }}</span>
+                    </li>
+                  </ul>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load More Loader -->
+      <div *ngIf="isLoadingMore" class="text-center my-5">
+        <div class="loader"></div>
+        <p>Loading More Products...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!isProducts">
+  <div class="md:pb-12 pb-5 lg:px-0 px-3">
+    <div class="max-w-6xl mx-auto">
+      <div class="grid grid-cols-12 gap-x-5 gap-y-5">
+        <div class="lg:col-span-4 md:col-span-3col-span-12">
+          <div class="bg-[#f5f5f5] p-5 text-center">
+            <span class="montserrat-600">NO PRODUCTS FOUND THIS MOMENT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
