@@ -1,11 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { NavigationEnd, RouterOutlet } from "@angular/router";
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from "@angular/forms"; // Import ReactiveFormsModule
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, } from "@angular/forms"; // Import ReactiveFormsModule
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { CommonModule } from "@angular/common";
 import { Router } from "@angular/router";
@@ -14,18 +9,13 @@ import { ScrollService } from "./scroll.service";
 import { RouterModule } from "@angular/router";
 import { CartService } from "./cart.service";
 import { CategoryService } from "./services/category.service";
+import { FooterComponent } from "./components/footer/footer.component";
+import { NavbarComponent } from "./components/navbar/navbar.component";
 
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [
-    RouterOutlet,
-    FormsModule,
-    CommonModule,
-    RouterModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-  ], // Include ReactiveFormsModule
+  imports: [RouterOutlet, FormsModule, CommonModule, RouterModule, HttpClientModule, ReactiveFormsModule, FooterComponent, NavbarComponent], // Include ReactiveFormsModule
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.css"],
 })
@@ -351,7 +341,7 @@ export class AppComponent implements OnInit {
   }
 
   goToHome() {
-    this.isMenuOpen = false; // Close the menu on selection
+    // this.isMenuOpen = false; // Close the menu on selection
     this.router.navigate(["/"]);
   }
 
@@ -499,7 +489,7 @@ export class AppComponent implements OnInit {
   }
 
   navigateToFaqs() {
-    this.isMenuOpen = false; // Close the menu on selection
+    // this.isMenuOpen = false; // Close the menu on selection
     this.navigateTo("/faqs");
   }
 }
