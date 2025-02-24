@@ -14,11 +14,10 @@ import { NavigationEnd, Router } from "@angular/router";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-faqs",
-  standalone: true,
-  imports: [],
-  templateUrl: "./faqs.component.html",
-  styleUrl: "./faqs.component.css",
+    selector: "app-faqs",
+    imports: [],
+    templateUrl: "./faqs.component.html",
+    styleUrl: "./faqs.component.css"
 })
 export class FaqsComponent implements OnInit, AfterViewInit {
   dataLoaded = false;

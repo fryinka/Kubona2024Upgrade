@@ -25,11 +25,10 @@ import { FormsModule } from "@angular/forms";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-contact-us",
-  standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
-  templateUrl: "./contact-us.component.html",
-  styleUrls: ["./contact-us.component.css"],
+    selector: "app-contact-us",
+    imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
+    templateUrl: "./contact-us.component.html",
+    styleUrls: ["./contact-us.component.css"]
 })
 export class ContactUsComponent implements OnInit, AfterViewInit {
   dataLoaded = false;

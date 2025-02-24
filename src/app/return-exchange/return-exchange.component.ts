@@ -7,11 +7,10 @@ import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../flowbite.service';
 
 @Component({
-  selector: 'app-return-exchange',
-  standalone: true,
-  imports: [],
-  templateUrl: './return-exchange.component.html',
-  styleUrl: './return-exchange.component.css'
+    selector: 'app-return-exchange',
+    imports: [],
+    templateUrl: './return-exchange.component.html',
+    styleUrl: './return-exchange.component.css'
 })
 export class ReturnExchangeComponent implements OnInit ,AfterViewInit {
   dataLoaded = false;

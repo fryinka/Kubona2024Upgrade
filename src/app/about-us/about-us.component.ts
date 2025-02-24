@@ -23,11 +23,10 @@ import { platformBrowser } from "@angular/platform-browser";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-about-us",
-  standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
-  templateUrl: "./about-us.component.html",
-  styleUrl: "./about-us.component.css",
+    selector: "app-about-us",
+    imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
+    templateUrl: "./about-us.component.html",
+    styleUrl: "./about-us.component.css"
 })
 export class AboutUsComponent implements OnInit, AfterViewInit {
   dataLoaded = false;

@@ -17,11 +17,10 @@ import { HttpClientModule } from "@angular/common/http";
 import { HttpClient } from "@angular/common/http";
 import { FlowbiteService } from "../flowbite.service";
 @Component({
-  selector: "app-women-shoes",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-  templateUrl: "./women-shoes.component.html",
-  styleUrl: "./women-shoes.component.css",
+    selector: "app-women-shoes",
+    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+    templateUrl: "./women-shoes.component.html",
+    styleUrl: "./women-shoes.component.css"
 })
 export class WomenShoesComponent {
   dataLoaded = false;

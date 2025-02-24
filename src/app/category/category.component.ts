@@ -15,11 +15,10 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-category",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule], // Include ReactiveFormsModule
-  templateUrl: "./category.component.html",
-  styleUrl: "./category.component.css",
+    selector: "app-category",
+    imports: [CommonModule, HttpClientModule], // Include ReactiveFormsModule
+    templateUrl: "./category.component.html",
+    styleUrl: "./category.component.css"
 })
 export class CategoryComponent implements OnInit, AfterViewInit {
   dataLoaded = false;

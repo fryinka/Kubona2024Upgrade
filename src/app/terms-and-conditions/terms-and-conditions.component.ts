@@ -7,11 +7,10 @@ import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../flowbite.service';
 
 @Component({
-  selector: 'app-terms-and-conditions',
-  standalone: true,
-  imports: [],
-  templateUrl: './terms-and-conditions.component.html',
-  styleUrl: './terms-and-conditions.component.css'
+    selector: 'app-terms-and-conditions',
+    imports: [],
+    templateUrl: './terms-and-conditions.component.html',
+    styleUrl: './terms-and-conditions.component.css'
 })
 export class TermsAndConditionsComponent implements OnInit ,AfterViewInit {
   dataLoaded = false;

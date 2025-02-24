@@ -7,11 +7,10 @@ import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../flowbite.service';
 
 @Component({
-  selector: 'app-how-to-place-an-order',
-  standalone: true,
-  imports: [],
-  templateUrl: './how-to-place-an-order.component.html',
-  styleUrl: './how-to-place-an-order.component.css'
+    selector: 'app-how-to-place-an-order',
+    imports: [],
+    templateUrl: './how-to-place-an-order.component.html',
+    styleUrl: './how-to-place-an-order.component.css'
 })
 export class HowToPlaceAnOrderComponent  implements OnInit ,AfterViewInit {
   dataLoaded = false;

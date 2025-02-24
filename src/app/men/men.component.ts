@@ -21,11 +21,10 @@ import { CategoryService } from "../services/category.service";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-category",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-  templateUrl: "./men.component.html",
-  styleUrl: "./men.component.css",
+    selector: "app-category",
+    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+    templateUrl: "./men.component.html",
+    styleUrl: "./men.component.css"
 })
 export class MenComponent implements OnInit, AfterViewInit {
   dataLoaded = false;

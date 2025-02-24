@@ -7,11 +7,10 @@ import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../flowbite.service';
 
 @Component({
-  selector: 'app-vacancies',
-  standalone: true,
-  imports: [],
-  templateUrl: './vacancies.component.html',
-  styleUrl: './vacancies.component.css'
+    selector: 'app-vacancies',
+    imports: [],
+    templateUrl: './vacancies.component.html',
+    styleUrl: './vacancies.component.css'
 })
 export class VacanciesComponent implements OnInit ,AfterViewInit {
   dataLoaded = false;

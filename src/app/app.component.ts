@@ -13,11 +13,10 @@ import { FooterComponent } from "./components/footer/footer.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 
 @Component({
-  selector: "app-root",
-  standalone: true,
-  imports: [RouterOutlet, FormsModule, CommonModule, RouterModule, HttpClientModule, ReactiveFormsModule, FooterComponent, NavbarComponent], // Include ReactiveFormsModule
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css"],
+    selector: "app-root",
+    imports: [RouterOutlet, FormsModule, CommonModule, RouterModule, HttpClientModule, ReactiveFormsModule, FooterComponent, NavbarComponent], // Include ReactiveFormsModule
+    templateUrl: "./app.component.html",
+    styleUrls: ["./app.component.css"]
 })
 export class AppComponent implements OnInit {
   title = "kubona-app";

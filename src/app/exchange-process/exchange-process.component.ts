@@ -14,11 +14,10 @@ import { NavigationEnd, Router } from "@angular/router";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-return-exchange",
-  standalone: true,
-  imports: [],
-  templateUrl: "./exchange-process.component.html",
-  styleUrl: "./exchange-process.component.css",
+    selector: "app-return-exchange",
+    imports: [],
+    templateUrl: "./exchange-process.component.html",
+    styleUrl: "./exchange-process.component.css"
 })
 export class ReturnExchangeProcessComponent implements OnInit, AfterViewInit {
   dataLoaded = false;

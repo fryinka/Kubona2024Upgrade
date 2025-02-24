@@ -11,12 +11,10 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
 
 @Component({
-  selector: "app-checkout",
-  standalone: true,
-  imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
-
-  templateUrl: "./checkout.component.html",
-  styleUrls: ["./checkout.component.css"],
+    selector: "app-checkout",
+    imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
+    templateUrl: "./checkout.component.html",
+    styleUrls: ["./checkout.component.css"]
 })
 export class CheckoutComponent implements OnInit {
   checkoutForm: FormGroup;

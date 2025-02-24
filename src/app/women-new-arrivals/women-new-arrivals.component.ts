@@ -25,11 +25,10 @@ import { CategoryService } from "../services/category.service";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-women-new-arrivals",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-  templateUrl: "./women-new-arrivals.component.html",
-  styleUrl: "./women-new-arrivals.component.css",
+    selector: "app-women-new-arrivals",
+    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+    templateUrl: "./women-new-arrivals.component.html",
+    styleUrl: "./women-new-arrivals.component.css"
 })
 export class WomenNewArrivalsComponent {
   womenRelatedProducts: any = [];

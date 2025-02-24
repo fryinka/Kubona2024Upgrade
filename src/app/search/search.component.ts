@@ -7,11 +7,10 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-search",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-  templateUrl: "./search.component.html",
-  styleUrls: ["./search.component.css"],
+    selector: "app-search",
+    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+    templateUrl: "./search.component.html",
+    styleUrls: ["./search.component.css"]
 })
 export class SearchComponent implements OnInit, AfterViewInit {
   advancedFilters = false;

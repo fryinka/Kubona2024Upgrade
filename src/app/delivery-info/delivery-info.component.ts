@@ -7,11 +7,10 @@ import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../flowbite.service';
 
 @Component({
-  selector: 'app-delivery-info',
-  standalone: true,
-  imports: [],
-  templateUrl: './delivery-info.component.html',
-  styleUrl: './delivery-info.component.css'
+    selector: 'app-delivery-info',
+    imports: [],
+    templateUrl: './delivery-info.component.html',
+    styleUrl: './delivery-info.component.css'
 })
 export class DeliveryInfoComponent implements OnInit ,AfterViewInit {
   dataLoaded = false;

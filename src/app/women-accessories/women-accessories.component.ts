@@ -15,11 +15,10 @@ import { NavigationEnd, Router } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { FlowbiteService } from "../flowbite.service";
 @Component({
-  selector: "app-women-accessories",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-  templateUrl: "./women-accessories.component.html",
-  styleUrl: "./women-accessories.component.css",
+    selector: "app-women-accessories",
+    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+    templateUrl: "./women-accessories.component.html",
+    styleUrl: "./women-accessories.component.css"
 })
 export class WomenAccessoriesComponent {
   dataLoaded = false;

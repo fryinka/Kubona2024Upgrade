@@ -14,11 +14,10 @@ import { NavigationEnd, Router } from "@angular/router";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-how-to-check-your-size",
-  standalone: true,
-  imports: [],
-  templateUrl: "./how-to-check-your-size.component.html",
-  styleUrl: "./how-to-check-your-size.component.css",
+    selector: "app-how-to-check-your-size",
+    imports: [],
+    templateUrl: "./how-to-check-your-size.component.html",
+    styleUrl: "./how-to-check-your-size.component.css"
 })
 export class HowToCheckYourSizeComponent implements OnInit, AfterViewInit {
   dataLoaded = false;

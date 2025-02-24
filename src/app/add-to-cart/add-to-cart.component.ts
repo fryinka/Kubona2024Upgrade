@@ -9,11 +9,10 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { CartService } from "../cart.service";
 
 @Component({
-  selector: "app-category",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-  templateUrl: "./add-to-cart.component.html",
-  styleUrls: ["./add-to-cart.component.css"],
+    selector: "app-category",
+    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+    templateUrl: "./add-to-cart.component.html",
+    styleUrls: ["./add-to-cart.component.css"]
 })
 export class AddToCartComponent implements AfterViewInit, OnInit {
   cartItems: any[] = [];

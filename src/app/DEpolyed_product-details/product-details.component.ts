@@ -10,11 +10,10 @@ import { FlowbiteService } from '../flowbite.service';
 
 
 @Component({
-  selector: 'app-product-details',
-  standalone: true,
-  imports: [CommonModule, HttpClientModule],
-  templateUrl: './product-details.component.html',
-  styleUrls: ['./product-details.component.css']
+    selector: 'app-product-details',
+    imports: [CommonModule, HttpClientModule],
+    templateUrl: './product-details.component.html',
+    styleUrls: ['./product-details.component.css']
 })
 export class ProductDetailsComponent implements OnInit ,AfterViewInit {
   size:any;

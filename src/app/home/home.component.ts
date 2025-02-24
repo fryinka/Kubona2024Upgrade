@@ -19,13 +19,13 @@ import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Meta, Title } from "@angular/platform-browser";
 import { filter } from "rxjs/operators";
+import { NewlyArrivedComponent } from "../components/newly-arrived/newly-arrived.component";
 
 @Component({
-  selector: "app-home",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
-  templateUrl: "./home.component.html",
-  styleUrls: ["./home.component.css"],
+    selector: "app-home",
+    imports: [CommonModule, HttpClientModule, ReactiveFormsModule, NewlyArrivedComponent], // Include ReactiveFormsModule
+    templateUrl: "./home.component.html",
+    styleUrls: ["./home.component.css"]
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   showMen: boolean = true;
@@ -358,21 +358,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       .subscribe({
         next: (res) => {
           console.log(res);
-          this.allSizes = res;
-
-           // Filter the response to include only sizes between 39 and 47
-        // this.allSizes = [
-        //   { sizeCode: 39, sizeDesc: 'Size 39' },
-        //   { sizeCode: 40, sizeDesc: 'Size 40' },
-        //   { sizeCode: 41, sizeDesc: 'Size 41' },
-        //   { sizeCode: 42, sizeDesc: 'Size 42' },
-        //   { sizeCode: 43, sizeDesc: 'Size 43' },
-        //   { sizeCode: 44, sizeDesc: 'Size 44' },
-        //   { sizeCode: 45, sizeDesc: 'Size 45' },
-        //   { sizeCode: 46, sizeDesc: 'Size 46' },
-        //   { sizeCode: 47, sizeDesc: 'Size 47' }
-        // ];
-      
+          this.allSizes = res;      
         },
         error: (err) => {
           console.error("There was an error!", err);
@@ -394,51 +380,43 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   get_categories() {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/Image/ImageRotators?rotatorId=2&pageSize=12"
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.allCategories = res;
-          setTimeout(() => this.initializeCarousel4(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.httpClient.get("https://friday.kubona.ng/api/Image/ImageRotators?rotatorId=2&pageSize=12").subscribe({
+      next: (res) => {
+        console.log(res);
+        this.allCategories = res;
+        setTimeout(() => this.initializeCarousel4(), 0);
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
 
   get_styles() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/StylesGroupBy/70610")
-      .subscribe({
-        next: (res) => {
-          console.log("All styles");
-          console.log(res);
-          this.allStyles = res;
-          setTimeout(() => this.initializeCarousel(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.httpClient.get("https://friday.kubona.ng/api/StylesGroupBy/70610").subscribe({
+      next: (res) => {
+        console.log("All styles");
+        console.log(res);
+        this.allStyles = res;
+        setTimeout(() => this.initializeCarousel(), 0);
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
   get_styles_women() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/StylesGroupBy/70710")
-      .subscribe({
-        next: (res) => {
-          console.log("All styles");
-          console.log(res);
-          this.allStyles = res;
-          // setTimeout(() => this.initializeCarousel(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.httpClient.get("https://friday.kubona.ng/api/StylesGroupBy/70710").subscribe({
+      next: (res) => {
+        console.log("All styles");
+        console.log(res);
+        this.allStyles = res;
+        // setTimeout(() => this.initializeCarousel(), 0);
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
 
   viewShopByStyle(styleDesc: string, caller: string = "style") {
@@ -502,18 +480,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
       const formBody2 = {
         email: email,
       };
-      this.httpClient
-        .post("https://friday.kubona.ng/api/Contact/Subscribe/", formBody2)
-        .subscribe(
-          (response) => {
-            console.log(JSON.stringify(response));
-            this.newsletterSuccess = true;
-          },
-          (error) => {
-            console.error("Error submitting form", error);
-            this.newsletterSuccess = true;
-          }
-        );
+      this.httpClient.post("https://friday.kubona.ng/api/Contact/Subscribe/", formBody2).subscribe(
+        (response) => {
+          console.log(JSON.stringify(response));
+          this.newsletterSuccess = true;
+        },
+        (error) => {
+          console.error("Error submitting form", error);
+          this.newsletterSuccess = true;
+        }
+      );
     } else {
       console.log("Form is not valid");
     }

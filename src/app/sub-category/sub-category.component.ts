@@ -8,11 +8,10 @@ import { HttpClient,HttpClientModule } from '@angular/common/http';
 import { FlowbiteService } from '../flowbite.service';
 
 @Component({
-  selector: 'app-category',
-  standalone: true,
-  imports: [CommonModule, HttpClientModule],
-  templateUrl: './sub-category.component.html',
-  styleUrl: './sub-category.component.css'
+    selector: 'app-category',
+    imports: [CommonModule, HttpClientModule],
+    templateUrl: './sub-category.component.html',
+    styleUrl: './sub-category.component.css'
 })
 export class SubCategoryComponent implements OnInit ,AfterViewInit {
   dataLoaded = false;

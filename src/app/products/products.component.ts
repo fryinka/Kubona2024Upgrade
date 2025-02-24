@@ -17,11 +17,10 @@ import { Util } from "../util/util.component";
 import { FlowbiteService } from "../flowbite.service";
 
 @Component({
-  selector: "app-category",
-  standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-  templateUrl: "./products.component.html",
-  styleUrl: "./products.component.css",
+    selector: "app-category",
+    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+    templateUrl: "./products.component.html",
+    styleUrl: "./products.component.css"
 })
 export class ProductsComponent implements AfterViewInit {
   caller: string | null = null;

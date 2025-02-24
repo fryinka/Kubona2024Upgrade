@@ -7,11 +7,10 @@ import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../flowbite.service';
 
 @Component({
-  selector: 'app-payment-options',
-  standalone: true,
-  imports: [],
-  templateUrl: './payment-options.component.html',
-  styleUrl: './payment-options.component.css'
+    selector: 'app-payment-options',
+    imports: [],
+    templateUrl: './payment-options.component.html',
+    styleUrl: './payment-options.component.css'
 })
 export class PaymentOptionsComponent implements OnInit ,AfterViewInit {
   dataLoaded = false;
