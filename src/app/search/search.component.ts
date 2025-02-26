@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import * as AOS from "aos";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { FlowbiteService } from "../flowbite.service";
+import { FlowbiteService } from "../services/flowbite.service";
 
 @Component({
     selector: "app-search",

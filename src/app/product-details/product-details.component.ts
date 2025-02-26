@@ -5,15 +5,16 @@ import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { CartService } from "../cart.service";
+import { CartService } from "../services/cart.service";
 import { ChangeDetectorRef } from "@angular/core";
-import { FlowbiteService } from "../flowbite.service";
+import { FlowbiteService } from "../services/flowbite.service";
+import { SeoServiceService } from "../services/seo-service.service";
 
 @Component({
-    selector: "app-product-details",
-    imports: [CommonModule, HttpClientModule],
-    templateUrl: "./product-details.component.html",
-    styleUrls: ["./product-details.component.css"]
+  selector: "app-product-details",
+  imports: [CommonModule, HttpClientModule],
+  templateUrl: "./product-details.component.html",
+  styleUrls: ["./product-details.component.css"]
 })
 export class ProductDetailsComponent implements OnInit, AfterViewInit {
   size: any;
@@ -119,6 +120,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     private cartService: CartService,
     private cdr: ChangeDetectorRef,
     private flowbiteService: FlowbiteService,
+    private seoService: SeoServiceService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.randomId = this.generateRandomId();
@@ -145,6 +147,9 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.recentlyViewedPost();
     this.getRecommendedProducts();
     // this.getProduct();
+
+    this.seoService.updateTitle("Shop" + this.productTitle);
+    // this.seoService.updateDescription();
 
     setTimeout(() => {
       this.dataLoaded = true;
@@ -493,7 +498,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.httpClient
       .get(
         "https://friday.kubona.ng/api/DepartmentGroupBy?urlId=" +
-          this.accessoryDepartmentId
+        this.accessoryDepartmentId
       )
       .subscribe({
         next: (res) => {
@@ -522,7 +527,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
   viewProduct(productId: string) {
     this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
-      this.router.navigate(["/product-details", productId]).then(() => {});
+      this.router.navigate(["/product-details", productId]).then(() => { });
     });
   }
 
@@ -625,8 +630,8 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
           console.log(JSON.stringify(res));
 
           if (this.productDetails) {
-            this.productTitle =
-              this.productDetails["title"] || "No Title Available";
+            this.productTitle = this.productDetails.title
+            // this.productDetails["title"] || "No Title Available";
             this.productCategoryTitle =
               this.productDetails["departmentName"] || "No Department Name";
             this.productCategoryName =
@@ -663,19 +668,19 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     const selectedSizePart = this.selectedSize.split(' ')[1];
     const sizeDescPart = sizeDesc.split(' ')[1];
     return selectedSizePart == sizeDescPart;
-  }  
+  }
 
   getProductColors() {
     this.httpClient
       .get(
         "https://friday.kubona.ng/api/OtherColors/ProdColors?similarId=" +
-          this.isSimilarId
+        this.isSimilarId
       )
       .subscribe({
         next: (res) => {
           this.productColors = res;
 
-          if(this.productColors.length === 1) {
+          if (this.productColors.length === 1) {
             this.selectColors(this.productColors[0]?.title, this.productColors[0]?.urlId, this.productColors[0]?.productId)
           }
         },

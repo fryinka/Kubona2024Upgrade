@@ -7,40 +7,27 @@
         <p>Loading Sub categories...</p>
       </div>
       <!-- Main Content -->
-      <div
-        *ngIf="!isCategoryLoading && subCategories.length > 0"
-        class="col-span-12 mt-3"
-        data-aos="fade-right"
-      >
+      <div *ngIf="!isCategoryLoading && subCategories.length > 0" class="col-span-12 mt-3" data-aos="fade-right">
         <div class="owl-carousel owl-style">
-          <div
-            class="item cursor-pointer"
-            *ngFor="let item of subCategories"
-            (click)="navigateToWomen(item.departmentId, item.destinationUrl)"
-          >
+          <div class="item cursor-pointer" *ngFor="let item of subCategories"
+            (click)="navigateToWomen(item.departmentId, item.destinationUrl)">
             <div class="p-2">
               <ng-container *ngIf="item.imageUrl">
-                <img
-                  src="{{ item.imageUrl }}"
-                  [ngClass]="{
+                <img src="{{ item.imageUrl }}" [ngClass]="{
                     'border-[0px] border-[#e2e2e2]':
                       item.departmentId === selectedCategory,
                     'border-[0px] border-[#000]':
                       item.departmentId !== selectedCategory
-                  }"
-                  class="md:max-w-[90%] image-fit max-w-full mx-auto shadow-md object-cover"
-                  alt="{{ item.description }}"
-                />
+                  }" class="md:max-w-[90%] image-fit max-w-full mx-auto shadow-md object-cover"
+                  alt="{{ item.description }}" />
               </ng-container>
             </div>
-            <span
-              class="capitalize text-[12px] md:text-[16px] mt-2 block text-center"
-            >
+            <span class="capitalize text-[12px] md:text-[16px] mt-2 block text-center">
               {{
-                item.description
-                  .replace("Women", "")
-                  .replace("Shoes", "")
-                  .trim()
+              item.description
+              .replace("Women", "")
+              .replace("Shoes", "")
+              .trim()
               }}
             </span>
           </div>
@@ -62,29 +49,17 @@
       </div>
       <!-- Main Content -->
       <Span class="font-bold">Sizes: </Span>
-      <div
-        class="col-span-12 md:mt-6 mt-2"
-        *ngIf="!isSizeLoading && sizes.length > 0"
-      >
-        <ul
-          class="max-w-[100%] w-full flex gap-x-3"
-          style="overflow: scroll hidden"
-        >
+      <div class="col-span-12 md:mt-6 mt-2" *ngIf="!isSizeLoading && sizes.length > 0">
+        <ul class="max-w-[100%] w-full flex gap-x-3" style="overflow: scroll hidden">
           <li class="flex-shrink-0 mb-2" (click)="getproductsBySizes('All')">
             <span
-              class="block md:text-[15px] text-[14px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 cursor-pointer"
-            >
+              class="block md:text-[15px] text-[14px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 cursor-pointer">
               All Sizes
             </span>
           </li>
-          <li
-            class="flex-shrink-0 mb-2"
-            *ngFor="let item of sizes"
-            (click)="filterProductsForSizes(item.sizeCode)"
-          >
+          <li class="flex-shrink-0 mb-2" *ngFor="let item of sizes" (click)="filterProductsForSizes(item.sizeCode)">
             <span
-              class="block md:text-[15px] text-[14px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 cursor-pointer"
-            >
+              class="block md:text-[15px] text-[14px] border-[2px] px-3 py-22 rounded-[5px] bg-[#000] text-[#fff] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 cursor-pointer">
               {{ item.sizeDesc?.split(" ")[1] }}
             </span>
           </li>
@@ -112,11 +87,8 @@
       <!-- Filter 1: Color -->
       <div class="flex items-center">
         <div class="custom-select-wrapper w-full">
-          <select
-            [(ngModel)]="selectedColors"
-            (change)="onColorChange($event)"
-            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
-          >
+          <select [(ngModel)]="selectedColors" (change)="onColorChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select">
             <option value="0">Select Color</option>
             <option *ngFor="let item of colors" [value]="item.colorId">
               {{ item.colorDesc }}
@@ -128,11 +100,8 @@
       <!-- Filter 2: Style -->
       <div class="flex items-center">
         <div class="custom-select-wrapper w-full">
-          <select
-            [(ngModel)]="selectedStyles"
-            (change)="onStyleChange($event)"
-            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
-          >
+          <select [(ngModel)]="selectedStyles" (change)="onStyleChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select">
             <option value="0">Select Style</option>
             <option *ngFor="let item of styles" [value]="item.styleId">
               {{ item.styleDesc }}
@@ -144,11 +113,8 @@
       <!-- Filter 3: Material -->
       <div class="flex items-center">
         <div class="custom-select-wrapper w-full">
-          <select
-            [(ngModel)]="selectedMaterial"
-            (change)="onMaterialChange($event)"
-            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
-          >
+          <select [(ngModel)]="selectedMaterial" (change)="onMaterialChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select">
             <option value="0">Select Material</option>
             <option *ngFor="let item of materials" [value]="item.materialId">
               {{ item.materialDesc }}
@@ -160,11 +126,8 @@
       <!-- Filter 4: Sort By -->
       <div class="flex items-center">
         <div class="custom-select-wrapper w-full">
-          <select
-            [(ngModel)]="selectedSort"
-            (change)="onSortChange($event)"
-            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
-          >
+          <select [(ngModel)]="selectedSort" (change)="onSortChange($event)"
+            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select">
             <option value="0">Sort By</option>
             <option *ngFor="let item of sorts" [value]="item.sortId">
               {{ item.sortName }}
@@ -197,80 +160,49 @@
         </div>
 
         <!-- Product Grid -->
-        <div
-          class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-          id="products"
-          style="overflow-y: auto; max-height: 1200px"
-          (scroll)="onScroll($event)"
-        >
-          <div
-            *ngFor="let item of womenRelatedProducts"
-            class="relative cursor-pointer"
-            (click)="viewProduct(item.itemGroupId)"
-          >
-            <div
-              class="relative overflow-hidden bg-white shadow-lg rounded-lg h-full flex flex-col"
-            >
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="products"
+          style="overflow-y: auto; max-height: 1200px" (scroll)="onScroll($event)">
+          <div *ngFor="let item of womenRelatedProducts" class="relative cursor-pointer"
+            (click)="viewProduct(item.itemGroupId)">
+            <div class="relative overflow-hidden bg-white shadow-lg rounded-lg h-full flex flex-col">
               <!-- Responsive Image -->
-              <img
-                *ngIf="item.image1Url"
-                src="{{ item.image1Url }}"
-                alt="Image 1"
-                class="w-full h-auto object-contain"
-              />
-              <img
-                *ngIf="!item.image1Url"
-                src="assets/images/placeholder.png"
-                alt="Placeholder Image"
-                class="w-full h-auto object-cover"
-              />
+              <img *ngIf="item.image1Url" src="{{ item.image1Url }}" alt="Image 1"
+                class="w-full h-auto object-contain" />
+              <img *ngIf="!item.image1Url" src="assets/images/placeholder.png" alt="Placeholder Image"
+                class="w-full h-auto object-cover" />
 
               <div class="px-4 pb-3 flex-1 flex flex-col justify-between">
                 <h5 class="montserrat-500 text-[14px] mt-2 capitalize-nowrap">
                   {{ item.title }}
                 </h5>
                 <div class="mt-2">
-                  <span
-                    class="text-[20px] text-[#000] font-bold md:inline block md:mr-2"
-                    >₦{{
-                      item.internetPrice.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })
-                    }}</span
-                  >
+                  <span class="text-[20px] text-[#000] font-bold md:inline block md:mr-2">₦{{
+                    item.internetPrice.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                    })
+                    }}</span>
                   <span class="text-[16px] line-through text-[#a0a0a0]">
                     ₦{{
-                      item.storePrice.toLocaleString("en-US", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })
-                    }}</span
-                  >
+                    item.storePrice.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                    })
+                    }}</span>
                 </div>
                 <div class="mt-2 flex justify-between items-center">
                   <ul class="flex flex-row gap-x-2 mt-1">
                     <li>
-                      <a
-                        href=""
-                        class="block w-[20px] h-[20px] border-[1px] border-[#e2e2e2] rounded-full"
-                        [ngStyle]="{ 'background-color': item.colorDesc }"
-                      ></a>
+                      <a href="" class="block w-[20px] h-[20px] border-[1px] border-[#e2e2e2] rounded-full"
+                        [ngStyle]="{ 'background-color': item.colorDesc }"></a>
                     </li>
                   </ul>
-                  <span
-                    class="flex justify-between items-center text-[13px] capitalize"
-                  >
+                  <span class="flex justify-between items-center text-[13px] capitalize">
                     <span>
                       <span></span>
                       <span [ngStyle]="{ color: item.colorDesc }"></span>
                     </span>
-                    <span
-                      ><img
-                        src="assets/images/buy-cart.png"
-                        class="max-w-[40px]"
-                        alt="Cart Icon"
-                    /></span>
+                    <span><img src="assets/images/buy-cart.png" class="max-w-[40px]" alt="Cart Icon" /></span>
                   </span>
                 </div>
                 <ul class="flex flex-wrap gap-x-2 md:mt-0 mt-1">

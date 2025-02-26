@@ -1,36 +1,21 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  OnInit,
-  Inject,
-  PLATFORM_ID,
-  afterNextRender,
-} from "@angular/core";
+import { Component, OnInit, Inject, PLATFORM_ID } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-  FormsModule,
-} from "@angular/forms"; // Import ReactiveFormsModule
+import { ReactiveFormsModule, FormsModule } from "@angular/forms"; // Import ReactiveFormsModule
 import { Router } from "@angular/router";
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { CategoryService } from "../services/category.service";
-import { FlowbiteService } from "../flowbite.service";
+import { FlowbiteService } from "../services/flowbite.service";
 
 @Component({
-    selector: "app-women-new-arrivals",
-    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-    templateUrl: "./women-new-arrivals.component.html",
-    styleUrl: "./women-new-arrivals.component.css"
+  selector: "app-women-new-arrivals",
+  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+  templateUrl: "./women-new-arrivals.component.html",
+  styleUrl: "./women-new-arrivals.component.css"
 })
-export class WomenNewArrivalsComponent {
+export class WomenNewArrivalsComponent implements OnInit {
   womenRelatedProducts: any = [];
   products: any;
   isFilterOpen: boolean = false;
@@ -96,7 +81,7 @@ export class WomenNewArrivalsComponent {
     private categoryService: CategoryService,
     private flowbiteService: FlowbiteService,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  ) { }
   selectedCategoryClick(categoryId: string) {
     console.log(categoryId);
     this.selectedCategory = categoryId;
@@ -252,9 +237,9 @@ export class WomenNewArrivalsComponent {
     this.httpClient
       .get<any[]>(
         "https://friday.kubona.ng/api/Product/Products/" +
-          this.searchQuery +
-          "&sortId=" +
-          this.selectedSort
+        this.searchQuery +
+        "&sortId=" +
+        this.selectedSort
       )
       .subscribe({
         next: (res) => {
@@ -362,25 +347,7 @@ export class WomenNewArrivalsComponent {
     }
   }
 
-  get_sliders() {
-    this.isLoadingSlider = true;
-    this.httpClient
-      .get("https://friday.kubona.ng/api/Image/GetSlideShowImages")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.slideShowImages = res;
-          this.isSlider = this.slideShowImages.length > 0;
-          setTimeout(() => this.initializeCarousel2(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-        complete: () => {
-          this.isLoadingSlider = false;
-        },
-      });
-  }
+
   viewShopByDepartments(routeId: number) {
     console.log(routeId);
     this.router.navigate(["/products", routeId, 0, 0, 0, 0]);
@@ -492,7 +459,6 @@ export class WomenNewArrivalsComponent {
       // Your custom code here
       console.log("Flowbite loaded", flowbite);
     });
-    this.get_sliders();
     this.get_categories();
     this.getSubCategories();
     this.getSizing();

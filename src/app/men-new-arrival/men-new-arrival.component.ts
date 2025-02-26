@@ -22,7 +22,7 @@ import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { CategoryService } from "../services/category.service";
-import { FlowbiteService } from "../flowbite.service";
+import { FlowbiteService } from "../services/flowbite.service";
 
 @Component({
     selector: "app-men-new-arrival",

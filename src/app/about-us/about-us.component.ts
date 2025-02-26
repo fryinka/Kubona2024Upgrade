@@ -20,7 +20,7 @@ import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
 import { platformBrowser } from "@angular/platform-browser";
-import { FlowbiteService } from "../flowbite.service";
+import { FlowbiteService } from "../services/flowbite.service";
 
 @Component({
     selector: "app-about-us",

@@ -29,7 +29,7 @@ export class NewlyArrivedComponent implements OnInit {
   }
 
   viewProduct(productId: number, productTitle: string) {
-    this.router.navigate(["/product-details", productTitle]);
+    this.router.navigate(["/product", productTitle]);
   }
 
   selectedSizeClick(sizeCode: string) {

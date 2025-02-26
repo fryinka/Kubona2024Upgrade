@@ -11,7 +11,8 @@ declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
-import { FlowbiteService } from "../flowbite.service";
+import { FlowbiteService } from "../services/flowbite.service";
+import { SeoServiceService } from "../services/seo-service.service";
 
 @Component({
     selector: "app-faqs",
@@ -24,7 +25,8 @@ export class FaqsComponent implements OnInit, AfterViewInit {
   constructor(
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
-    private flowbiteService: FlowbiteService
+    private flowbiteService: FlowbiteService,
+    private seoService:SeoServiceService
   ) {}
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
@@ -35,6 +37,9 @@ export class FaqsComponent implements OnInit, AfterViewInit {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded
     }, 1000); // Adjust timeout as necessary
+
+    this.seoService.updateTitle("Help - Kubona.ng Premium Italian Leather");
+    this.seoService.updateDescription("Help");
   }
 
   ngAfterViewInit(): void {

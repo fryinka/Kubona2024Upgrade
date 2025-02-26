@@ -34,10 +34,13 @@ import { routing}
     ReactiveFormsModule,
     FormsModule,
     RouterModule.forRoot(routes), // Apply your routes
-    HttpClientModule
+    ServiceWorkerModule.register('ngsw-worker.js',{
+      registrationStrategy:'registrationWhenStable:3000'
+    })
   ],
   providers: [Util],
   exports: [RouterModule],
   bootstrap: [AppComponent]
 })
-export class AppModule { } 
+export class AppModule { }import { ServiceWorkerModule } from '@angular/service-worker';
+ 

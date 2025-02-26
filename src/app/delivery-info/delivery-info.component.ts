@@ -4,7 +4,7 @@ declare var $: any;
 import * as AOS from 'aos';
 import 'aos/dist/aos.css';
 import { NavigationEnd, Router } from '@angular/router';
-import { FlowbiteService } from '../flowbite.service';
+import { FlowbiteService } from '../services/flowbite.service';
 
 @Component({
     selector: 'app-delivery-info',

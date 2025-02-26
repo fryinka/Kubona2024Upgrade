@@ -15,7 +15,7 @@ import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
 import { HttpClient } from "@angular/common/http";
-import { FlowbiteService } from "../flowbite.service";
+import { FlowbiteService } from "../services/flowbite.service";
 @Component({
     selector: "app-women-shoes",
     imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],

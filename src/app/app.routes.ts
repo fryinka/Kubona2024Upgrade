@@ -29,12 +29,9 @@ import { ReturnExchangeProcessComponent } from "./exchange-process/exchange-proc
 
 export const routes: Routes = [
   {
-    path: "",
-    component: HomeComponent,
-    data: {
-      title: "Home",
-      description: "Welcome to our homepage with a wide selection of products.",
-    },
+    path: "", component: HomeComponent, data: {
+      title: "Home", description: "Welcome to our homepage with a wide selection of products.",
+    }, pathMatch: "full"
   },
   {
     path: "search",
@@ -53,7 +50,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "product-details/:id",
+    path: "product/:id",
     component: ProductDetailsComponent,
     data: {
       title: "Product Details",
@@ -173,7 +170,7 @@ export const routes: Routes = [
     },
   },  
   {
-    path: "faqs",
+    path: "faq",
     component: FaqsComponent,
     data: {
       title: "FAQs",
@@ -181,7 +178,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "about-us",
+    path: "about",
     component: AboutUsComponent,
     data: {
       title: "About Us",
@@ -189,7 +186,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "terms-and-conditions",
+    path: "terms",
     component: TermsAndConditionsComponent,
     data: {
       title: "Terms and Conditions",
@@ -197,7 +194,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "privacy-policy",
+    path: "privacy",
     component: PrivacyPolicyComponent,
     data: {
       title: "Privacy Policy",
@@ -205,7 +202,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "contact-us",
+    path: "contact",
     component: ContactUsComponent,
     data: {
       title: "Contact Us",
@@ -221,7 +218,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "delivery-info",
+    path: "delivery",
     component: DeliveryInfoComponent,
     data: {
       title: "Delivery Information",
@@ -229,7 +226,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "payment-options",
+    path: "paymentoptions",
     component: PaymentOptionsComponent,
     data: {
       title: "Payment Options",
@@ -237,7 +234,7 @@ export const routes: Routes = [
     },
   },
   {
-    path: "how-to-check-your-size",
+    path: "sizehowto",
     component: HowToCheckYourSizeComponent,
     data: {
       title: "How to Check Your Size",

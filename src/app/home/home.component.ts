@@ -174,11 +174,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   viewProduct(productId: number, productTitle: string) {
-    this.router.navigate(["/product-details", productTitle]);
+    this.router.navigate(["/product", productTitle]);
   }
 
   viewnewProduct(itemGroupId: number) {
-    this.router.navigate(["/product-details", itemGroupId]);
+    this.router.navigate(["/product", itemGroupId]);
   }
 
   get_men_products() {
@@ -657,7 +657,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   }
   goToProductDetails() {
-    this.router.navigate(["/product-details"]);
+    this.router.navigate(["/product"]);
   }
   goToCategoryMen() {
     this.router.navigate(["/men"]);

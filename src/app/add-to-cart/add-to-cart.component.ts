@@ -6,7 +6,7 @@ import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { CartService } from "../cart.service";
+import { CartService } from "../services/cart.service";
 
 @Component({
     selector: "app-category",
