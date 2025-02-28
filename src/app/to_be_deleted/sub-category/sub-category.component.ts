@@ -5,7 +5,7 @@ import * as AOS from 'aos';
 import 'aos/dist/aos.css';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient,HttpClientModule } from '@angular/common/http';
-import { FlowbiteService } from '../services/flowbite.service';
+import { FlowbiteService } from '../../services/flowbite.service';
 
 @Component({
     selector: 'app-category',

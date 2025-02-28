@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CategoryService } from '../../services/category.service';
 import { CartService } from '../../services/cart.service';
+import { ProductService } from '../../services/product.service';
 
 @Component({
     selector: 'app-navbar',
@@ -10,7 +11,7 @@ import { CartService } from '../../services/cart.service';
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.css'
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
 
   isMenuOpen = false;
   isMobileMenuOpen = false;
@@ -23,10 +24,26 @@ export class NavbarComponent {
     men: {},
     women: {},
   };
+  mnCategories:any[]=[];
+  wnCategories:any[]=[];
+  asCategories:any[]=[];
+  waCategories:any[]=[];
+  bsCategories:any[]=[];
+  haCategories:any[]=[];
 
   cartItemCount: number = 0;
 
-  constructor(private categoryService: CategoryService, private router: Router, private cartService: CartService) { }
+  constructor(private categoryService: CategoryService, private router: Router, private cartService: CartService, private productService:ProductService) { }
+  ngOnInit(): void {
+    this.productService.getDepartmentGroupBy('70610').subscribe(response => {
+      let menShoes=response;
+       this.mnCategories = menShoes.filter(x => x.departmentId > 7000); })
+    this.productService.getDepartmentGroupBy('70710').subscribe(response => { this.wnCategories = response.filter(x => x.departmentId > 7000) })
+    this.productService.getDepartmentGroupBy('70340').subscribe(response => { this.asCategories = response.filter(x => x.departmentId > 7000) })
+    this.productService.getDepartmentGroupBy('70510').subscribe(response => { this.waCategories = response.filter(x => x.departmentId > 7000) })
+    this.productService.getDepartmentGroupBy('70220').subscribe(response => { this.bsCategories = response.filter(x => x.departmentId > 7000) })
+    this.productService.getDepartmentGroupBy('70010').subscribe(response => { this.haCategories = response.filter(x => x.departmentId > 7000) })
+  }
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
@@ -93,7 +110,7 @@ export class NavbarComponent {
       const slug = categoryName
         ? categoryName.toLowerCase().replace(/\s+/g, "-")
         : null;
-      this.router.navigate(["/men/category", destinationUrl]); // Navigate with 'id'
+      this.router.navigate(["category", destinationUrl]); // Navigate with 'id'
     } else {
       this.router.navigate(["/men"]); // Navigate without 'id'
     }
@@ -103,6 +120,7 @@ export class NavbarComponent {
     this.toggleDropdown("menDropdown");
     this.isMenuOpen = false; // Close the menu on selection
     this.navigateTo("/men/new-arrivals");
+    this.router.navigate(['/category','70610','7'])
   }
 
   navigateTo(url: string): void {
@@ -123,14 +141,14 @@ export class NavbarComponent {
       const slug = categoryName
         ? categoryName.toLowerCase().replace(/\s+/g, "-")
         : null;
-      this.router.navigate(["/women/category", destinationUrl]); // Navigate with 'id'
+      this.router.navigate(["/category", destinationUrl]); // Navigate with 'id'
     } else {
-      this.router.navigate(["/women"]); // Navigate without 'id'
+      this.router.navigate(["/category","70710-Women-Shoes"]); // Navigate without 'id'
     }
   }
 
   navigateToAccessories() {
-    this.router.navigate(["/products/70460-women-necklaces/0/0/0/0"]);
+    this.router.navigate(["/category","7340-Accessories"]);
   }
 
   navigateToAcc() {

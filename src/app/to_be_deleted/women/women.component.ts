@@ -17,8 +17,8 @@ import { HttpClientModule } from "@angular/common/http";
 import { HttpClient } from "@angular/common/http";
 import { Meta, Title } from "@angular/platform-browser";
 import { filter } from "rxjs/operators";
-import { CategoryService } from "../services/category.service";
-import { FlowbiteService } from "../services/flowbite.service";
+import { CategoryService } from "../../services/category.service";
+import { FlowbiteService } from "../../services/flowbite.service";
 
 @Component({
     selector: "app-category",

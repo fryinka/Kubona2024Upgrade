@@ -1,29 +1,19 @@
-import {
-  Component,
-  ViewChild,
-  ElementRef,
-  AfterViewInit,
-  OnInit,
-} from "@angular/core";
+import {  Component,ViewChild, ElementRef,AfterViewInit,OnInit,} from "@angular/core";
 import { CommonModule } from "@angular/common";
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from "@angular/forms"; // Import ReactiveFormsModule
+import {FormBuilder,FormGroup,Validators,ReactiveFormsModule,} from "@angular/forms"; // Import ReactiveFormsModule
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
-import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Meta, Title } from "@angular/platform-browser";
 import { filter } from "rxjs/operators";
 import { NewlyArrivedComponent } from "../components/newly-arrived/newly-arrived.component";
+import { SeoServiceService } from "../services/seo-service.service";
 
 @Component({
     selector: "app-home",
-    imports: [CommonModule, HttpClientModule, ReactiveFormsModule, NewlyArrivedComponent], // Include ReactiveFormsModule
+    imports: [CommonModule, HttpClientModule, ReactiveFormsModule, RouterModule, NewlyArrivedComponent], // Include ReactiveFormsModule
     templateUrl: "./home.component.html",
     styleUrls: ["./home.component.css"]
 })
@@ -31,7 +21,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   showMen: boolean = true;
   showWomen: boolean = false;
   loader: boolean = false;
-
   viewMen: boolean = false;
   viewWomen: boolean = false;
   loaders: boolean = false;
@@ -52,14 +41,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   products: any;
   isProducts: boolean = false;
 
-  constructor(
-    private router: Router,
-    private httpClient: HttpClient,
-    private fb: FormBuilder,
-    private titleService: Title,
-    private metaService: Meta,
-    private route: ActivatedRoute
-  ) {
+  constructor(private router: Router, private httpClient: HttpClient, private fb: FormBuilder,
+    private titleService: Title, private metaService: Meta, private route: ActivatedRoute, private seoService:SeoServiceService) {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
     });
@@ -146,7 +129,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.get_reviews();
     this.get_categories();
     this.get_styles();
-    this.get_styles_women();
     this.get_sizes();
     this.get_sizes_women();
   }
@@ -393,7 +375,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   get_styles() {
-    this.httpClient.get("https://friday.kubona.ng/api/StylesGroupBy/70610").subscribe({
+    this.httpClient.get("https://friday.kubona.ng/api/StylesGroupBy/70000").subscribe({
       next: (res) => {
         console.log("All styles");
         console.log(res);
@@ -405,47 +387,25 @@ export class HomeComponent implements OnInit, AfterViewInit {
       },
     });
   }
-  get_styles_women() {
-    this.httpClient.get("https://friday.kubona.ng/api/StylesGroupBy/70710").subscribe({
-      next: (res) => {
-        console.log("All styles");
-        console.log(res);
-        this.allStyles = res;
-        // setTimeout(() => this.initializeCarousel(), 0);
-      },
-      error: (err) => {
-        console.error("There was an error!", err);
-      },
-    });
+
+  viewShopByStyle(destUrl: string, styleId: number) {
+    let deptId = destUrl.split('-')[0];
+    this.router.navigate(["/category", `${deptId}-0-0-${styleId}-0-0`]);
   }
 
-  viewShopByStyle(styleDesc: string, caller: string = "style") {
-    console.log(styleDesc);
-    // const formattedStyleDesc = styleDesc.replace(/\s+/g, '-');
-    // this.router.navigate(["/products", "70610", 0, 0, styleId, 0]);
-    this.router.navigate(["/products", "70610", 0, 0 , styleDesc, 0 ], {
-      queryParams: { caller: caller },
-    });
-
+  viewShopBySizeMen(destUrl: string, sizeCode: number) {
+    let deptId = destUrl.split('-')[0];
+    this.router.navigate(["/category", `${deptId}-${sizeCode}-0-0-0-0`]);
   }
 
-  viewShopBySizeMen(sizeCode: string, caller: string) {
-    console.log(sizeCode);
-    this.router.navigate(["/products", "70610", sizeCode, 0, 0, 0],{
-      queryParams: { caller: caller }
-    });
-  }
-
-  viewShopBySizeWomen(sizeCode: number, caller: string) {
-    console.log(sizeCode);
-    this.router.navigate(["/products", "70710", sizeCode, 0, 0, 0],{
-      queryParams: { caller: caller }
-    });
+  viewShopBySizeWomen(destUrl: string, sizeCode: number) {
+    let deptId = destUrl.split('-')[0];
+    this.router.navigate(["/category", `${deptId}-${sizeCode}-0-0-0-0`]);
   }
 
   viewShopByDepartments(routeId: number) {
     console.log(routeId);
-    this.router.navigate(["/products", routeId, 0, 0, 0, 0]);
+    this.router.navigate(["/category", routeId]);
   }
 
   initializeCarousel() {
@@ -659,12 +619,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
   goToProductDetails() {
     this.router.navigate(["/product"]);
   }
-  goToCategoryMen() {
-    this.router.navigate(["/men"]);
-  }
-  goToCategoryWomen() {
-    this.router.navigate(["/women"]);
-  }
+  // goToCategoryMen() {
+  //   this.router.navigate(["/men"]);
+  // }
+  // goToCategoryWomen() {
+  //   this.router.navigate(["/women"]);
+  // }
 
   ngAfterViewInit(): void {
     AOS.init({

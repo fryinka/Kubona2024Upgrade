@@ -1,9 +1,7 @@
 import { Routes } from "@angular/router";
 import { HomeComponent } from "./home/home.component";
 import { SearchComponent } from "./search/search.component";
-import { ProductsComponent } from "./products/products.component";
 import { ProductDetailsComponent } from "./product-details/product-details.component";
-import { CategoryComponent } from "./category/category.component";
 import { AddToCartComponent } from "./add-to-cart/add-to-cart.component";
 import { CheckoutComponent } from "./checkout/checkout.component";
 import { FaqsComponent } from "./faqs/faqs.component";
@@ -17,15 +15,8 @@ import { HowToCheckYourSizeComponent } from "./how-to-check-your-size/how-to-che
 import { HowToPlaceAnOrderComponent } from "./how-to-place-an-order/how-to-place-an-order.component";
 import { ReturnExchangeComponent } from "./return-exchange/return-exchange.component";
 import { VacanciesComponent } from "./vacancies/vacancies.component";
-import { MenComponent } from "./men/men.component";
-import { WomenComponent } from "./women/women.component";
-import { AccessoriesComponent } from "./accessories/accessories.component";
-import { SubCategoryComponent } from "./sub-category/sub-category.component";
-import { MenNewArrivalComponent } from "./men-new-arrival/men-new-arrival.component";
-import { WomenNewArrivalsComponent } from "./women-new-arrivals/women-new-arrivals.component";
-import { WomenShoesComponent } from "./women-shoes/women-shoes.component";
-import { WomenAccessoriesComponent } from "./women-accessories/women-accessories.component";
 import { ReturnExchangeProcessComponent } from "./exchange-process/exchange-process.component";
+import { ProdListComponent } from "./components/prod-list/prod-list.component";
 
 export const routes: Routes = [
   {
@@ -42,14 +33,6 @@ export const routes: Routes = [
     },
   },
   {
-    path: "products/:departmentId/:sizeId/:colorId/:styleId/:materialId",
-    component: ProductsComponent,
-    data: {
-      title: "Products",
-      description: "Explore our wide range of products tailored to your needs.",
-    },
-  },
-  {
     path: "product/:id",
     component: ProductDetailsComponent,
     data: {
@@ -58,101 +41,21 @@ export const routes: Routes = [
     },
   },
   {
-    path: "category",
-    component: CategoryComponent,
+    path: "category/:categoryId",
+    component: ProdListComponent,
     data: {
       title: "Categories",
       description: "Browse through our categories to find what you need.",
     },
   },
   {
-    path: "sub-category/:categoryIdCategoryName",
-    component: SubCategoryComponent,
+    path: "category/:categoryId/:sortId",
+    component: ProdListComponent,
     data: {
-      title: "Subcategories",
-      description: "Explore products within this subcategory.",
+      title: "Categories",
+      description: "Browse through our categories to find what you need.",
     },
-  },
-  {
-    path: "men/new-arrivals",
-    component: MenNewArrivalComponent,
-    data: {
-      title: "Men's New Arrivals",
-      description: "Discover the latest arrivals for men.",
-    },
-  },
-  {
-    path: "women/new-arrivals",
-    component: WomenNewArrivalsComponent,
-    data: {
-      title: "Women's New Arrivals",
-      description: "Check out the latest trends and new arrivals for women.",
-    },
-  },
-  {
-    path: "men",
-    component: MenComponent,
-    data: {
-      title: "Men's Collection",
-      description: "Shop our exclusive men's collection.",
-    },
-  },
-  {
-    path: "men/category/:slug",
-    component: MenComponent,
-    data: {
-      title: "Men's Collection",
-      description: "Explore men's products based on your selection.",
-    },
-  },
-  {
-    path: "women",
-    component: WomenComponent,
-    data: {
-      title: "Women's Collection",
-      description: "Explore our stylish women's collection.",
-    },
-  },
-  {
-    path: "women/category/:slug",
-    component: WomenComponent,
-    data: {
-      title: "Women's Collection",
-      description: "Find the perfect items for women from our collection.",
-    },
-  },
-  {
-    path: "women/shoes",
-    component: WomenShoesComponent,
-    data: {
-      title: "Women's Shoes",
-      description: "Browse our stylish and comfortable women's shoes.",
-    },
-  },
-  {
-    path: "women/accessories",
-    component: WomenAccessoriesComponent,
-    data: {
-      title: "Women's Accessories",
-      description: "Find trendy accessories for women.",
-    },
-  },
-  {
-    path: "men/accessories",
-    component: AccessoriesComponent,
-    data: {
-      title: "Men's Accessories",
-      description: "Shop men's accessories to complete your look.",
-    },
-  },
-  {
-    path: "men/shoes",
-    component: MenComponent,
-    data: {
-      title: "Men's Shoes",
-      description: "Discover the latest styles in men's shoes.",
-    },
-  },
+  },  
   {
     path: "cart",
     component: AddToCartComponent,

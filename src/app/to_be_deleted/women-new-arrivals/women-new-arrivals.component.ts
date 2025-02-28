@@ -1,44 +1,51 @@
-import {
-  Component,
-  AfterViewInit,
-  OnInit,
-  Inject,
-  PLATFORM_ID,
-  afterNextRender,
-} from "@angular/core";
+import { Component, OnInit, Inject, PLATFORM_ID } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { ReactiveFormsModule, FormsModule } from "@angular/forms"; // Import ReactiveFormsModule
+import { Router } from "@angular/router";
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
-import { NavigationEnd, Router } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { FlowbiteService } from "../services/flowbite.service";
+import { CategoryService } from "../../services/category.service";
+import { FlowbiteService } from "../../services/flowbite.service";
+
 @Component({
-    selector: "app-women-accessories",
-    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-    templateUrl: "./women-accessories.component.html",
-    styleUrl: "./women-accessories.component.css"
+  selector: "app-women-new-arrivals",
+  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+  templateUrl: "./women-new-arrivals.component.html",
+  styleUrl: "./women-new-arrivals.component.css"
 })
-export class WomenAccessoriesComponent {
-  dataLoaded = false;
+export class WomenNewArrivalsComponent implements OnInit {
+  womenRelatedProducts: any = [];
+  products: any;
   isFilterOpen: boolean = false;
+  sizes: any;
   isCategoryLoading: boolean = true;
+  isProductLoading: boolean = true;
+  isLoadingMore: boolean = false;
   isLoading: boolean = false;
   isSizeLoading: boolean = true;
-  isProductLoading: boolean = true;
+  page: number = 1;
   subCategories: any = [];
-  sizes: any = [];
-  isLoadingMore = false;
-  page = 1;
-  selectedSize: string | null = null;
-  selectedCategory: string | null = "70340";
-  colors: any = [];
+  selectedSize: string | null = "All";
   selectedColors: string = "0";
-  styles: any = [];
   selectedStyles: string = "0";
-  materials: any = [];
   selectedMaterial: string = "0";
+  selectedCategory: string | null = "70710";
+  searchQuery: any;
+  selectedSort: string = "0";
+  hasMoreProducts: boolean = true; // Assume more products are available initially
+  displayedProducts: any[] = [];
+  productsPerPage = 12;
+  currentPage = 1;
+  slideShowImages: any = [];
+  isLoadingSlider = false;
+  isSlider = false;
+  allCategories: any = [];
+  materials: any = [];
+  colors: any = [];
+  styles: any = [];
+  isMobileView: boolean = false;
   sorts: any = [
     {
       sortId: "1",
@@ -65,53 +72,31 @@ export class WomenAccessoriesComponent {
       sortName: "RANDOMLY",
     },
   ];
-  selectedSort: string = "0";
 
-  products: any[] = [];
-  displayedProducts: any[] = [];
-  productsPerPage = 12;
-  currentPage = 1;
-  hasMoreProducts = false;
   isProducts = false;
 
-  searchQuery: any;
-  womenRelatedProducts: any;
-
   constructor(
-    private router: Router,
     private httpClient: HttpClient,
+    private router: Router,
+    private categoryService: CategoryService,
     private flowbiteService: FlowbiteService,
     @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
-
-  viewProduct(productId: number) {
-    this.router.navigate(["/product-details", productId], {
-      queryParams: { category: "accessories" },
-    });
-  }
-
-  selectedSizeClick(sizeCode: string) {
-    console.log(sizeCode);
-    this.selectedSize = sizeCode;
-    this.getFilterproducts();
-  }
-
+  ) { }
   selectedCategoryClick(categoryId: string) {
     console.log(categoryId);
     this.selectedCategory = categoryId;
     this.getFilterproducts();
   }
-  get isMobile(): boolean {
-    return window.innerWidth < 768;
-  }
 
   getSubCategories() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/DepartmentGroupBy?urlId=70340")
+      .get("https://friday.kubona.ng/api/DepartmentGroupBy?urlId=70710")
       .subscribe({
         next: (res) => {
           console.log(res);
-          this.subCategories = res;
+          this.subCategories = Array.isArray(res)
+            ? res.filter((v) => v.imageUrl)
+            : [];
           this.isCategoryLoading = false;
           setTimeout(() => this.initializeCarousel(), 0);
         },
@@ -120,9 +105,29 @@ export class WomenAccessoriesComponent {
         },
       });
   }
+
+  extractSizeNumber(sizeDesc: string | null): string[] {
+    if (!sizeDesc) {
+      return [];
+    }
+
+    // Split the sizes by comma and trim whitespace
+    const sizeParts = sizeDesc.split(",");
+
+    // Extract only the numeric parts
+    return sizeParts
+      .map((part) => part.trim().match(/\d+/)) // Match only the numeric values
+      .filter((match) => match) // Remove null matches
+      .map((match: any) => match[0]); // Extract the matched number as a string
+  }
+
+  get isMobile(): boolean {
+    return window.innerWidth < 768;
+  }
+
   getSizing() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/SizingGroupBy/70340")
+      .get("https://friday.kubona.ng/api/SizingGroupBy/70710")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -132,13 +137,12 @@ export class WomenAccessoriesComponent {
         },
         error: (err) => {
           console.error("There was an error!", err);
-          this.isSizeLoading = false;
         },
       });
   }
   getColor() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/ColorsGroupBy/70340")
+      .get("https://friday.kubona.ng/api/ColorsGroupBy/70710")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -157,7 +161,7 @@ export class WomenAccessoriesComponent {
   }
   getStyle() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/StylesGroupBy/70340")
+      .get("https://friday.kubona.ng/api/StylesGroupBy/70710")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -176,7 +180,7 @@ export class WomenAccessoriesComponent {
   }
   getMaterial() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/MaterialGroupBy/70340")
+      .get("https://friday.kubona.ng/api/MaterialGroupBy/70710")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -199,31 +203,6 @@ export class WomenAccessoriesComponent {
     console.log("Selected Sort:", this.selectedSort);
     this.getFilterproducts();
   }
-  getproducts() {
-    const searchQuery = this.constructQuery();
-    const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
-
-    this.httpClient.get<any[]>(API_URL).subscribe({
-      next: (res) => {
-        console.log("Products", res);
-        this.products = res;
-        this.isProductLoading = false;
-        this.displayedProducts = res;
-        if (this.products.length > 0) {
-          this.page++; // Increment the page number
-          this.isProducts = true;
-        }
-      },
-      error: (err) => {
-        console.error("There was an error!", err);
-      },
-    });
-  }
-  extractSizeNumber(sizeDesc: string): string {
-    const match = sizeDesc.match(/\d+/); // Match only the numbers
-    return match ? match[0] : sizeDesc; // Return the matched number or original if none
-  }
-
   getFilterproducts() {
     if (this.selectedSize == null) {
       this.selectedSize = "0";
@@ -258,16 +237,48 @@ export class WomenAccessoriesComponent {
     this.httpClient
       .get<any[]>(
         "https://friday.kubona.ng/api/Product/Products/" +
-          this.searchQuery +
-          "&sortId=" +
-          this.selectedSort
+        this.searchQuery +
+        "&sortId=" +
+        this.selectedSort
       )
       .subscribe({
         next: (res) => {
           console.log("Products", res);
           this.products = res;
-          this.displayedProducts = res;
+          this.womenRelatedProducts = res;
           this.isProducts = this.products.length > 0;
+        },
+        error: (err) => {
+          console.error("There was an error!", err);
+        },
+      });
+  }
+
+  getproductsBySizes(sizeId: any) {
+    this.isProductLoading = true;
+    this.selectedSize = sizeId === "All" ? null : sizeId;
+    this.getFilterproducts();
+  }
+
+  filterProductsForSizes(sizeId: any) {
+    if (sizeId == "All") {
+      this.selectedCategory = sizeId;
+      this.get_women_related_products();
+    } else {
+      this.getproductsBySizes(sizeId);
+    }
+  }
+
+  get_categories() {
+    this.httpClient
+      .get(
+        "https://friday.kubona.ng/api/Image/ImageRotators?rotatorId=2&pageSize=12"
+      )
+      .subscribe({
+        next: (res) => {
+          console.log(res);
+          this.allCategories = res;
+          setTimeout(() => this.initializeCarousel3(), 0);
         },
         error: (err) => {
           console.error("There was an error!", err);
@@ -301,15 +312,15 @@ export class WomenAccessoriesComponent {
       }
     }
   }
-
   loadMore() {
     this.isLoadingMore = true;
-    if (this.displayedProducts && !this.isLoading) {
+    console.log("isLoading", this.isLoading);
+    if (!this.isLoading) {
       this.isLoading = true;
 
-      const searchQuery = this.constructQuery();
+      const searchQuery = this.constructQuery(this.page);
 
-      const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
+      const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}`;
 
       // Make the API request
       this.httpClient.get(API_URL).subscribe(
@@ -317,10 +328,10 @@ export class WomenAccessoriesComponent {
           const newProducts = data; // Adjust based on actual API structure
 
           // If no products are returned, stop loading more
-          if (this.displayedProducts.length === 0) {
+          if (newProducts.length === 0) {
             this.hasMoreProducts = false;
           } else {
-            this.displayedProducts.push(...newProducts); // Append the new products
+            this.womenRelatedProducts.push(...newProducts); // Append the new products
             this.page++; // Increment the page number
             this.hasMoreProducts = true;
           }
@@ -335,44 +346,47 @@ export class WomenAccessoriesComponent {
       );
     }
   }
+
+
+  viewShopByDepartments(routeId: number) {
+    console.log(routeId);
+    this.router.navigate(["/products", routeId, 0, 0, 0, 0]);
+  }
+
+  navigateToWomen(id?: string, destinationUrl?: string) {
+    if (id) {
+      this.categoryService.setCategoryId(id);
+      this.router.navigate(["/category", destinationUrl]); // Navigate with 'id'
+    } else {
+      this.router.navigate(["/women"]); // Navigate without 'id'
+    }
+  }
+
   initializeCarousel() {
     $(".owl-style").owlCarousel({
       loop: true,
-      margin: 10,
-      nav: true,
+      margin: 0,
+      nav: false,
+      autoplay: false,
+      autoplayTimeout: 3000,
+      autoplaySpeed: 300,
       dots: false,
       navText: [
-        '<img src="assets/images/to-left.png" class="max-w-[35px]" alt="Prev">',
-        '<img src="assets/images/to-right.png" class="max-w-[35px]" alt="Next">',
+        // '<img src="assets/images/to-left.png" class="max-w-[35px]" alt="Prev">',
+        // '<img src="assets/images/to-right.png" class="max-w-[35px]" alt="Next">'
       ],
       responsive: {
         0: {
           items: 3.5,
         },
         600: {
-          items: 2,
+          items: 3.5,
         },
         1000: {
-          items: 4,
+          items: 5.5,
         },
       },
     });
-  }
-  constructQuery(): string {
-    const queryParts = [
-      this.selectedCategory,
-      this.selectedSize === "All" ? null : this.selectedSize,
-      this.selectedColors,
-      this.selectedStyles,
-      this.selectedMaterial,
-    ];
-
-    // Filter out null or undefined values and join the remaining parts
-    const query = queryParts
-      .filter((part) => part !== null && part !== undefined)
-      .join("-");
-
-    return `${query}&sortId=${this.selectedSort}`;
   }
   initializeCarousel2() {
     $(".owl-types").owlCarousel({
@@ -399,6 +413,7 @@ export class WomenAccessoriesComponent {
       },
     });
   }
+
   initializeCarousel3() {
     $(".owl-new-arrival-category").owlCarousel("destroy"); // Destroy the previous instance
     $(".owl-new-arrival-category").owlCarousel({
@@ -420,32 +435,97 @@ export class WomenAccessoriesComponent {
       },
     });
   }
+  goToCategoryMen() {
+    this.router.navigate(["/men"]);
+  }
+  goToCategoryWomen() {
+    this.router.navigate(["/women"]);
+  }
+
+  selectedSizeClick(sizeCode: string) {
+    console.log(sizeCode);
+    this.selectedSize = sizeCode;
+    this.getFilterproducts();
+  }
+
+  viewProduct(productId: number) {
+    this.router.navigate(["/product-details", productId], {
+      queryParams: { category: "women" },
+    });
+  }
+
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here
       console.log("Flowbite loaded", flowbite);
     });
+    this.get_categories();
     this.getSubCategories();
     this.getSizing();
     this.getColor();
     this.getStyle();
     this.getMaterial();
-    this.getproducts();
-    setTimeout(() => {
-      this.dataLoaded = true;
-      AOS.refresh(); // Refresh AOS after data is loaded
-    }, 1000); // Adjust timeout as necessary
+    this.get_women_related_products();
+
+    AOS.init({ duration: 1000 });
   }
-  ngAfterViewInit(): void {
-    AOS.init({
-      duration: 1200,
-      once: false,
-      mirror: false,
+
+  get_women_related_products() {
+    const searchQuery = this.constructQuery(this.page);
+
+    const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}`;
+
+    this.httpClient.get(API_URL).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.womenRelatedProducts = res;
+        this.isProductLoading = false;
+        setTimeout(() => this.initializeCarousel6(), 0);
+      },
+      error: (err) => {
+        this.isProductLoading = false;
+        console.error("There was an error!", err);
+      },
     });
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        AOS.refresh();
-      }
+  }
+
+  constructQuery(page: number): string {
+    const queryParts = [
+      this.selectedCategory,
+      this.selectedSize === "All" ? null : this.selectedSize,
+      this.selectedColors,
+      this.selectedStyles,
+      this.selectedMaterial,
+    ];
+
+    // Filter out null or undefined values and join the remaining parts
+    const query = queryParts
+      .filter((part) => part !== null && part !== undefined)
+      .join("-");
+
+    return `${query}&lowerPrice=0&upperPrice=0&sortId=${this.selectedSort}&pageIndex=${page}`;
+  }
+
+  initializeCarousel6() {
+    $(".owl-new-arrival2").owlCarousel({
+      loop: true,
+      margin: 20,
+      nav: true,
+      navText: [
+        '<img src="assets/images/to-left.png" class="max-w-[35px]" alt="Prev">',
+        '<img src="assets/images/to-right.png" class="max-w-[35px]" alt="Next">',
+      ],
+      responsive: {
+        0: {
+          items: 2,
+        },
+        600: {
+          items: 2,
+        },
+        1000: {
+          items: 3,
+        },
+      },
     });
   }
 }

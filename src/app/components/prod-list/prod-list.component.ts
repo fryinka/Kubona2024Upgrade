@@ -1,32 +1,26 @@
-import {
-  Component,
-  AfterViewInit,
-  OnInit,
-  HostListener,
-  Inject,
-  PLATFORM_ID,
-  afterNextRender,
-} from "@angular/core";
+import { Component, AfterViewInit, OnInit, HostListener, Inject, PLATFORM_ID, afterNextRender, } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
-import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, ParamMap, Router } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
 import { HttpClient } from "@angular/common/http";
 import { Meta, Title } from "@angular/platform-browser";
-import { filter } from "rxjs/operators";
-import { CategoryService } from "../services/category.service";
-import { FlowbiteService } from "../services/flowbite.service";
+import { filter, switchMap } from "rxjs/operators";
+import { CategoryService } from "../../services/category.service";
+import { FlowbiteService } from "../../services/flowbite.service";
+import { ProductService } from "../../services/product.service";
+import { url } from "inspector";
 
 @Component({
-    selector: "app-category",
-    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-    templateUrl: "./men.component.html",
-    styleUrl: "./men.component.css"
+  selector: 'app-prod-list',
+  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+  templateUrl: './prod-list.component.html',
+  styleUrl: './prod-list.component.css'
 })
-export class MenComponent implements OnInit, AfterViewInit {
+export class ProdListComponent implements OnInit, AfterViewInit {
   dataLoaded = false;
 
   isCategoryLoading: boolean = true;
@@ -88,7 +82,19 @@ export class MenComponent implements OnInit, AfterViewInit {
   searchQuery: any;
   unavailableSizes: Set<number> = new Set();
 
+  //productList
+  deptId: number = 0;
+  lowerPrice: number = 0;
+  upperPrice: number = 0;
+  sortId: number = 0;
+  pageIndex: number = 1;
+  pageSize: number = 30;
+  urlId: string = '';
+
   sizeApiUrl = "https://friday.kubona.ng/api/SizingGroupBy/70610";
+
+
+
   constructor(
     private router: Router,
     private httpClient: HttpClient,
@@ -98,6 +104,7 @@ export class MenComponent implements OnInit, AfterViewInit {
     private metaService: Meta,
     private categoryService: CategoryService,
     private flowbiteService: FlowbiteService,
+    private productService: ProductService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.titleService.setTitle("Mens Category");
@@ -169,59 +176,21 @@ export class MenComponent implements OnInit, AfterViewInit {
     console.log(categoryId);
     this.selectedCategory = categoryId;
     this.getFilterproducts();
-    // this.router.navigate(['/sub-category', categoryId, categoryName]);
-    // this.router.navigate(['/sub-category', `${categoryId}-${categoryName}`]);
   }
 
-  getSubCategories() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/DepartmentGroupBy?urlId=70610")
-      .subscribe({
-        next: (res) => {
-          //        console.log(res);
-          this.subCategories = res;
-          for (let i = this.subCategories.length - 1; i >= 0; i--) {
-            if (!this.subCategories[i].imageUrl) {
-              this.subCategories.splice(i, 1); // Remove the item if imageUrl is null or undefined
-            }
-          }
-
-          console.log(this.subCategories);
-          this.isCategoryLoading = false;
-          setTimeout(() => this.initializeCarousel(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
   getSizing() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/SizingGroupBy/70610")
-      .subscribe({
-        next: (res) => {
-          //console.log(res);
-          this.sizes = res;
-          // Filter the response to include only sizes between 39 and 47
-          // this.sizes = [
-          //   { sizeCode: 39, sizeDesc: "Size 39" },
-          //   { sizeCode: 40, sizeDesc: "Size 40" },
-          //   { sizeCode: 41, sizeDesc: "Size 41" },
-          //   { sizeCode: 42, sizeDesc: "Size 42" },
-          //   { sizeCode: 43, sizeDesc: "Size 43" },
-          //   { sizeCode: 44, sizeDesc: "Size 44" },
-          //   { sizeCode: 45, sizeDesc: "Size 45" },
-          //   { sizeCode: 46, sizeDesc: "Size 46" },
-          //   { sizeCode: 47, sizeDesc: "Size 47" },
-          // ];
-          this.isSizeLoading = false;
-          setTimeout(() => this.initializeCarousel2(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        const catId = params.get("categoryId") ?? "";
+        return this.productService.getSizingGroupBy(catId);
+      })
+    ).subscribe(response => {
+      this.sizes = response;
+      this.isSizeLoading = false;
+      setTimeout(() => this.initializeCarousel2(), 0);
+    });
   }
+
   getColor() {
     this.httpClient
       .get("https://friday.kubona.ng/api/ColorsGroupBy/70610")
@@ -387,9 +356,9 @@ export class MenComponent implements OnInit, AfterViewInit {
     this.httpClient
       .get<any[]>(
         "https://friday.kubona.ng/api/Product/Products/" +
-          this.searchQuery +
-          "&sortId=" +
-          this.selectedSort
+        this.searchQuery +
+        "&sortId=" +
+        this.selectedSort
       )
       .subscribe({
         next: (res) => {
@@ -490,13 +459,9 @@ export class MenComponent implements OnInit, AfterViewInit {
     });
   }
 
-  navigateToMen(id?: string, destinationUrl?: string) {
-    if (id) {
-      this.categoryService.setCategoryId(id);
-      this.router.navigate(["/men/category", destinationUrl]); // Navigate with 'id'
-    } else {
-      this.router.navigate(["/men"]); // Navigate without 'id'
-    }
+  navigateToMen(destinationUrl?: string) {
+    this.router.navigate(["/category", destinationUrl]);
+    this.getSubCategoryList();
   }
 
   initializeCarousel3() {
@@ -525,8 +490,11 @@ export class MenComponent implements OnInit, AfterViewInit {
       // Your custom code here
       console.log("Flowbite loaded", flowbite);
     });
+
+
     this.checkViewport();
-    this.getSubCategories();
+    this.getSubCategoryList();
+    this.getProductList();
     this.getSizing();
     this.getColor();
     this.getStyle();
@@ -552,7 +520,8 @@ export class MenComponent implements OnInit, AfterViewInit {
         });
       } else {
         this.hasCategoryId = false; // If no 'id' is found, set 'hasId' to false
-        this.getproducts();
+        // this.getproducts();
+        this.getProductList();
         const formattedTitle = `Men's Collection`;
         this.titleService.setTitle(formattedTitle);
         this.metaService.updateTag({
@@ -604,4 +573,32 @@ export class MenComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
+  getSubCategoryList() {
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        const catId = params.get("categoryId") ?? "";
+        return this.productService.getDepartmentGroupBy(catId);
+      })
+    ).subscribe(response => {
+      this.subCategories = response.filter(x => x.imageUrl);
+      console.log("subCategories", this.subCategories);
+      this.isCategoryLoading = false;
+      setTimeout(() => this.initializeCarousel(), 0);
+    });
+  }
+
+
+  getProductList() {
+    this.route.paramMap.pipe(switchMap((params: ParamMap) =>
+      this.productService.getProducts(params.get("categoryId") || "70000", 0, 0, Number(params.get("sortId")), 0, this.pageSize)
+    )).subscribe((response) => {
+      console.log("response", response);
+      this.displayedProducts = response;
+      this.isProducts = this.displayedProducts.length > 0;
+      this.isProductLoading = false;
+    })
+  }
+
 }
+

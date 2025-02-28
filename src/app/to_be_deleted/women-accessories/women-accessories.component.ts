@@ -2,7 +2,6 @@ import {
   Component,
   AfterViewInit,
   OnInit,
-  HostListener,
   Inject,
   PLATFORM_ID,
   afterNextRender,
@@ -13,30 +12,27 @@ declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
-import { HttpClientModule } from "@angular/common/http";
-import { HttpClient } from "@angular/common/http";
-import { FlowbiteService } from "../services/flowbite.service";
+import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { FlowbiteService } from "../../services/flowbite.service";
 @Component({
-    selector: "app-women-shoes",
+    selector: "app-women-accessories",
     imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-    templateUrl: "./women-shoes.component.html",
-    styleUrl: "./women-shoes.component.css"
+    templateUrl: "./women-accessories.component.html",
+    styleUrl: "./women-accessories.component.css"
 })
-export class WomenShoesComponent {
+export class WomenAccessoriesComponent {
   dataLoaded = false;
-
+  isFilterOpen: boolean = false;
   isCategoryLoading: boolean = true;
+  isLoading: boolean = false;
   isSizeLoading: boolean = true;
-
-  products: any[] = []; // Store the products
-  hasMoreProducts: boolean = true; // Assume more products are available initially
-  isLoading: boolean = false; // Prevent multiple API calls at once
-  page: number = 1;
+  isProductLoading: boolean = true;
   subCategories: any = [];
   sizes: any = [];
   isLoadingMore = false;
+  page = 1;
   selectedSize: string | null = null;
-  selectedCategory: string | null = "70710";
+  selectedCategory: string | null = "70340";
   colors: any = [];
   selectedColors: string = "0";
   styles: any = [];
@@ -71,61 +67,26 @@ export class WomenShoesComponent {
   ];
   selectedSort: string = "0";
 
-  isFilterOpen: boolean = false;
+  products: any[] = [];
   displayedProducts: any[] = [];
   productsPerPage = 12;
   currentPage = 1;
-  isMobileView: boolean = false;
-
+  hasMoreProducts = false;
   isProducts = false;
 
   searchQuery: any;
-  unavailableSizes: Set<number> = new Set();
+  womenRelatedProducts: any;
 
-  apiUrl = "https://friday.kubona.ng/api/SizingGroupBy/70710";
   constructor(
     private router: Router,
     private httpClient: HttpClient,
-    private http: HttpClient,
     private flowbiteService: FlowbiteService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  onScroll(event: Event) {
-    console.log("Scroll event triggered");
-    if (isPlatformBrowser(this.platformId)) {
-      const productsElement = document.getElementById("products");
-      if (!productsElement) return;
-
-      const { clientHeight, scrollTop, scrollHeight } = productsElement;
-
-      console.log(
-        "first",
-        clientHeight,
-        scrollTop,
-        scrollHeight,
-        this.hasMoreProducts,
-        clientHeight + scrollTop >= scrollHeight - 100
-      );
-
-      // Adjust condition to include a buffer of 100px
-      if (
-        clientHeight + scrollTop >= scrollHeight - 100 &&
-        this.hasMoreProducts
-      ) {
-        this.loadMore();
-      }
-    }
-  }
-
-  getproductsBySizes(sizeId: any) {
-    this.selectedSize = sizeId === "All" ? null : sizeId;
-    this.getFilterproducts();
-  }
-
   viewProduct(productId: number) {
     this.router.navigate(["/product-details", productId], {
-      queryParams: { category: "women" },
+      queryParams: { category: "accessories" },
     });
   }
 
@@ -140,27 +101,13 @@ export class WomenShoesComponent {
     this.selectedCategory = categoryId;
     this.getFilterproducts();
   }
-  extractSizeNumber(sizeDesc: string | null): string[] {
-    if (!sizeDesc) {
-      return [];
-    }
-
-    // Split the sizes by comma and trim whitespace
-    const sizeParts = sizeDesc.split(",");
-
-    // Extract only the numeric parts
-    return sizeParts
-      .map((part) => part.trim().match(/\d+/)) // Match only the numeric values
-      .filter((match) => match) // Remove null matches
-      .map((match: any) => match[0]); // Extract the matched number as a string
-  }
   get isMobile(): boolean {
     return window.innerWidth < 768;
   }
 
   getSubCategories() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/DepartmentGroupBy?urlId=70710")
+      .get("https://friday.kubona.ng/api/DepartmentGroupBy?urlId=70340")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -175,7 +122,7 @@ export class WomenShoesComponent {
   }
   getSizing() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/SizingGroupBy/70710")
+      .get("https://friday.kubona.ng/api/SizingGroupBy/70340")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -185,12 +132,13 @@ export class WomenShoesComponent {
         },
         error: (err) => {
           console.error("There was an error!", err);
+          this.isSizeLoading = false;
         },
       });
   }
   getColor() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/ColorsGroupBy/70710")
+      .get("https://friday.kubona.ng/api/ColorsGroupBy/70340")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -209,7 +157,7 @@ export class WomenShoesComponent {
   }
   getStyle() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/StylesGroupBy/70710")
+      .get("https://friday.kubona.ng/api/StylesGroupBy/70340")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -228,7 +176,7 @@ export class WomenShoesComponent {
   }
   getMaterial() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/MaterialGroupBy/70710")
+      .get("https://friday.kubona.ng/api/MaterialGroupBy/70340")
       .subscribe({
         next: (res) => {
           console.log(res);
@@ -252,19 +200,28 @@ export class WomenShoesComponent {
     this.getFilterproducts();
   }
   getproducts() {
-    this.httpClient
-      .get<any[]>("https://friday.kubona.ng/api/Product/Products/70710")
-      .subscribe({
-        next: (res) => {
-          console.log("Products", res);
-          this.products = res;
-          this.displayedProducts = res;
-          this.isProducts = this.products.length > 0;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    const searchQuery = this.constructQuery();
+    const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
+
+    this.httpClient.get<any[]>(API_URL).subscribe({
+      next: (res) => {
+        console.log("Products", res);
+        this.products = res;
+        this.isProductLoading = false;
+        this.displayedProducts = res;
+        if (this.products.length > 0) {
+          this.page++; // Increment the page number
+          this.isProducts = true;
+        }
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
+  }
+  extractSizeNumber(sizeDesc: string): string {
+    const match = sizeDesc.match(/\d+/); // Match only the numbers
+    return match ? match[0] : sizeDesc; // Return the matched number or original if none
   }
 
   getFilterproducts() {
@@ -318,6 +275,33 @@ export class WomenShoesComponent {
       });
   }
 
+  onScroll(event: Event) {
+    console.log("Scroll event triggered");
+    if (isPlatformBrowser(this.platformId)) {
+      const productsElement = document.getElementById("products");
+      if (!productsElement) return;
+
+      const { clientHeight, scrollTop, scrollHeight } = productsElement;
+
+      console.log(
+        "first",
+        clientHeight,
+        scrollTop,
+        scrollHeight,
+        this.hasMoreProducts,
+        clientHeight + scrollTop >= scrollHeight - 100
+      );
+
+      // Adjust condition to include a buffer of 100px
+      if (
+        clientHeight + scrollTop >= scrollHeight - 100 &&
+        this.hasMoreProducts
+      ) {
+        this.loadMore();
+      }
+    }
+  }
+
   loadMore() {
     this.isLoadingMore = true;
     if (this.displayedProducts && !this.isLoading) {
@@ -328,12 +312,12 @@ export class WomenShoesComponent {
       const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
 
       // Make the API request
-      this.http.get(API_URL).subscribe(
+      this.httpClient.get(API_URL).subscribe(
         (data: any) => {
           const newProducts = data; // Adjust based on actual API structure
 
           // If no products are returned, stop loading more
-          if (newProducts.length === 0) {
+          if (this.displayedProducts.length === 0) {
             this.hasMoreProducts = false;
           } else {
             this.displayedProducts.push(...newProducts); // Append the new products
@@ -351,7 +335,29 @@ export class WomenShoesComponent {
       );
     }
   }
-
+  initializeCarousel() {
+    $(".owl-style").owlCarousel({
+      loop: true,
+      margin: 10,
+      nav: true,
+      dots: false,
+      navText: [
+        '<img src="assets/images/to-left.png" class="max-w-[35px]" alt="Prev">',
+        '<img src="assets/images/to-right.png" class="max-w-[35px]" alt="Next">',
+      ],
+      responsive: {
+        0: {
+          items: 3.5,
+        },
+        600: {
+          items: 2,
+        },
+        1000: {
+          items: 4,
+        },
+      },
+    });
+  }
   constructQuery(): string {
     const queryParts = [
       this.selectedCategory,
@@ -367,32 +373,6 @@ export class WomenShoesComponent {
       .join("-");
 
     return `${query}&sortId=${this.selectedSort}`;
-  }
-  initializeCarousel() {
-    $(".owl-style").owlCarousel({
-      loop: true,
-      margin: 0,
-      nav: false,
-      autoplay: false,
-      autoplayTimeout: 3000,
-      dots: false,
-      autoplaySpeed: 300,
-      navText: [
-        // '<img src="assets/images/to-left.png" class="max-w-[35px]" alt="Prev">',
-        // '<img src="assets/images/to-right.png" class="max-w-[35px]" alt="Next">'
-      ],
-      responsive: {
-        0: {
-          items: 3.5,
-        },
-        600: {
-          items: 3.5,
-        },
-        1000: {
-          items: 5.5,
-        },
-      },
-    });
   }
   initializeCarousel2() {
     $(".owl-types").owlCarousel({
@@ -419,7 +399,6 @@ export class WomenShoesComponent {
       },
     });
   }
-
   initializeCarousel3() {
     $(".owl-new-arrival-category").owlCarousel("destroy"); // Destroy the previous instance
     $(".owl-new-arrival-category").owlCarousel({
@@ -441,23 +420,17 @@ export class WomenShoesComponent {
       },
     });
   }
-  ngOnInit(): void {
+  ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here
       console.log("Flowbite loaded", flowbite);
     });
-    this.loadMore();
-
     this.getSubCategories();
     this.getSizing();
     this.getColor();
     this.getStyle();
     this.getMaterial();
     this.getproducts();
-    this.isMobileView = window.innerWidth < 768; // Adjust the breakpoint as needed
-    window.addEventListener("resize", () => {
-      this.isMobileView = window.innerWidth < 768;
-    });
     setTimeout(() => {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded

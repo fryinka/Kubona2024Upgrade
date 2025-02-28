@@ -110,8 +110,8 @@
                                         class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2">New
                                         Arrivals</a>
                                 </li>
-                                <li *ngFor="let subCategory of subCategories.men">
-                                    <a class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2"
+                                <li *ngFor="let subCategory of mnCategories; let i=index">
+                                    <a class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2" *ngIf="i>0"
                                         (click)="navigateToMen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
                                         {{ subCategory.description }}
                                     </a>
@@ -133,12 +133,12 @@
                                         class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2">All</a>
                                 </li>
                                 <li>
-                                    <a [routerLink]="['/women','new-arrivals']"
+                                    <a [routerLink]="['/category','70710-Women-Shoes','7']"
                                         class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2">New
                                         Arrivals</a>
                                 </li>
-                                <li *ngFor="let subCategory of subCategories.women">
-                                    <a class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2"
+                                <li *ngFor="let subCategory of wnCategories; let i=index">
+                                    <a class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2" *ngIf="i!=0"
                                         (click)="navigateToWomen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
                                         {{ subCategory.description }}
                                     </a>
@@ -213,7 +213,7 @@
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
                                 New Arrivals
                             </li>
-                            <li *ngFor="let subCategory of subCategories.men"
+                            <li *ngFor="let subCategory of mnCategories; let i=index;"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
                                 (click)="navigateToMen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
                                 {{ subCategory.description }}
@@ -229,11 +229,11 @@
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
                                 All
                             </li>
-                            <li [routerLink]="['/women','new-arrivals']"
+                            <li [routerLink]="['/category','70710-Women-Shoes','7']"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
                                 New Arrivals
                             </li>
-                            <li *ngFor="let subCategory of subCategories.women"
+                            <li *ngFor="let subCategory of wnCategories; let i=index;"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
                                 (click)="navigateToWomen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
                                 {{ subCategory.description }}
@@ -243,18 +243,6 @@
                     <li (click)="navigateToAccessories()"
                         class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px]">
                         Accessories
-                    </li>
-                    <li>
-                        <a [routerLink]="['/about-us']"
-                            class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px]">About</a>
-                    </li>
-                    <li>
-                        <a [routerLink]="['/contact-us']"
-                            class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px]">Contact</a>
-                    </li>
-                    <li>
-                        <a [routerLink]="['/faqs']"
-                            class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px]">FAQs</a>
                     </li>
                 </ul>
             </div>
