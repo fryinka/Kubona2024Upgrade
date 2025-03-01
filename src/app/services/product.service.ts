@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { ColorsGroup, HeelHeightGroup, MaterialGroup, SizeGroup, StylesGroup } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -46,8 +47,28 @@ export class ProductService {
     return this.http.get<any[]>(url,{params});
   }
 
-  getSizingGroupBy(urlId: string): Observable<any[]> {
+  getSizingGroupBy(urlId: string): Observable<SizeGroup[]> {
     var url = this.baseURL + 'api/SizingGroupBy/'+urlId;
-    return this.http.get<any[]>(url);
+    return this.http.get<SizeGroup[]>(url);
   }
+
+  getColorGroupBy(urlId: string): Observable<ColorsGroup[]> {
+    var url = this.baseURL + 'api/ColorsGroupBy/' + urlId;
+    return this.http.get<ColorsGroup[]>(url);
+  }
+
+  getHeelGroupBy(urlId: string): Observable<HeelHeightGroup[]> {
+    var url = this.baseURL + 'api/HeelHeightGroupBy/' + urlId;
+    return this.http.get<HeelHeightGroup[]>(url);
+  }
+  geMaterialGroupBy(urlId: string): Observable<MaterialGroup[]> {
+    var url = this.baseURL + 'api/MaterialGroupBy/' + urlId;
+    return this.http.get<MaterialGroup[]>(url);
+  }
+
+  getStyleGroupBy(urlId: string): Observable<StylesGroup[]> {
+    var url = this.baseURL + 'api/StylesGroupBy/' + urlId;
+    return this.http.get<StylesGroup[]>(url);
+  }
+
 }

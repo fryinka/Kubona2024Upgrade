@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
-import { ActivatedRoute, NavigationEnd, ParamMap, Router } from "@angular/router";
+import { ActivatedRoute, NavigationEnd, ParamMap, Router, RouterModule } from "@angular/router";
 import { HttpClientModule } from "@angular/common/http";
 import { HttpClient } from "@angular/common/http";
 import { Meta, Title } from "@angular/platform-browser";
@@ -13,10 +13,11 @@ import { CategoryService } from "../../services/category.service";
 import { FlowbiteService } from "../../services/flowbite.service";
 import { ProductService } from "../../services/product.service";
 import { url } from "inspector";
+import { ColorsGroup, HeelHeightGroup, MaterialGroup, SizeGroup, StylesGroup } from "../../models/models";
 
 @Component({
   selector: 'app-prod-list',
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule,RouterModule,],
   templateUrl: './prod-list.component.html',
   styleUrl: './prod-list.component.css'
 })
@@ -32,40 +33,41 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   isLoading: boolean = false; // Prevent multiple API calls at once
   page: number = 1;
   isLoadingMore = false;
-  subCategories: any = [];
-  sizes: any = [];
+  subCategories: any[] = [];
+  sizes: SizeGroup[] = [];
   selectedSize: string | null = "All";
   selectedCategory: string | null = "70610";
-  colors: any = [];
+  colors: ColorsGroup[] = [];
   selectedColors: string = "0";
-  styles: any = [];
+  styles: StylesGroup[] = [];
   selectedStyles: string = "0";
-  materials: any = [];
+  materials: MaterialGroup[] = [];
+  heels:HeelHeightGroup[]=[];
   selectedMaterial: string = "0";
   hasCategoryId: boolean = false;
   sorts: any = [
     {
-      sortId: "1",
+      sortId: "2",
       sortName: "HIGH PRICE",
     },
     {
-      sortId: "2",
+      sortId: "3",
       sortName: "LOW PRICE",
     },
     {
-      sortId: "3",
+      sortId: "5",
       sortName: "TITLE",
     },
     {
-      sortId: "4",
+      sortId: "0",
       sortName: "POPULAR",
     },
     {
-      sortId: "5",
+      sortId: "7",
       sortName: "NEWEST",
     },
     {
-      sortId: "6",
+      sortId: "4",
       sortName: "RANDOMLY",
     },
   ];
@@ -90,8 +92,6 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   pageIndex: number = 1;
   pageSize: number = 30;
   urlId: string = '';
-
-  sizeApiUrl = "https://friday.kubona.ng/api/SizingGroupBy/70610";
 
 
 
@@ -136,9 +136,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   }
 
   viewProduct(productId: number) {
-    this.router.navigate(["/product-details", productId], {
-      queryParams: { category: "men" },
-    });
+    this.router.navigate(["/product", productId]);
   }
 
   extractSizeNumber(sizeDesc: string | null): string[] {
@@ -192,68 +190,72 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   }
 
   getColor() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/ColorsGroupBy/70610")
-      .subscribe({
-        next: (res) => {
-          // console.log(res);
-          this.colors = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        const catId = params.get("categoryId") ?? "";
+        return this.productService.getColorGroupBy(catId);
+      })
+    ).subscribe(response => {
+      this.colors = response;;
+    });
   }
-  onColorChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.selectedColors = selectElement.value;
-    console.log("Selected Color:", this.selectedColors);
-    this.getFilterproducts();
+  onChange(event: Event) {
+    let x =event.target as HTMLSelectElement;
+    let destinationUrl = x.value;
+    this.router.navigate(['category', destinationUrl]);
   }
+
   getStyle() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/StylesGroupBy/70610")
-      .subscribe({
-        next: (res) => {
-          //        console.log(res);
-          this.styles = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-  onStyleChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.selectedStyles = selectElement.value;
-    console.log("Selected Style:", this.selectedStyles);
-    this.getFilterproducts();
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        const catId = params.get("categoryId") ?? "";
+        return this.productService.getStyleGroupBy(catId);
+      })
+    ).subscribe(response => {
+      this.styles = response;;
+    });
   }
   getMaterial() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/MaterialGroupBy/70610")
-      .subscribe({
-        next: (res) => {
-          //        console.log(res);
-          this.materials = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        const catId = params.get("categoryId") ?? "";
+        return this.productService.geMaterialGroupBy(catId);
+      })
+    ).subscribe(response => {
+      this.materials = response;;
+    });
   }
-  onMaterialChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.selectedMaterial = selectElement.value;
-    console.log("Selected Material:", this.selectedMaterial);
-    this.getFilterproducts();
+  
+  getHeelHeight(){
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        const catId = params.get("categoryId") ?? "";
+        return this.productService.getHeelGroupBy(catId);
+      })
+    ).subscribe(response => {
+      this.heels = response;
+    });
   }
+
   onSortChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedSort = selectElement.value;
-    console.log("Selected Sort:", this.selectedSort);
-    this.getFilterproducts();
+    this.router.navigate(['/category', this.urlId, this.selectedSort]);
   }
+
+  getProductList() {
+    this.isProductLoading = true;
+    this.isProducts = false;
+    this.route.paramMap.pipe(switchMap((params: ParamMap) =>
+      this.productService.getProducts(params.get("categoryId") || "70000", 0, 0, Number(params.get("sortId")), 0, this.pageSize)
+    )).subscribe((response) => {
+      console.log("response", response);
+      this.displayedProducts = response;
+      this.isProducts = this.displayedProducts.length > 0;
+      this.isProductLoading = false;
+    })
+  }
+
   getproducts() {
     this.isProductLoading = true;
     this.isProducts = false;
@@ -499,10 +501,12 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     this.getColor();
     this.getStyle();
     this.getMaterial();
+    this.getHeelHeight();
     this.isMobileView = window.innerWidth < 768; // Adjust the breakpoint as needed
     window.addEventListener("resize", () => {
       this.isMobileView = window.innerWidth < 768;
     });
+
 
     this.route.paramMap.subscribe((params) => {
       const slug = params.get("slug");
@@ -578,6 +582,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const catId = params.get("categoryId") ?? "";
+        this.urlId = catId;
         return this.productService.getDepartmentGroupBy(catId);
       })
     ).subscribe(response => {
@@ -586,18 +591,6 @@ export class ProdListComponent implements OnInit, AfterViewInit {
       this.isCategoryLoading = false;
       setTimeout(() => this.initializeCarousel(), 0);
     });
-  }
-
-
-  getProductList() {
-    this.route.paramMap.pipe(switchMap((params: ParamMap) =>
-      this.productService.getProducts(params.get("categoryId") || "70000", 0, 0, Number(params.get("sortId")), 0, this.pageSize)
-    )).subscribe((response) => {
-      console.log("response", response);
-      this.displayedProducts = response;
-      this.isProducts = this.displayedProducts.length > 0;
-      this.isProductLoading = false;
-    })
   }
 
 }
