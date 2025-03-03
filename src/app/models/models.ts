@@ -52,4 +52,50 @@ export interface MaterialGroup {
     materialDesc: string;
     totalCount: number;
     destinationUrl: string;
-}  
+}
+export interface Prodlist {
+    itemGroupId: number;
+    departmentId: number;
+    title: string;
+    sizeDesc: string;
+    colorDesc: string;
+    departmentName: string;
+    numAvailable: number;
+    styleDesc: string;
+    colorId: number;
+    trackingId: string;
+    brandId: number;
+    styleId: number;
+    internetPrice: number;
+    storePrice: number;
+    similarId: string;
+    image1Url: string;
+    image2Url: string;
+    numOfViews: number;
+    description: string;
+    youTubeId: string;
+    tfItemsgroupSizes: Sizelist[];
+    destinationUrl: string;
+    positionId: number;
+    materialId: number;
+    heelHeightId: number;
+    heelHeight: string;
+}
+
+export interface SlideShowImages {
+    id: string;
+    imageUrl: string;
+    title: string;
+    category: string;
+    description: string;
+    createdAt: Date;
+}
+
+export interface ImageRotators {
+    imageurl: string;
+    imageTitle: string;
+    summary: string;
+    routeUrl: string;
+    routeId: string;
+}
+

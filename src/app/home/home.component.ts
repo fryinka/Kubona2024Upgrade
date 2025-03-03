@@ -10,7 +10,9 @@ import { Meta, Title } from "@angular/platform-browser";
 import { filter } from "rxjs/operators";
 import { NewlyArrivedComponent } from "../components/newly-arrived/newly-arrived.component";
 import { SeoServiceService } from "../services/seo-service.service";
-
+import { ProductService } from "../services/product.service";
+import { forkJoin } from "rxjs";
+import { ImageRotators, Prodlist, SlideShowImages } from "../models/models";
 @Component({
     selector: "app-home",
     imports: [CommonModule, HttpClientModule, ReactiveFormsModule, RouterModule, NewlyArrivedComponent], // Include ReactiveFormsModule
@@ -42,7 +44,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   isProducts: boolean = false;
 
   constructor(private router: Router, private httpClient: HttpClient, private fb: FormBuilder,
-    private titleService: Title, private metaService: Meta, private route: ActivatedRoute, private seoService:SeoServiceService) {
+    private titleService: Title, private metaService: Meta, private route: ActivatedRoute, private seoService:SeoServiceService, private productService: ProductService) {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
     });
@@ -56,7 +58,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   selectedSizeClick(sizeCode: string) {
     console.log(sizeCode);
     this.selectedSize = sizeCode;
-    this.getFilterproducts();
+    // this.getFilterproducts();
   }
 
   seeShopBySize(sizeCode: number) {
@@ -101,12 +103,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
   isPlaying = false;
   newsletterForm: FormGroup;
   newsletterSuccess: any;
-  menRelatedProducts: any = [];
-  womenRelatedProducts: any = [];
+  menRelatedProducts: Prodlist[] = [];
+  womenRelatedProducts: Prodlist[] = [];
   accRelatedProducts: any = [];
-  slideShowImages: any = [];
+  slideShowImages: SlideShowImages[] = [];
   allReviews: any = [];
-  allCategories: any = [];
+  allCategories: ImageRotators[] = [];
   allStyles: any = [];
   allStylesWomen: any = [];
   allSizes: any = [];
@@ -114,6 +116,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   isLoadingSlider = false;
   isSlider = false;
+  pageSize: number = 15;
+  rotatorId: number = 2;
 
   ngOnInit() {
     // Simulate data fetching
@@ -123,14 +127,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }, 1000); // Adjust timeout as necessary
 
     this.get_men_related_products();
-    this.get_women_related_products();
-    this.get_acc_related_products();
+    // this.get_acc_related_products();
     this.get_sliders();
     this.get_reviews();
     this.get_categories();
     this.get_styles();
     this.get_sizes();
-    this.get_sizes_women();
   }
 
   showMenItems() {
@@ -159,167 +161,41 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.router.navigate(["/product", productTitle]);
   }
 
-  viewnewProduct(itemGroupId: number) {
-    this.router.navigate(["/product", itemGroupId]);
-  }
-
-  get_men_products() {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/Product/Products/70610?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=10"
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.menProducts = res;
-          this.filteredMenProducts = res; // Initialize filteredMenProducts with all men products
-          // setTimeout(() => this.initializeCarousel5(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-
-  get_women_products() {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/Product/Products/70710?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=10"
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.womenProducts = res;
-          this.filteredWomenProducts = res; // Initialize filteredWomenProducts with all women products
-          setTimeout(() => this.initializeCarousel6(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-
   get_men_related_products() {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/Product/Products/70610?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=8"
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.menRelatedProducts = res; //.slice(0, 3);
-          setTimeout(() => this.initializeCarousel5(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    forkJoin({
+      men: this.productService.getProducts("70610",0,0,7,0,8),
+      women: this.productService.getProducts("70710",0,0,7,0,8)
+    }).subscribe({
+      next: ({ men, women }) => {
+        this.menRelatedProducts=men;
+        this.womenRelatedProducts=women;
+        setTimeout(() => this.initializeCarousel5(), 0);
+        setTimeout(() => this.initializeCarousel6(), 0);
+            },
+      error: (err) => console.error("There was an error!", err),
+    });
+
   }
-  get_women_related_products() {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/Product/Products/70710?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=8"
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.womenRelatedProducts = res;
-          setTimeout(() => this.initializeCarousel6(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-  get_acc_related_products() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/Product/Products/70340")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.accRelatedProducts = res;
-          setTimeout(() => this.initializeCarousel7(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
+  
   get_sliders() {
     this.isLoadingSlider = true;
-    this.httpClient
-      .get("https://friday.kubona.ng/api/Image/GetSlideShowImages")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.slideShowImages = res;
-          this.isSlider = this.slideShowImages.length > 0;
-          setTimeout(() => this.initializeCarousel2(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-        complete: () => {
-          this.isLoadingSlider = false;
-        },
-      });
+    this.productService.getSlideShowImages().subscribe({
+      next: (res: SlideShowImages[]) => {
+        console.log(res);
+        this.slideShowImages = res;
+        this.isSlider = this.slideShowImages.length > 0;
+        setTimeout(() => this.initializeCarousel2(), 0);
+      },
+      error: (err: any) => {
+        console.error("There was an error!", err);
+      },
+      complete: () => {
+        this.isLoadingSlider = false;
+      }
+    });
   }
 
-  getFilterproducts() {
-    if (this.selectedSize == null) {
-      this.selectedSize = "0";
-    }
-
-    if (this.selectedColors == null) {
-      this.selectedColors = "0";
-    }
-
-    if (this.selectedStyles == null) {
-      this.selectedStyles = "0";
-    }
-
-    if (this.selectedMaterial == null) {
-      this.selectedMaterial = "0";
-    }
-
-    if (this.selectedCategory == null) {
-      this.selectedCategory = "0";
-    }
-
-    this.searchQuery =
-      this.selectedCategory +
-      "-" +
-      this.selectedSize +
-      "-" +
-      this.selectedColors +
-      "-" +
-      this.selectedStyles +
-      "-" +
-      this.selectedMaterial;
-    this.httpClient
-      .get<any[]>(
-        "https://friday.kubona.ng/api/Product/Products/" +
-          this.searchQuery +
-          "&sortId=" +
-          this.selectedSort
-      )
-      .subscribe({
-        next: (res) => {
-          console.log("Products", res);
-          this.products = res;
-          this.loadProducts();
-          this.isProducts = this.products.length > 0;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-  loadProducts() {
-    throw new Error("Method not implemented.");
-  }
-
-  get_reviews() {
+    get_reviews() {
     this.httpClient
       .get("https://friday.kubona.ng/api/Reviews/GetAll")
       .subscribe({
@@ -335,62 +211,47 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   get_sizes() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/SizingGroupBy/70610")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.allSizes = res;      
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-  get_sizes_women() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/SizingGroupBy/70710")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.allSizesWomen = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    forkJoin({
+      men: this.productService.getSizingGroupBy("70610"),
+      women: this.productService.getSizingGroupBy("70710")
+    }).subscribe({
+      next: ({ men, women }) => {
+        this.allSizes=men;
+        this.allSizesWomen=women;
+      },
+      error: (err) => console.error("There was an error!", err),
+    });
   }
 
   get_categories() {
-    this.httpClient.get("https://friday.kubona.ng/api/Image/ImageRotators?rotatorId=2&pageSize=12").subscribe({
-      next: (res) => {
+    this.productService.getImageRotators(this.rotatorId, this.pageSize).subscribe({
+      next: (res: ImageRotators[]) => {
         console.log(res);
         this.allCategories = res;
         setTimeout(() => this.initializeCarousel4(), 0);
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error("There was an error!", err);
       },
     });
   }
 
   get_styles() {
-    this.httpClient.get("https://friday.kubona.ng/api/StylesGroupBy/70000").subscribe({
-      next: (res) => {
-        console.log("All styles");
-        console.log(res);
-        this.allStyles = res;
+    forkJoin({
+      men: this.productService.getStyleGroupBy("70610"),
+      women: this.productService.getStyleGroupBy("70710")
+    }).subscribe({
+      next: ({ men, women }) => {
+        this.allStyles = men.concat(women);
         setTimeout(() => this.initializeCarousel(), 0);
       },
-      error: (err) => {
-        console.error("There was an error!", err);
-      },
+      error: (err) => console.error("There was an error!", err),
     });
   }
+   
 
-  viewShopByStyle(destUrl: string, styleId: number) {
-    let deptId = destUrl.split('-')[0];
-    this.router.navigate(["/category", `${deptId}-0-0-${styleId}-0-0`]);
+  viewShopByStyle(destUrl: string) {
+    this.router.navigate(["/category", destUrl]);
   }
 
   viewShopBySizeMen(destUrl: string, sizeCode: number) {
@@ -403,8 +264,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.router.navigate(["/category", `${deptId}-${sizeCode}-0-0-0-0`]);
   }
 
-  viewShopByDepartments(routeId: number) {
-    console.log(routeId);
+  viewShopByDepartments(routeId: string) {
     this.router.navigate(["/category", routeId]);
   }
 
@@ -619,12 +479,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   goToProductDetails() {
     this.router.navigate(["/product"]);
   }
-  // goToCategoryMen() {
-  //   this.router.navigate(["/men"]);
-  // }
-  // goToCategoryWomen() {
-  //   this.router.navigate(["/women"]);
-  // }
+
 
   ngAfterViewInit(): void {
     AOS.init({

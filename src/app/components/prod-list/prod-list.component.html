@@ -10,7 +10,7 @@
       <div *ngIf="!isCategoryLoading && subCategories.length > 0" class="col-span-12 mt-0" data-aos="fade-right">
         <div class="owl-carousel owl-style">
           <div class="item cursor-pointer" *ngFor="let item of subCategories" [ngStyle]="{ 'margin-top': '-20px' }"
-            (click)="navigateToMen(item.destinationUrl)">
+            (click)="navigateToCategory(item.destinationUrl)">
             <div class="p-2">
               <ng-container *ngIf="item.imageUrl">
                 <img src="{{ item.imageUrl }}" [ngClass]="{
@@ -33,7 +33,7 @@
     </div>
   </div>
 </div>
-<div class="pb-5 lg:px-0 px-3">
+<div class="pb-5 lg:px-0 px-3" *ngIf="!isSizeLoading && sizes.length > 0">
   <div class="max-w-6xl mx-auto">
     <div class="grid grid-cols-12 items-center">
       <div class="col-span-12" data-aos="fade-left">
@@ -55,7 +55,7 @@
             </span>
           </li>
 
-          <li class="flex-shrink-0 mb-2" *ngFor="let item of sizes" (click)="filterProductsForSizes(item.sizeCode)">
+          <li class="flex-shrink-0 mb-2" *ngFor="let item of sizes" (click)="filterProductsForSizes(item.destinationUrl)">
             <span class="block md:text-[15px] text-[14px] border-2 px-3 py-2 rounded-md bg-black text-white border-black 
                hover:bg-white hover:text-black transition ease-in-out delay-150 cursor-pointer whitespace-nowrap">
               {{ item.sizeDesc.split(" ")[1] }}
@@ -125,8 +125,8 @@
       <!-- Filter 5: Sort By -->
       <div class="flex items-center">
         <div class="custom-select-wrapper w-full">
-          <select [(ngModel)]="selectedSort" (change)="onSortChange($event)"
-            class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select">
+          <select class="w-full py-3 md:text-[20px] text-[15px] border-none focus:outline-none custom-select"
+          (change)="onSortChange($event)">
             <option value="0">Sort By</option>
             <option *ngFor="let item of sorts" [value]="item.sortId">
               {{ item.sortName }}

@@ -148,7 +148,7 @@ export class NavbarComponent implements OnInit {
   }
 
   navigateToAccessories() {
-    this.router.navigate(["/category","7340-Accessories"]);
+    this.router.navigate(["/category","70340-Accessories"]);
   }
 
   navigateToAcc() {

@@ -71,7 +71,7 @@
       </div>
       <div class="col-span-12 mt-3 mb-5" data-aos="fade-left">
         <div class="owl-carousel owl-style">
-          <div class="item" *ngFor="let item of allStyles" (click)="viewShopByStyle(item.destinationUrl,item.styleId)">
+          <div class="item" *ngFor="let item of allStyles" (click)="viewShopByStyle(item.destinationUrl)">
             <img src="{{ item.styleImageUrl }}" class="rounded-full shadow-md object-cover" alt="Image 2" />
             <span class="capitalize md:text-[20px] mt-2 block text-center">{{
               item.styleDesc

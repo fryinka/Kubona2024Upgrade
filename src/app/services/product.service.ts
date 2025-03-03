@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ColorsGroup, HeelHeightGroup, MaterialGroup, SizeGroup, StylesGroup } from '../models/models';
+import { ColorsGroup, HeelHeightGroup, ImageRotators, MaterialGroup, Prodlist, SizeGroup, SlideShowImages, StylesGroup } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
-  getProducts<Prodlist>(urlId: string, lowerPrice: number, upperPrice: number, sortId: number, pageIndex: number, pageSize: number): Observable<Prodlist[]> {
+  getProducts(urlId: string, lowerPrice: number, upperPrice: number, sortId: number, pageIndex: number, pageSize: number): Observable<Prodlist[]> {
     var url = this.baseURL + 'api/Product/Products/' + urlId;
     var params = new HttpParams()
       .set("lowerPrice", lowerPrice.toString())
@@ -71,4 +71,16 @@ export class ProductService {
     return this.http.get<StylesGroup[]>(url);
   }
 
+  getSlideShowImages(): Observable<SlideShowImages[]> {
+    var url = this.baseURL + 'api/Image/GetSlideShowImages';
+    return this.http.get<SlideShowImages[]>(url);
+  }
+  
+  getImageRotators(rotatorId: number, pageSize: number): Observable<ImageRotators[]> {
+    var url = this.baseURL + 'api/Image/ImageRotators';
+    var params = new HttpParams()
+      .set("rotatorId", rotatorId.toString())
+      .set("pageSize", pageSize.toString())
+    return this.http.get<ImageRotators[]>(url, { params });
+  }
 }

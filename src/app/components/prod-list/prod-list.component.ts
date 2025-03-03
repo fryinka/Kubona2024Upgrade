@@ -5,19 +5,17 @@ declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { ActivatedRoute, NavigationEnd, ParamMap, Router, RouterModule } from "@angular/router";
-import { HttpClientModule } from "@angular/common/http";
 import { HttpClient } from "@angular/common/http";
 import { Meta, Title } from "@angular/platform-browser";
 import { filter, switchMap } from "rxjs/operators";
 import { CategoryService } from "../../services/category.service";
 import { FlowbiteService } from "../../services/flowbite.service";
 import { ProductService } from "../../services/product.service";
-import { url } from "inspector";
-import { ColorsGroup, HeelHeightGroup, MaterialGroup, SizeGroup, StylesGroup } from "../../models/models";
+import { ColorsGroup, HeelHeightGroup, MaterialGroup, Prodlist, SizeGroup, StylesGroup } from "../../models/models";
 
 @Component({
   selector: 'app-prod-list',
-  imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule,RouterModule,],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule,RouterModule,],
   templateUrl: './prod-list.component.html',
   styleUrl: './prod-list.component.css'
 })
@@ -36,7 +34,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   subCategories: any[] = [];
   sizes: SizeGroup[] = [];
   selectedSize: string | null = "All";
-  selectedCategory: string | null = "70610";
+  selectedCategory: string | null = "";
   colors: ColorsGroup[] = [];
   selectedColors: string = "0";
   styles: StylesGroup[] = [];
@@ -74,7 +72,8 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   selectedSort: string = "0";
 
   isFilterOpen: boolean = false;
-  displayedProducts: any[] = [];
+  displayedProducts: Prodlist[] = [];
+  prodlistsArr: Prodlist[] = [];
   productsPerPage = 12;
   currentPage = 1;
   isMobileView: boolean = false;
@@ -91,6 +90,8 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   sortId: number = 0;
   pageIndex: number = 1;
   pageSize: number = 30;
+  grandSize: number = 2000;
+  arrayLength: number = 0;
   urlId: string = '';
 
 
@@ -118,7 +119,6 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   }
 
   onScroll(event: Event) {
-    console.log("Scroll event triggered");
     if (isPlatformBrowser(this.platformId)) {
       const productsElement = document.getElementById("products");
       if (!productsElement) return;
@@ -135,7 +135,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     }
   }
 
-  viewProduct(productId: number) {
+  viewProduct(productId: string) {
     this.router.navigate(["/product", productId]);
   }
 
@@ -170,11 +170,6 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     return window.innerWidth < 768;
   }
 
-  selectedCategoryClick(categoryId: string, categoryName: string) {
-    console.log(categoryId);
-    this.selectedCategory = categoryId;
-    this.getFilterproducts();
-  }
 
   getSizing() {
     this.route.paramMap.pipe(
@@ -247,13 +242,18 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     this.isProductLoading = true;
     this.isProducts = false;
     this.route.paramMap.pipe(switchMap((params: ParamMap) =>
-      this.productService.getProducts(params.get("categoryId") || "70000", 0, 0, Number(params.get("sortId")), 0, this.pageSize)
+      this.productService.getProducts(params.get("categoryId") || "70000", 0, 0, Number(params.get("sortId")), 0, this.grandSize)
     )).subscribe((response) => {
-      console.log("response", response);
-      this.displayedProducts = response;
-      this.isProducts = this.displayedProducts.length > 0;
-      this.isProductLoading = false;
-    })
+      if (response.length > 0) {
+        this.prodlistsArr = response;
+            this.arrayLength = this.prodlistsArr.length > this.pageSize ? this.pageSize : this.prodlistsArr.length;
+            this.isLoadingMore = this.prodlistsArr.length > this.pageSize ? true : false;
+            this.pageIndex = 0;
+            this.displayedProducts = this.prodlistsArr.splice(this.pageIndex, this.arrayLength);
+            this.isProductLoading = false;
+            this.isProducts = this.displayedProducts.length > 0;
+      }
+    });
   }
 
   getproducts() {
@@ -290,12 +290,12 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     this.getFilterproducts();
   }
 
-  filterProductsForSizes(sizeId: any) {
-    if (sizeId == "All") {
-      this.selectedSize = sizeId;
+  filterProductsForSizes(destinationUrl: string) {
+    if (destinationUrl == "All") {
+      this.selectedSize = destinationUrl;
       this.getproducts();
     } else {
-      this.getproductsBySizes(sizeId);
+      this.router.navigate(['category', destinationUrl]);
     }
   }
 
@@ -377,37 +377,17 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   }
 
   loadMore() {
-    this.isLoadingMore = true;
-    if (this.displayedProducts && !this.isLoading) {
-      this.isLoading = true;
-
-      const searchQuery = this.constructQuery();
-
-      const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
-
-      // Make the API request
-      this.http.get(API_URL).subscribe(
-        (data: any) => {
-          const newProducts = data; // Adjust based on actual API structure
-
-          // If no products are returned, stop loading more
-          if (newProducts.length === 0) {
-            this.hasMoreProducts = false;
-          } else {
-            this.displayedProducts.push(...newProducts); // Append the new products
-            this.page++; // Increment the page number
-            this.hasMoreProducts = true;
-          }
-          this.isLoading = false; // Allow more API calls after this completes
-          this.isLoadingMore = false; // Allow more API calls after this completes
-        },
-        (error: any) => {
-          console.error("Error loading products", error);
-          this.isLoading = false; // Allow more API calls after this completes
-          this.isLoadingMore = false; // Allow more API calls after this completes
-        }
-      );
+if(this.displayedProducts&&!this.isLoading){
+  this.isLoading = true;
+  let big = this.prodlistsArr.splice(0, this.pageSize);
+    if (big.length > 0) {
+      let Arr = this.displayedProducts.concat(big);
+      this.displayedProducts = Arr;
     }
+    this.isLoading = false;
+    this.isLoadingMore = false;
+}
+
   }
   initializeCarousel() {
     $(".owl-style").owlCarousel({
@@ -461,9 +441,10 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  navigateToMen(destinationUrl?: string) {
+  navigateToCategory(destinationUrl?: string) {
     this.router.navigate(["/category", destinationUrl]);
     this.getSubCategoryList();
+    $('.owl-style').trigger('refresh.owl.carousel');
   }
 
   initializeCarousel3() {
@@ -513,7 +494,6 @@ export class ProdListComponent implements OnInit, AfterViewInit {
       const id = this.categoryService.getCategoryId();
       if (slug && id) {
         this.hasCategoryId = true;
-        this.selectedCategoryClick(id, ""); // Call your filtering function with the 'id'
         const formattedTitle = `Men's Collection - ${this.formatSlug(slug)}`;
         this.titleService.setTitle(formattedTitle);
         this.metaService.updateTag({
