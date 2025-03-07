@@ -9,7 +9,7 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { Meta, Title } from "@angular/platform-browser";
 import { filter } from "rxjs/operators";
 import { NewlyArrivedComponent } from "../components/newly-arrived/newly-arrived.component";
-import { SeoServiceService } from "../services/seo-service.service";
+import { SeoService } from "../services/seo.service";
 import { ProductService } from "../services/product.service";
 import { forkJoin } from "rxjs";
 import { ImageRotators, Prodlist, SlideShowImages } from "../models/models";
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   isProducts: boolean = false;
 
   constructor(private router: Router, private httpClient: HttpClient, private fb: FormBuilder,
-    private titleService: Title, private metaService: Meta, private route: ActivatedRoute, private seoService:SeoServiceService, private productService: ProductService) {
+    private titleService: Title, private metaService: Meta, private route: ActivatedRoute, private seoService:SeoService, private productService: ProductService) {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
     });

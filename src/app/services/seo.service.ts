@@ -4,7 +4,7 @@ import { Meta, Title } from '@angular/platform-browser';
 @Injectable({
   providedIn: 'root'
 })
-export class SeoServiceService {
+export class SeoService {
 
   constructor(private title: Title, private meta: Meta) { }
 

@@ -8,7 +8,9 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { CartService } from "../services/cart.service";
 import { ChangeDetectorRef } from "@angular/core";
 import { FlowbiteService } from "../services/flowbite.service";
-import { SeoServiceService } from "../services/seo-service.service";
+import { SeoService } from "../services/seo.service";
+import { ProductService } from "../services/product.service";
+import { Prodlist } from "../models/models";
 
 @Component({
   selector: "app-product-details",
@@ -23,7 +25,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   isMenuOpen = false;
   dataLoaded = false;
   productImages: any;
-  productDetails: any;
+  productDetails!: Prodlist;
   recentlyViewed: any;
   selectedSizeId: any;
   productColors: any;
@@ -34,6 +36,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   isSizeSelected: boolean = false;
   isColorSelected: boolean = false;
   productId: string | null = null;
+  prodId: number = 0;
   availableSizesTagString: string = "";
   selectedColorId: string | null = null;
   recommendedProducts: any[] = []; // Adjust type as needed
@@ -50,7 +53,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   productCategoryName: string | null = null;
   productColor: string | null = null;
   selectedSizeQty: number | null = null;
-  productPrice: string | null = null;
+  productPrice: number = 0;
   productSize: string | null = null;
   productImage: string | null = null;
   itemGroupId: string | null = null;
@@ -59,30 +62,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   selectedSize: string | null = null;
   itemGroupSizeId: string | null = null;
 
-  SizesMen = [
-    { sizeCode: 39, sizeDesc: "39" },
-    { sizeCode: 40, sizeDesc: "40" },
-    { sizeCode: 41, sizeDesc: "41" },
-    { sizeCode: 42, sizeDesc: "42" },
-    { sizeCode: 43, sizeDesc: "43" },
-    { sizeCode: 44, sizeDesc: "44" },
-    { sizeCode: 45, sizeDesc: "45" },
-    { sizeCode: 46, sizeDesc: "46" },
-    { sizeCode: 47, sizeDesc: "47" },
-  ];
-
-  SizesWomen = [
-    { sizeCode: 36, sizeDesc: "36" },
-    { sizeCode: 37, sizeDesc: "37" },
-    { sizeCode: 38, sizeDesc: "38" },
-    { sizeCode: 39, sizeDesc: "39", boolean: false },
-    { sizeCode: 40, sizeDesc: "40", boolean: true },
-    { sizeCode: 41, sizeDesc: "41" },
-    { sizeCode: 42, sizeDesc: "42" },
-    { sizeCode: 43, sizeDesc: "43", boolean: true },
-  ];
-
-  availableSizes = [36, 38];
 
   showSizeGuideImage: boolean = false;
   gender: "men" | "women" | null = null; // Added gender property
@@ -108,8 +87,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.isSizeSelected = true;
     this.itemGroupSizeId = itemGroupSizeId || null;
     this.selectedSizeQty = quantity;
-    // this.checkinStock();
-    // alert(this.productSize?.split(' ')[1] +' size is selected')
   }
 
   constructor(
@@ -120,7 +97,8 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     private cartService: CartService,
     private cdr: ChangeDetectorRef,
     private flowbiteService: FlowbiteService,
-    private seoService: SeoServiceService,
+    private seoService: SeoService,
+    private productService: ProductService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.randomId = this.generateRandomId();
@@ -146,10 +124,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.getproductSizes();
     this.recentlyViewedPost();
     this.getRecommendedProducts();
-    // this.getProduct();
-
-    this.seoService.updateTitle("Shop" + this.productTitle);
-    // this.seoService.updateDescription();
 
     setTimeout(() => {
       this.dataLoaded = true;
@@ -527,17 +501,10 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
   viewProduct(productId: string) {
     this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
-      this.router.navigate(["/product-details", productId]).then(() => { });
+      this.router.navigate(["/product", productId]).then(() => { });
     });
   }
 
-  // Helper method to format product title for the URL
-  formatProductTitle(title: string): string {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric characters with hyphens
-      .replace(/^-+|-+$/g, ""); // Remove leading and trailing hyphens
-  }
 
   initializeCarousel2() {
     const sync1 = $("#sync1");
@@ -621,44 +588,22 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
   getProductDetails() {
-    this.httpClient
-      .get(`https://friday.kubona.ng/api/Product/${this.productId}`)
-      .subscribe({
-        next: (res: any) => {
-          this.productDetails = res;
-
-          console.log(JSON.stringify(res));
-
-          if (this.productDetails) {
-            this.productTitle = this.productDetails.title
-            // this.productDetails["title"] || "No Title Available";
-            this.productCategoryTitle =
-              this.productDetails["departmentName"] || "No Department Name";
-            this.productCategoryName =
-              this.productDetails["departmentId"] || "No Department ID";
-            this.productPrice = this.productDetails["internetPrice"] || 0;
-
-            this.itemGroupId = this.productDetails["itemGroupId"];
-            this.trackingId = this.productDetails["trackingId"];
-            // this.productSize = this.productDetails['sizeDesc'] || 'Out Of Stock';
-            // this.productColor = this.productDetails['colorDesc'] || 'No Color Available';
-            this.gender = this.productDetails["gender"]; // Set the gender property
-
-            this.getAccessoryByDepartment(this.productDetails["departmentId"]);
-
-            this.isSimilarId = this.productDetails["similarId"];
-            if (this.isSimilarId) {
-              this.getProductColors();
-            }
-          }
-        },
-        error: (err) => {
-          console.error(
-            "There was an error fetching the product details!",
-            err
-          );
-        },
+    if (this.productId) {
+      this.productService.getProduct(this.productId).subscribe((res: any) => {
+        this.productDetails = res;
+        this.prodId = this.productDetails.itemGroupId;
+        this.productCategoryTitle = this.productDetails.departmentName;
+        this.trackingId = this.productDetails.trackingId;
+        this.productTitle = this.productDetails.title;
+        this.isSimilarId = this.productDetails.similarId;
+        if (this.isSimilarId !== null) {
+          this.getProductColors(this.isSimilarId);
+        }
+        this.productPrice = this.productDetails.internetPrice;
+        this.seoService.updateTitle("Shop " + this.productTitle);
+        this.seoService.updateDescription(this.productDetails.title);
       });
+    }
   }
 
   isSelected(sizeDesc: string | undefined): boolean {
@@ -670,7 +615,13 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     return selectedSizePart == sizeDescPart;
   }
 
-  getProductColors() {
+
+  getProductColors(similarId: string) {
+
+    this.productService.getOtherColors(this.isSimilarId, this.prodId).subscribe((res: any) => {
+      this.productColors = res;
+    });
+
     this.httpClient
       .get(
         "https://friday.kubona.ng/api/OtherColors/ProdColors?similarId=" +
@@ -713,7 +664,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
   checkinStock() {
     this.httpClient
-      .get("https://friday.kubona.ng/api/Product/Sizes/" + this.itemGroupId)
+      .get("https://friday.kubona.ng/api/Product/Sizes/" + this.prodId)
       .subscribe({
         next: (res) => {
           this.productSizes = res;

@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit, PLATFORM_ID } from "@angular/core";
 import { NavigationEnd, RouterOutlet } from "@angular/router";
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, } from "@angular/forms"; // Import ReactiveFormsModule
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { CommonModule } from "@angular/common";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { ScrollService } from "./services/scroll.service";
@@ -11,6 +11,8 @@ import { CartService } from "./services/cart.service";
 import { CategoryService } from "./services/category.service";
 import { FooterComponent } from "./components/footer/footer.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
+import { SwUpdate, VersionEvent, VersionReadyEvent } from "@angular/service-worker";
+import { filter } from "rxjs/operators";
 
 @Component({
     selector: "app-root",
@@ -38,6 +40,8 @@ export class AppComponent implements OnInit {
   isWomenDropdownOpen = false;
   isMenDropdownOpenMobile = false;
   isWomenDropdownOpenMobile = false;
+  private platformId = inject(PLATFORM_ID);
+  private updates = inject(SwUpdate);
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
@@ -283,6 +287,9 @@ export class AppComponent implements OnInit {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
     });
+    if (isPlatformBrowser(this.platformId)) {
+      this.checkForUpdates();
+    }
   }
 
   ngOnInit() {
@@ -490,5 +497,15 @@ export class AppComponent implements OnInit {
   navigateToFaqs() {
     // this.isMenuOpen = false; // Close the menu on selection
     this.navigateTo("/faqs");
+  }
+
+  private checkForUpdates() {
+    this.updates.versionUpdates
+      .pipe(filter((event: VersionEvent): event is VersionReadyEvent => event.type === 'VERSION_READY'))
+      .subscribe(() => {
+        if (confirm('New version available. Load new version?')) {
+          window.location.reload();
+        }
+      });
   }
 }

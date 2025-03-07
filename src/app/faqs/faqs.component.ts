@@ -12,7 +12,7 @@ import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
 import { FlowbiteService } from "../services/flowbite.service";
-import { SeoServiceService } from "../services/seo-service.service";
+import { SeoService } from "../services/seo.service";
 
 @Component({
     selector: "app-faqs",
@@ -26,7 +26,7 @@ export class FaqsComponent implements OnInit, AfterViewInit {
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object,
     private flowbiteService: FlowbiteService,
-    private seoService:SeoServiceService
+    private seoService:SeoService
   ) {}
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {

@@ -20,11 +20,7 @@
           <div id="sync1" class="owl-carousel owl-item">
             <div *ngFor="let item of productImages">
               <a href="{{ item.image }}" data-fancybox="gallery">
-                <img
-                  src="{{ item.image }}"
-                  class="!max-w-[450px] mx-auto cursor-pointer"
-                  alt="Image"
-                />
+                <img src="{{ item.image }}" class="!max-w-[450px] mx-auto cursor-pointer" alt="Image" />
               </a>
             </div>
           </div>
@@ -32,11 +28,7 @@
           <!-- Secondary carousel (Thumbnails) -->
           <div id="sync2" class="owl-carousel owl-item">
             <div *ngFor="let item of productImages">
-              <img
-                src="{{ item.image }}"
-                class="!max-w-[80px] cursor-pointer"
-                alt="Thumbnail"
-              />
+              <img src="{{ item.image }}" class="!max-w-[80px] cursor-pointer" alt="Thumbnail" />
             </div>
           </div>
         </div>
@@ -45,79 +37,37 @@
       <div class="lg:col-span-6 col-span-12 md:mt-0 mt-5">
         <div class="grid grid-cols-12 items-center md:gap-y-0">
           <div class="mb-3 col-span-12">
-            <span
-              class="md:text-[24px] text-[18px] capitalize montserrat-600 md:mt-0 mt-5 max-w-[400px] block"
-              >{{ productDetails?.title }}</span
-            >
+            <span class="md:text-[24px] text-[18px] capitalize montserrat-600 md:mt-0 mt-5 max-w-[400px] block">{{
+              productDetails.title }}</span>
           </div>
 
           <!-- Price Section -->
           <div class="mb-3 col-span-12">
             <div class="text-left">
-              <span class="block md:text-[24px] text-[20px] font-bold"
-                >₦{{
-                  productDetails?.internetPrice.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })
-                }}</span
-              >
-              <span
-                class="block md:text-[18px] text-[16px] line-through text-red-500"
-                >₦{{
-                  productDetails?.storePrice.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })
-                }}</span
-              >
+              <span class="block md:text-[24px] text-[20px] font-bold">{{productDetails.internetPrice | currency:'₦'
+                :'symbol':'3.2'}}</span>
+              <span class="block md:text-[18px] text-[16px] line-through text-red-500">{{productDetails.storePrice |
+                currency:'₦' :'symbol':'3.2'}}</span>
             </div>
           </div>
 
-          <!-- 5-Star Rating Section -->
-          <!-- <div class="col-span-12">
-            <div class="flex items-center">
-              <div class="text-yellow-500">
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-                <i class="fas fa-star"></i>
-              </div>
-              <span class="ml-2 text-gray-600">(4.5/5)</span>
-            </div>
-          </div> -->
 
           <!-- Color Section -->
           <div *ngIf="!isColorSelected" class="mb-3 col-span-12 mb-1">
             <span class="md:text-[20px] text-[16px] capitalize">
-              <span [ngStyle]="{ color: productDetails?.colorDesc }"></span>
+              <span [ngStyle]="{ color: productDetails.colorDesc }"></span>
             </span>
           </div>
 
           <div class="mb-3 col-span-12 mb-1">
             <ul class="flex flex-row gap-x-2" *ngIf="isSimilarId">
               <li *ngFor="let item of productColors">
-                <!-- <div
-                  class="w-[30px] h-[30px] border-[2px] p-[4px] rounded-full cursor-pointer"
-                  (click)="
-                    selectColors(item?.title, item?.urlId, item?.productId)
-                  "
-                  [ngClass]="{
-                    'border-[#000000]': selectedColorId === item.title,
-                    'border-[#ffffff]': selectedColorId !== item.title
-                  }"
-                  [ngStyle]="{ 'background-color': item.title }"
-                ></div> -->
+               
                 <div class="flex flex-col items-center">
-                  <img
-                    src="{{ item.mobileImageUrl }}"
-                    alt="Product-types"
-                    class="w-[80px] h-[80px] border-[2px] p-[4px] cursor-pointer"
-                    (click)="
+                  <img src="{{ item.mobileImageUrl }}" alt="Product-types"
+                    class="w-[80px] h-[80px] border-[2px] p-[4px] cursor-pointer" (click)="
                       selectColors(item?.title, item?.urlId, item?.productId)
-                    "
-                  />
+                    " />
                   <span class="text-sm">{{ item.title }}</span>
                 </div>
               </li>
@@ -126,26 +76,16 @@
 
           <!-- Size Section -->
           <div class="mb-3 col-span-12 text-left mt-3">
-            <span
-              *ngIf="
+            <span *ngIf="
                 isAccessory
                   ? productColors.length == 0
                   : (!productColors || productColors?.length == 0) &&
                     productSizes.length == 0
-              "
-              >This Product is out of Stock</span
-            >
+              ">This Product is out of Stock</span>
 
-            <ul
-              *ngIf="productSizes?.length > 0"
-              class="flex flex-wrap gap-x-2 gap-y-3"
-            >
-              <li
-                class="mb-2"
-                *ngFor="let item of productSizes"
-                [class.cursor-not-allowed]="item.quantity == 0"
-                [class.cursor-pointer]="item.quantity > 0"
-                (click)="
+            <ul *ngIf="productSizes?.length > 0" class="flex flex-wrap gap-x-2 gap-y-3">
+              <li class="mb-2" *ngFor="let item of productSizes" [class.cursor-not-allowed]="item.quantity == 0"
+                [class.cursor-pointer]="item.quantity > 0" (click)="
                   item.quantity > 0 &&
                     selectSize(
                       item?.sizeDesc,
@@ -153,15 +93,9 @@
                       item.quantity,
                       item?.itemGroupSizeId
                     )
-                "
-              >
-                <div
-                  *ngIf="item.quantity == 0"
-                  class="out-of-stock-container disabled"
-                >
-                  <span
-                    class="text-[14px] border-[2px] px-3 py-2 rounded-[5px] bg-[#555] text-[#fff] border-[#555]"
-                  >
+                ">
+                <div *ngIf="item.quantity == 0" class="out-of-stock-container disabled">
+                  <span class="text-[14px] border-[2px] px-3 py-2 rounded-[5px] bg-[#555] text-[#fff] border-[#555]">
                     {{ item?.sizeDesc?.split(" ")[1] }}
                   </span>
                 </div>
@@ -171,9 +105,7 @@
                     class="text-[14px] border-[2px] px-3 py-2 rounded-[5px] border-[#000] hover:bg-[#fff] hover:text-[#000] transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 cursor-pointer"
                     [style.backgroundColor]="
                       isSelected(item.sizeDesc) ? '#000' : '#fff'
-                    "
-                    [style.color]="isSelected(item.sizeDesc) ? '#fff' : '#000'"
-                  >
+                    " [style.color]="isSelected(item.sizeDesc) ? '#fff' : '#000'">
                     {{ item?.sizeDesc?.split(" ")[1] }}
                   </span>
                 </div>
@@ -182,14 +114,9 @@
           </div>
 
           <!-- Size Section tags -->
-          <div
-            class="mb-3 col-span-12 text-left mt-3 border border-gray-400"
-            *ngIf="productSizes?.length != 0"
-          >
+          <div class="mb-3 col-span-12 text-left mt-3 border border-gray-400" *ngIf="productSizes?.length != 0">
             <!-- Heading for the container -->
-            <span class="font-bold text-[16px] block mb-2 bg-gray-200 p-3"
-              >AVAILABLE SIZES</span
-            >
+            <span class="font-bold text-[16px] block mb-2 bg-gray-200 p-3">AVAILABLE SIZES</span>
 
             <!-- Display sizes as a comma-separated string -->
             <div *ngIf="productSizes?.length > 0" class="px-3">
@@ -200,67 +127,49 @@
 
             <!-- Link to the Size Guide -->
             <div class="mt-2 px-3 text-end">
-              <a
-                (click)="navigateToCS()"
-                class="text-[12px] underline cursor-pointer"
-              >
+              <a (click)="navigateToCS()" class="text-[12px] underline cursor-pointer">
                 Size Guide
               </a>
             </div>
           </div>
 
           <!-- Selected Color and Size Display -->
-          <div
-            *ngIf="isColorSelected && isSizeSelected"
-            class="flex col-span-12 items-center space-x-4 mt-4"
-          >
+          <div *ngIf="isColorSelected && isSizeSelected" class="flex col-span-12 items-center space-x-4 mt-4">
             <div class="flex items-center">
               <span class="text-[16px] font-semibold">Selected Color:</span>
-              <div
-                class="w-[30px] h-[30px] rounded-full ml-2"
-                [ngStyle]="{ 'background-color': selectedColorId }"
-              ></div>
+              <div class="w-[30px] h-[30px] rounded-full ml-2" [ngStyle]="{ 'background-color': selectedColorId }">
+              </div>
             </div>
             <div class="flex items-center">
               <span class="text-[16px] font-semibold">Selected Size:</span>
               <span class="text-[16px] font-medium ml-2">{{
                 selectedSize
-              }}</span>
+                }}</span>
             </div>
           </div>
           <!-- Selected Color Display if size is not available -->
-          <div
-            *ngIf="isColorSelected && !isSizeSelected"
-            class="flex col-span-12 items-center space-x-4 mt-0"
-          >
+          <div *ngIf="isColorSelected && !isSizeSelected" class="flex col-span-12 items-center space-x-4 mt-0">
             <div class="flex items-center">
               <span class="text-[16px] font-semibold">Selected Color:</span>
-              <div
-                class="w-[30px] h-[30px] rounded-full ml-2"
-                [ngStyle]="{ 'background-color': selectedColorId }"
-              ></div>
+              <div class="w-[30px] h-[30px] rounded-full ml-2" [ngStyle]="{ 'background-color': selectedColorId }">
+              </div>
             </div>
           </div>
 
-          <div
-            *ngIf="!isColorSelected && isSizeSelected"
-            class="flex col-span-12 items-center space-x-4 mt-0"
-          >
+          <div *ngIf="!isColorSelected && isSizeSelected" class="flex col-span-12 items-center space-x-4 mt-0">
             <div class="flex items-center">
               <span class="text-[16px] font-semibold">Selected Size:</span>
               <span class="text-[16px] font-medium ml-2">{{
                 selectedSize
-              }}</span>
+                }}</span>
             </div>
           </div>
 
           <!-- This button show when Color or size is available -->
           <div class="col-span-12">
-            <button
-              *ngIf="productSizes.length > 0 || productSizes.length == 0"
+            <button *ngIf="productSizes.length > 0 || productSizes.length == 0"
               (click)="addToCartOld(productSizes.length > 0 ? true : false)"
-              class="bg-[#000] rounded-[5px] text-[#fff] py-4 md:py-4 md:text-[16px] montserrat-700 mt-5 w-full"
-            >
+              class="bg-[#000] rounded-[5px] text-[#fff] py-4 md:py-4 md:text-[16px] montserrat-700 mt-5 w-full">
               Add To Bag
             </button>
           </div>
@@ -273,53 +182,29 @@
         <!-- Accordion for Product Details -->
         <div class="grid grid-cols-12">
           <div class="col-span-12 mt-0">
-            <div
-              id="accordion-collapse5"
-              data-accordion="collapse"
-              class="pt-0"
-            >
+            <div id="accordion-collapse5" data-accordion="collapse" class="pt-0">
               <!-- Details Section -->
               <div class="mb-5">
                 <h2 id="accordion-collapse5-heading-1">
-                  <button
-                    type="button"
+                  <button type="button"
                     class="aria-expanded:bg-transparent bg-[#FFFFFF] shadow-md aria-expanded:shadow-none flex flex-col justify-start w-full md:items-center overflow-hidden group relative z-[0] aria-expanded:border-none"
-                    data-accordion-target="#accordion-collapse5-body-1"
-                    aria-expanded="true"
-                    aria-controls="accordion-collapse5-body-1"
-                  >
+                    data-accordion-target="#accordion-collapse5-body-1" aria-expanded="true"
+                    aria-controls="accordion-collapse5-body-1">
                     <div
-                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5"
-                    >
+                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5">
                       <span
-                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0"
-                      >
+                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0">
                         Details Section
                       </span>
-                      <img
-                        width=""
-                        height=""
-                        src="assets/images/plus.png"
-                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden"
-                        alt="arrow"
-                      />
-                      <img
-                        width=""
-                        height=""
-                        src="assets/images/minus.png"
-                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block"
-                        alt="arrow"
-                      />
+                      <img width="" height="" src="assets/images/plus.png"
+                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden" alt="arrow" />
+                      <img width="" height="" src="assets/images/minus.png"
+                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block" alt="arrow" />
                     </div>
-                    <div
-                      id="accordion-collapse5-body-1"
-                      class="hidden w-full"
-                      aria-labelledby="accordion-collapse5-heading-1"
-                    >
+                    <div id="accordion-collapse5-body-1" class="hidden w-full"
+                      aria-labelledby="accordion-collapse5-heading-1">
                       <div class="">
-                        <p
-                          class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4"
-                        >
+                        <p class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4">
                           Kubona is a Premium fashion retail brand that serves
                           as the recommended source of Premium items that
                           empower our customers to express their life
@@ -333,45 +218,25 @@
               <!-- Shipping Section -->
               <div class="mb-5">
                 <h2 id="accordion-collapse5-heading-2">
-                  <button
-                    type="button"
+                  <button type="button"
                     class="aria-expanded:bg-transparent bg-[#FFFFFF] shadow-md aria-expanded:shadow-none flex flex-col justify-start w-full md:items-center overflow-hidden group relative z-[0] aria-expanded:border-none"
-                    data-accordion-target="#accordion-collapse5-body-2"
-                    aria-expanded="true"
-                    aria-controls="accordion-collapse5-body-2"
-                  >
+                    data-accordion-target="#accordion-collapse5-body-2" aria-expanded="true"
+                    aria-controls="accordion-collapse5-body-2">
                     <div
-                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5"
-                    >
+                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5">
                       <span
-                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0"
-                      >
+                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0">
                         Shippings
                       </span>
-                      <img
-                        width=""
-                        height=""
-                        src="assets/images/plus.png"
-                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden"
-                        alt="arrow"
-                      />
-                      <img
-                        width=""
-                        height=""
-                        src="assets/images/minus.png"
-                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block"
-                        alt="arrow"
-                      />
+                      <img width="" height="" src="assets/images/plus.png"
+                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden" alt="arrow" />
+                      <img width="" height="" src="assets/images/minus.png"
+                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block" alt="arrow" />
                     </div>
-                    <div
-                      id="accordion-collapse5-body-2"
-                      class="hidden w-full"
-                      aria-labelledby="accordion-collapse5-heading-2"
-                    >
+                    <div id="accordion-collapse5-body-2" class="hidden w-full"
+                      aria-labelledby="accordion-collapse5-heading-2">
                       <div class="">
-                        <p
-                          class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4"
-                        >
+                        <p class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4">
                           You can buy at our Oniru, Lekki, Lagos Warehouse.
                           Please Click here for the address.
                         </p>
@@ -383,45 +248,25 @@
               <!-- Returns Section -->
               <div class="mb-5">
                 <h2 id="accordion-collapse5-heading-3">
-                  <button
-                    type="button"
+                  <button type="button"
                     class="aria-expanded:bg-transparent bg-[#FFFFFF] shadow-md aria-expanded:shadow-none flex flex-col justify-start w-full md:items-center overflow-hidden group relative z-[0] aria-expanded:border-none"
-                    data-accordion-target="#accordion-collapse5-body-3"
-                    aria-expanded="true"
-                    aria-controls="accordion-collapse5-body-3"
-                  >
+                    data-accordion-target="#accordion-collapse5-body-3" aria-expanded="true"
+                    aria-controls="accordion-collapse5-body-3">
                     <div
-                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5"
-                    >
+                      class="bg-[#fff] flex flex-row justify-between w-full items-center group-aria-expanded:border-b group-aria-expanded:border-[#000] lg:py-5 py-3 px-2 relative lg:px-5">
                       <span
-                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0"
-                      >
+                        class="xl:text-[24px] lg:text-[20px] text-[14px] text-[#000] montserrat-600 leading-snug group-aria-expanded:pb-5 text-start montserrat-500 !pb-0">
                         Returns
                       </span>
-                      <img
-                        width=""
-                        height=""
-                        src="assets/images/plus.png"
-                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden"
-                        alt="arrow"
-                      />
-                      <img
-                        width=""
-                        height=""
-                        src="assets/images/minus.png"
-                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block"
-                        alt="arrow"
-                      />
+                      <img width="" height="" src="assets/images/plus.png"
+                        class="invert-[1] w-5 h-5 group-aria-expanded:hidden" alt="arrow" />
+                      <img width="" height="" src="assets/images/minus.png"
+                        class="hidden invert-[1] w-5 h-5 group-aria-expanded:block" alt="arrow" />
                     </div>
-                    <div
-                      id="accordion-collapse5-body-3"
-                      class="hidden w-full"
-                      aria-labelledby="accordion-collapse5-heading-3"
-                    >
+                    <div id="accordion-collapse5-body-3" class="hidden w-full"
+                      aria-labelledby="accordion-collapse5-heading-3">
                       <div class="">
-                        <p
-                          class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4"
-                        >
+                        <p class="px-4 md:text-[16px] text-[14px] text-[#000] leading-[1.5] text-start mt-4">
                           You can return the product to our Lagos Warehouse
                           within 30 days. Click here for the address.
                         </p>
@@ -442,31 +287,18 @@
             <div *ngIf="isRecentlyViewed">
               <!-- Owl Carousel for Recently Viewed -->
               <div id="recentlyViewedCarousel" class="owl-carousel owl-theme">
-                <div
-                  class="bg-white p-4 border rounded-lg shadow-lg cursor-pointer"
-                  *ngFor="let item of recentlyViewed"
-                  (click)="viewProduct(item.urlId)"
-                >
+                <div class="bg-white p-4 border rounded-lg shadow-lg cursor-pointer" *ngFor="let item of recentlyViewed"
+                  (click)="viewProduct(item.urlId)">
                   <div class="relative">
-                    <img
-                      src="{{ item.imageUrl }}"
-                      alt="Product Image"
-                      class="w-full md:h-48 object-cover mb-3 rounded"
-                    />
+                    <img src="{{ item.imageUrl }}" alt="Product Image"
+                      class="w-full md:h-48 object-cover mb-3 rounded" />
                   </div>
-                  <h5
-                    class="montserrat-500 text-[12px] mb-2 capitalize truncate"
-                  >
+                  <h5 class="montserrat-500 text-[12px] mb-2 capitalize truncate">
                     {{ item.title }}
                   </h5>
                   <div class="flex justify-between items-center">
                     <span class="text-[12px] montserrat-600">
-                      ₦{{
-                        item.internetPrice.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        })
-                      }}
+                      {{ item.internetPrice | currency:'₦' :'symbol':'3.2'}}
                     </span>
                   </div>
                 </div>
@@ -490,31 +322,18 @@
 
             <div>
               <div id="recommendedCarousel" class="owl-carousel owl-theme">
-                <div
-                  class="bg-white p-4 border rounded-lg shadow-lg cursor-pointer"
-                  *ngFor="let item of recommendedProducts"
-                  (click)="viewProduct(item.urlId)"
-                >
+                <div class="bg-white p-4 border rounded-lg shadow-lg cursor-pointer"
+                  *ngFor="let item of recommendedProducts" (click)="viewProduct(item.urlId)">
                   <div class="relative">
-                    <img
-                      src="{{ item.imageUrl }}"
-                      alt="Product Image"
-                      class="w-full md:h-48 object-cover mb-3 rounded"
-                    />
+                    <img src="{{ item.imageUrl }}" alt="Product Image"
+                      class="w-full md:h-48 object-cover mb-3 rounded" />
                   </div>
-                  <h5
-                    class="montserrat-500 text-[12px] mb-2 capitalize truncate"
-                  >
+                  <h5 class="montserrat-500 text-[12px] mb-2 capitalize truncate">
                     {{ item.title }}
                   </h5>
                   <div class="flex justify-between items-center">
                     <span class="text-[12px] montserrat-600">
-                      ₦{{
-                        item.internetPrice.toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        })
-                      }}
+                      {{ item.internetPrice | currency:'₦' :'symbol':'3.2'}}
                     </span>
                   </div>
                 </div>

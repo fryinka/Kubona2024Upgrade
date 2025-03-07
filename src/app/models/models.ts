@@ -99,3 +99,32 @@ export interface ImageRotators {
     routeId: string;
 }
 
+export interface CategoryTitle {
+    categoryId: number;
+    categoryDesc: string;
+    urlId: string;
+  }
+
+  export interface OtherColors {
+    title: string;
+    mobileImageUrl: string;
+    urlId: string;
+    productId: number;
+    internetPrice: number;
+  }
+  
+  export interface MenuLinks {
+    linkId: number;
+    shortTitle: string;
+    routeId: string;
+    routeUrl: string;
+  }
+  
+  export interface RelatedProducts {
+    itemgroupId: number,
+    title: string,
+    internetPrice: number,
+    imageUrl: string,
+    urlId: string
+  }
+

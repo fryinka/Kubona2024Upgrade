@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ColorsGroup, HeelHeightGroup, ImageRotators, MaterialGroup, Prodlist, SizeGroup, SlideShowImages, StylesGroup } from '../models/models';
+import { CategoryTitle, ColorsGroup, HeelHeightGroup, ImageRotators, MaterialGroup, OtherColors, Prodlist, SizeGroup, SlideShowImages, StylesGroup } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -23,14 +23,14 @@ export class ProductService {
     return this.http.get<Prodlist[]>(url, { params });
   }
 
-  getProduct(productId: string): Observable<any> {
+  getProduct(productId: string): Observable<Prodlist> {
     var url = this.baseURL + 'api/Product/' + productId;
-    return this.http.get<any>(url);
+    return this.http.get<Prodlist>(url);
   }
 
-  getCategoryTitle(urlId: string): Observable<any> {
+  getCategoryTitle(urlId: string): Observable<CategoryTitle> {
     var url = this.baseURL + 'api/CategoryTitle/' + urlId;
-    return this.http.get<any>(url);
+    return this.http.get<CategoryTitle>(url);
   }
 
 
@@ -44,11 +44,11 @@ export class ProductService {
     var url = this.baseURL + 'api/DepartmentGroupBy';
     var params = new HttpParams()
       .set("urlId", urlId)
-    return this.http.get<any[]>(url,{params});
+    return this.http.get<any[]>(url, { params });
   }
 
   getSizingGroupBy(urlId: string): Observable<SizeGroup[]> {
-    var url = this.baseURL + 'api/SizingGroupBy/'+urlId;
+    var url = this.baseURL + 'api/SizingGroupBy/' + urlId;
     return this.http.get<SizeGroup[]>(url);
   }
 
@@ -75,12 +75,20 @@ export class ProductService {
     var url = this.baseURL + 'api/Image/GetSlideShowImages';
     return this.http.get<SlideShowImages[]>(url);
   }
-  
+
   getImageRotators(rotatorId: number, pageSize: number): Observable<ImageRotators[]> {
     var url = this.baseURL + 'api/Image/ImageRotators';
     var params = new HttpParams()
       .set("rotatorId", rotatorId.toString())
       .set("pageSize", pageSize.toString())
     return this.http.get<ImageRotators[]>(url, { params });
+  }
+
+  getOtherColors(similarId: string, productId: number): Observable<OtherColors[]> {
+    var url = this.baseURL + 'api/OtherColors';
+    var params = new HttpParams()
+      .set("similarId", similarId)
+      .set("productId", productId.toString());
+    return this.http.get<OtherColors[]>(url, { params });
   }
 }
