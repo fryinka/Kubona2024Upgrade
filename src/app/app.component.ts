@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, PLATFORM_ID } from "@angular/core";
 import { NavigationEnd, RouterOutlet } from "@angular/router";
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, } from "@angular/forms"; // Import ReactiveFormsModule
-import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
@@ -13,10 +12,13 @@ import { FooterComponent } from "./components/footer/footer.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { SwUpdate, VersionEvent, VersionReadyEvent } from "@angular/service-worker";
 import { filter } from "rxjs/operators";
+import { Prodlist } from "./models/models";
+import { ProductService } from "./services/product.service";
+import { forkJoin } from "rxjs";
 
 @Component({
     selector: "app-root",
-    imports: [RouterOutlet, FormsModule, CommonModule, RouterModule, HttpClientModule, ReactiveFormsModule, FooterComponent, NavbarComponent], // Include ReactiveFormsModule
+    imports: [RouterOutlet, FormsModule, CommonModule, RouterModule, ReactiveFormsModule, FooterComponent, NavbarComponent,], // Include ReactiveFormsModule
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.css"]
 })
@@ -42,6 +44,13 @@ export class AppComponent implements OnInit {
   isWomenDropdownOpenMobile = false;
   private platformId = inject(PLATFORM_ID);
   private updates = inject(SwUpdate);
+
+  menNewArrivals: Prodlist[] = [];
+  menAccessories: Prodlist[] = [];
+  womenNewArrivals: Prodlist[] = [];
+  womenAccessories: Prodlist[] = [];
+  menShoes: Prodlist[] = []; // Define menShoes
+  womenShoes: Prodlist[] = []; // Define womenShoes
 
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
@@ -82,158 +91,30 @@ export class AppComponent implements OnInit {
   }
 
   navigateTo(url: string): void {
-    // this.isMenDropdownOpen = false;
-    // this.isWomenDropdownOpen = false;
     this.isMenuOpen = false; // Close the menu on selection
     // Your navigation logic
     this.router.navigate([url]);
-    //this.isMenuOpen = false; // Close the menu after navigation
-    console.log("Navigating to", url);
   }
 
-  menNewArrivals: any[] = [];
-  menAccessories: any[] = [];
-  womenNewArrivals: any[] = [];
-  womenAccessories: any[] = [];
-  menShoes: any[] = []; // Define menShoes
-  womenShoes: any[] = []; // Define womenShoes
+ 
 
-  loadMenNewArrivals(): void {
-    //const apiUrl = 'https://friday.kubona.ng/api/Product/Products/70610?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=30';
-    //this.http.get<any>(apiUrl).subscribe(
-    // data => {
-    //  console.log(data); // Inspect the data structure
-    //  this.menNewArrivals = data.products;
-    // },
-    //error => {
-    // console.error('Error loading men new arrivals:', error);
-    //}
-    //);
+  loadNewArrivals(): void {
 
-    this.http
-      .get<any[]>(
-        `https://friday.kubona.ng/api/Product/Products/70610?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=5`
-      )
-      .subscribe({
-        next: (res) => {
-          console.log("Products", res);
-          this.products = res;
-          this.loadProducts();
-          this.isProducts = this.products.length > 0;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-
-  loadProducts() {
-    if (Array.isArray(this.products)) {
-      this.menNewArrivals = this.products.slice(
-        0,
-        this.currentPage * this.productsPerPage
-      );
-      this.hasMoreProducts = this.products.length > this.menNewArrivals.length;
-    } else {
-      console.error("Fetched data is not an array:", this.products);
-    }
-  }
-
-  getSubCategories(urlId: number, category: string): void {
-    const url = `https://friday.kubona.ng/api/DepartmentGroupBy?urlId=${urlId}`;
-
-    this.http.get(url).subscribe({
-      next: (res) => {
-        // Assign the response to the respective category in subCategories
-        this.subCategories[category] = res;
-
-        // Filter out items without imageUrl
-        this.subCategories[category] = this.subCategories[category].filter(
-          (item: any) => item.imageUrl
-        );
-        // Optionally, initialize carousel here
-      },
-      error: (err) => {
-        console.error("There was an error!", err);
-      },
+    forkJoin({
+      men: this.productService.getProducts("70610",0,0,7,0,8),
+      women: this.productService.getProducts("70710",0,0,7,0,8),
+      // accessories: this.productService.getProducts("70460",0,0,7,0,8),
+    }).subscribe({
+      next: ({ men, women }) => {
+        this.menNewArrivals=men;
+        this.womenNewArrivals=women;  
+            },
+      error: (err) => console.error("There was an error!", err),
     });
+  
   }
 
-  loadMenAccessories(): void {
-    const apiUrl = "https://friday.kubona.ng/api/Product/Products/70610";
-    const params = {
-      lowerPrice: "0",
-      upperPrice: "0",
-      sortId: "7",
-      pageIndex: "0",
-      pageSize: "10",
-    };
-
-    this.http.get<any>(apiUrl, { params }).subscribe((data) => {
-      this.menAccessories = data.products; // Adjust this if the structure is different
-    });
-  }
-
-  loadWomenNewArrivals(): void {
-    const apiUrl = "https://friday.kubona.ng/api/Product/Products/70610";
-    const params = {
-      lowerPrice: "0",
-      upperPrice: "0",
-      sortId: "7",
-      pageIndex: "0",
-      pageSize: "10",
-    };
-
-    this.http.get<any>(apiUrl, { params }).subscribe((data) => {
-      this.womenNewArrivals = data.products; // Adjust this if the structure is different
-    });
-  }
-
-  loadWomenAccessories(): void {
-    const apiUrl = "https://friday.kubona.ng/api/Product/Products/70610";
-    const params = {
-      lowerPrice: "0",
-      upperPrice: "0",
-      sortId: "7",
-      pageIndex: "0",
-      pageSize: "10",
-    };
-
-    this.http.get<any>(apiUrl, { params }).subscribe((data) => {
-      this.womenAccessories = data.products; // Adjust this if the structure is different
-    });
-  }
-
-  loadMenShoes(): void {
-    const apiUrl = "https://friday.kubona.ng/api/Product/Products/70610";
-    const params = {
-      lowerPrice: "0",
-      upperPrice: "0",
-      sortId: "7",
-      pageIndex: "0",
-      pageSize: "10",
-    };
-
-    this.http.get<any>(apiUrl, { params }).subscribe((data) => {
-      this.menShoes = data.products; // Adjust this if the structure is different
-    });
-  }
-
-  loadWomenShoes(): void {
-    const apiUrl =
-      "https://friday.kubona.ng/api/Product/Products/70610?lowerPrice=0&upperPrice=0&sortId=0&pageIndex=0&pageSize=30";
-    const params = {
-      lowerPrice: "0",
-      upperPrice: "0",
-      sortId: "7",
-      pageIndex: "0",
-      pageSize: "10",
-    };
-
-    this.http.get<any>(apiUrl, { params }).subscribe((data) => {
-      this.womenShoes = data.products; // Adjust this if the structure is different
-    });
-  }
+  
 
   menOpen = false;
   womenOpen = false;
@@ -280,9 +161,9 @@ export class AppComponent implements OnInit {
     private router: Router,
     private scrollService: ScrollService,
     private fb: FormBuilder,
-    private http: HttpClient,
     private cartService: CartService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private productService: ProductService,
   ) {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
@@ -293,12 +174,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadMenNewArrivals();
-    this.loadMenAccessories();
-    this.loadWomenNewArrivals();
-    this.loadWomenAccessories();
-    this.loadMenShoes(); // Add this call
-    this.loadWomenShoes(); // Add this call
+    this.loadNewArrivals();
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.scrollService.scrollToTop();
@@ -308,15 +184,13 @@ export class AppComponent implements OnInit {
         this.getCartItemCount();
       }
     });
-    this.getSubCategories(70660, "men"); // Men category
-    this.getSubCategories(70750, "women"); // Women category
   }
 
   getCartItemCount(): void {
     this.cartService.getCartItems().subscribe({
       next: (cartItems: any[]) => {
         this.cartItemCount = cartItems.length;
-        console.log("Cart item count:", this.cartItemCount); // Debugging
+        // console.log("Cart item count:", this.cartItemCount); // Debugging
       },
       error: (err) => {
         console.error("Error fetching cart items:", err); // Debugging
@@ -324,27 +198,27 @@ export class AppComponent implements OnInit {
     });
   }
 
-  onSubscribe() {
-    if (this.newsletterForm.valid) {
-      const email = this.newsletterForm.get("email")?.value;
-      const formBody = { email: email };
+  // onSubscribe() {
+  //   if (this.newsletterForm.valid) {
+  //     const email = this.newsletterForm.get("email")?.value;
+  //     const formBody = { email: email };
 
-      this.http
-        .post("https://friday.kubona.ng/api/Contact/Subscribe/", formBody)
-        .subscribe(
-          (response) => {
-            console.log(JSON.stringify(response));
-            this.newsletterSuccess = true;
-          },
-          (error) => {
-            console.error("Error submitting form", error);
-            this.newsletterSuccess = false;
-          }
-        );
-    } else {
-      console.log("Form is not valid");
-    }
-  }
+  //     this.http
+  //       .post("https://friday.kubona.ng/api/Contact/Subscribe/", formBody)
+  //       .subscribe(
+  //         (response) => {
+  //           console.log(JSON.stringify(response));
+  //           this.newsletterSuccess = true;
+  //         },
+  //         (error) => {
+  //           console.error("Error submitting form", error);
+  //           this.newsletterSuccess = false;
+  //         }
+  //       );
+  //   } else {
+  //     console.log("Form is not valid");
+  //   }
+  // }
 
   goToHome() {
     // this.isMenuOpen = false; // Close the menu on selection

@@ -181,7 +181,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.isLoadingSlider = true;
     this.productService.getSlideShowImages().subscribe({
       next: (res: SlideShowImages[]) => {
-        console.log(res);
         this.slideShowImages = res;
         this.isSlider = this.slideShowImages.length > 0;
         setTimeout(() => this.initializeCarousel2(), 0);
@@ -226,7 +225,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   get_categories() {
     this.productService.getImageRotators(this.rotatorId, this.pageSize).subscribe({
       next: (res: ImageRotators[]) => {
-        console.log(res);
         this.allCategories = res;
         setTimeout(() => this.initializeCarousel4(), 0);
       },

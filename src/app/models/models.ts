@@ -128,3 +128,25 @@ export interface CategoryTitle {
     urlId: string
   }
 
+  export interface RecentlyViewed {
+    itemId: number;
+    title: string;
+    imageUrl: string;
+    internetPrice: number;
+    urlId: string;
+    viewDate: Date;
+  }
+
+  export interface ProductImages {
+    orderId: number;
+    image: string;
+    thumbImage: string;
+    alt: string;
+    title: string;
+  }
+  export interface ContactUs {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    message: string;
+  }

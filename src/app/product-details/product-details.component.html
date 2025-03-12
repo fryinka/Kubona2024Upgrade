@@ -38,13 +38,13 @@
         <div class="grid grid-cols-12 items-center md:gap-y-0">
           <div class="mb-3 col-span-12">
             <span class="md:text-[24px] text-[18px] capitalize montserrat-600 md:mt-0 mt-5 max-w-[400px] block">{{
-              productDetails.title }}</span>
+              productTitle }}</span>
           </div>
 
           <!-- Price Section -->
           <div class="mb-3 col-span-12">
             <div class="text-left">
-              <span class="block md:text-[24px] text-[20px] font-bold">{{productDetails.internetPrice | currency:'₦'
+              <span class="block md:text-[24px] text-[20px] font-bold">{{productPrice | currency:'₦'
                 :'symbol':'3.2'}}</span>
               <span class="block md:text-[18px] text-[16px] line-through text-red-500">{{productDetails.storePrice |
                 currency:'₦' :'symbol':'3.2'}}</span>
@@ -83,20 +83,20 @@
                     productSizes.length == 0
               ">This Product is out of Stock</span>
 
-            <ul *ngIf="productSizes?.length > 0" class="flex flex-wrap gap-x-2 gap-y-3">
+            <ul *ngIf="productSizes.length > 0" class="flex flex-wrap gap-x-2 gap-y-3">
               <li class="mb-2" *ngFor="let item of productSizes" [class.cursor-not-allowed]="item.quantity == 0"
                 [class.cursor-pointer]="item.quantity > 0" (click)="
                   item.quantity > 0 &&
                     selectSize(
-                      item?.sizeDesc,
-                      item?.sizeDesc.toString(),
+                      item.sizeDesc,
+                      item.sizeDesc.toString(),
                       item.quantity,
-                      item?.itemGroupSizeId
+                      item.itemGroupSizeId
                     )
                 ">
                 <div *ngIf="item.quantity == 0" class="out-of-stock-container disabled">
                   <span class="text-[14px] border-[2px] px-3 py-2 rounded-[5px] bg-[#555] text-[#fff] border-[#555]">
-                    {{ item?.sizeDesc?.split(" ")[1] }}
+                    {{ item.sizeDesc.split(" ")[1] }}
                   </span>
                 </div>
 
@@ -106,7 +106,7 @@
                     [style.backgroundColor]="
                       isSelected(item.sizeDesc) ? '#000' : '#fff'
                     " [style.color]="isSelected(item.sizeDesc) ? '#fff' : '#000'">
-                    {{ item?.sizeDesc?.split(" ")[1] }}
+                    {{ item.sizeDesc.split(" ")[1] }}
                   </span>
                 </div>
               </li>
@@ -114,12 +114,12 @@
           </div>
 
           <!-- Size Section tags -->
-          <div class="mb-3 col-span-12 text-left mt-3 border border-gray-400" *ngIf="productSizes?.length != 0">
+          <div class="mb-3 col-span-12 text-left mt-3 border border-gray-400" *ngIf="productSizes.length != 0">
             <!-- Heading for the container -->
             <span class="font-bold text-[16px] block mb-2 bg-gray-200 p-3">AVAILABLE SIZES</span>
 
             <!-- Display sizes as a comma-separated string -->
-            <div *ngIf="productSizes?.length > 0" class="px-3">
+            <div *ngIf="productSizes.length > 0" class="px-3">
               <span class="text-[14px]">
                 {{ availableSizesTagString }}
               </span>

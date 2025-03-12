@@ -1,6 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpParams, HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -8,8 +9,9 @@ import { isPlatformBrowser } from '@angular/common';
 export class CartService {
   private cartItems: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
   private isBrowser: boolean;
+  baseURL: string = "https://friday.kubona.ng/";
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient) {
     this.isBrowser = isPlatformBrowser(this.platformId);
 
     // Initialize cart only in the browser
@@ -57,5 +59,13 @@ export class CartService {
     const updatedItems = currentItems.filter(cartItem => cartItem.productId !== item.productId);
     this.cartItems.next(updatedItems); // Update BehaviorSubject
     this.updateLocalStorage(updatedItems); // Update localStorage
+  }
+
+  onCheckoutWhatsapp(email: string, phoneNumber: string, productData: any){
+    const params = new HttpParams()
+        .set("userId", email.toString())
+        .set("phoneNumber", phoneNumber);
+        const url = this.baseURL + "api/checkoutWithWhatsApp";
+        return this.http.post(url, productData, {params});
   }
 }

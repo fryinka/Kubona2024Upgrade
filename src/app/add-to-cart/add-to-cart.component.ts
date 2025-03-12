@@ -1,35 +1,29 @@
-import { Component, AfterViewInit, OnInit } from "@angular/core";
-import { CommonModule, Location } from "@angular/common";
+import { Component, OnInit } from "@angular/core";
+import { CommonModule } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
-import { NavigationEnd, Router } from "@angular/router";
-import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { Router } from "@angular/router";
 import { CartService } from "../services/cart.service";
+import { RelatedProducts } from "../models/models";
+import { ProductService } from "../services/product.service";
+import { NumberToWordsPipe } from "../services/num2text.pipe";
 
 @Component({
-    selector: "app-category",
-    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-    templateUrl: "./add-to-cart.component.html",
-    styleUrls: ["./add-to-cart.component.css"]
+  selector: "app-category",
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, NumberToWordsPipe],
+  templateUrl: "./add-to-cart.component.html",
+  styleUrls: ["./add-to-cart.component.css"]
 })
-export class AddToCartComponent implements AfterViewInit, OnInit {
+export class AddToCartComponent implements OnInit {
   cartItems: any[] = [];
-  totalPrice: any;
-  menRelatedProducts: any = [];
-  womenRelatedProducts: any = [];
-  recommendedProducts: any[] = []; // Adjust type as needed
-  private apiUrl =
-    "https://friday.kubona.ng/api/RelatedProducts?departmentId=0&itemGroupId=0&pageSize=8";
+  totalPrice: number = 0;
+  recommendedProducts: RelatedProducts[] = []; // Adjust type as needed
 
   orderId: any;
 
-  constructor(
-    private router: Router,
-    private httpClient: HttpClient,
-    private cartService: CartService
-  ) {
+  constructor(private router: Router, private cartService: CartService, private productService: ProductService) {
     this.orderId = this.generateOrderId();
   }
 
@@ -50,16 +44,14 @@ export class AddToCartComponent implements AfterViewInit, OnInit {
   }
 
   viewProduct(productId: number) {
-    this.router.navigate(["/product-details", productId]);
+    this.router.navigate(["/product", productId]);
   }
   ngOnInit(): void {
     this.cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
     this.totalPrice = this.calculateTotalPrice();
-    this.get_men_related_products();
-    this.get_women_related_products();
     this.fetchRecommendedProducts();
 
-    console.log("cartItems", this.cartItems);
+    // console.log("cartItems", this.cartItems);
   }
 
   ngDoCheck(): void {
@@ -67,49 +59,12 @@ export class AddToCartComponent implements AfterViewInit, OnInit {
     this.totalPrice = this.calculateTotalPrice();
   }
 
-  get_men_related_products() {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/Product/Products/70610?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=10"
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.menRelatedProducts = res;
-          setTimeout(() => this.initializeCarousel1(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-  get_women_related_products() {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/Product/Products/70710?lowerPrice=0&upperPrice=0&sortId=7&pageIndex=0&pageSize=10"
-      )
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.womenRelatedProducts = res;
-          setTimeout(() => this.initializeCarousel2(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
-
   fetchRecommendedProducts(): void {
-    this.httpClient.get<any[]>(this.apiUrl).subscribe(
-      (data) => {
-        // Assign data to recommendedProducts
-        this.recommendedProducts = data;
-      },
-      (error) => {
-        console.error("Error fetching recommended products:", error);
-      }
-    );
+    this.productService.getRelatedProducts(0, 0, 8).subscribe(response => {
+      this.recommendedProducts = response;
+    }, (error) => {
+      console.error("Error fetching recommended products:", error);
+    });
   }
 
   calculateTotalPrice(): number {
@@ -124,9 +79,6 @@ export class AddToCartComponent implements AfterViewInit, OnInit {
 
   increaseQuantity(itemId: number) {
     const item = this.cartItems.find((cartItem) => cartItem.id === itemId);
-
-    console.log('item.sizeQty', item.sizeQty)
-  
     if (item) {
       if (item.productQty < item.sizeQty) {
         item.productQty += 1;
@@ -136,73 +88,8 @@ export class AddToCartComponent implements AfterViewInit, OnInit {
         alert('Cannot increase quantity: Maximum size quantity reached for selected size');
       }
     }
-  }  
+  }
 
-  numToWords(n: number) {
-    console.log('number we have', n)
-    if (n === 0) {
-      return 'zero';
-    }
-  
-    const lessThanTwenty = [
-      '', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
-      'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen',
-      'eighteen', 'nineteen'
-    ];
-  
-    const tens = [
-      '', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'
-    ];
-  
-    const scales = ['', 'thousand', 'million', 'billion', 'trillion'];
-  
-    const convertChunk = (num: number) => {
-      let chunkResult = '';
-      const hundreds = Math.floor(num / 100);
-      num %= 100;
-  
-      if (hundreds !== 0) {
-        chunkResult += `${lessThanTwenty[hundreds]} hundred`;
-      }
-  
-      if (num === 0) {
-        return chunkResult.trim();
-      }
-  
-      if (chunkResult !== '') {
-        chunkResult += ' and ';
-      }
-  
-      if (num < 20) {
-        chunkResult += lessThanTwenty[num];
-      } else {
-        const tensDigit = Math.floor(num / 10);
-        const onesDigit = num % 10;
-        chunkResult += `${tens[tensDigit]}${onesDigit !== 0 ? '-' + lessThanTwenty[onesDigit] : ''}`;
-      }
-  
-      return chunkResult.trim();
-    };
-  
-    const convertGroup = (num: number) => {
-      let groupResult = '';
-      let chunkCount = 0;
-  
-      while (num > 0) {
-        const chunk = num % 1000;
-        if (chunk !== 0) {
-          const chunkWords = convertChunk(chunk);
-          groupResult = `${chunkWords} ${scales[chunkCount]} ${groupResult}`.trim();
-        }
-        num = Math.floor(num / 1000);
-        chunkCount++;
-      }
-  
-      return groupResult.trim();
-    };
-  
-    return convertGroup(n);
-  }  
 
   decreaseQuantity(itemId: number) {
     const item = this.cartItems.find((cartItem) => cartItem.id === itemId);
@@ -224,7 +111,6 @@ export class AddToCartComponent implements AfterViewInit, OnInit {
       this.cartItems.splice(index, 1); // Remove the item at the found index
       this.saveCart();
       this.cartService.removeFromCart(item);
-      // this.location.replaceState(this.location.path()); // Ensures the URL remains the same
     }
   }
 
@@ -276,6 +162,4 @@ export class AddToCartComponent implements AfterViewInit, OnInit {
       },
     });
   }
-
-  ngAfterViewInit(): void {}
 }

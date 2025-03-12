@@ -1,7 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CategoryTitle, ColorsGroup, HeelHeightGroup, ImageRotators, MaterialGroup, OtherColors, Prodlist, SizeGroup, SlideShowImages, StylesGroup } from '../models/models';
+import { CategoryTitle, ColorsGroup, ContactUs, HeelHeightGroup, ImageRotators, MaterialGroup, OtherColors, Prodlist, ProductImages, RecentlyViewed, RelatedProducts, SizeGroup, Sizelist, SlideShowImages, StylesGroup } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -34,10 +34,10 @@ export class ProductService {
   }
 
 
-  getProductImages(productId: number) {
+  getProductImages(productId: string): Observable<ProductImages[]> {
     const URL = this.baseURL + 'api/ProductImages';
     const PARAMS = new HttpParams().set("Id", productId)
-    return this.http.get(URL, { params: PARAMS })
+    return this.http.get<ProductImages[]>(URL, { params: PARAMS })
   }
 
   getDepartmentGroupBy(urlId: string): Observable<any[]> {
@@ -90,5 +90,41 @@ export class ProductService {
       .set("similarId", similarId)
       .set("productId", productId.toString());
     return this.http.get<OtherColors[]>(url, { params });
+  }
+
+  getProductSizes(productId: string): Observable<Sizelist[]> {
+    var url = this.baseURL + 'api/Product/Sizes/' + productId;
+    return this.http.get<Sizelist[]>(url);
+  }
+
+  getRelatedProducts(departmentId: number, itemGroupId: number, pageSize: number): Observable<RelatedProducts[]> {
+    var url = this.baseURL + 'api/RelatedProducts';
+    var params = new HttpParams()
+      .set("departmentId", departmentId.toString())
+      .set("itemGroupId", itemGroupId.toString())
+      .set("pageSize", pageSize.toString())
+    return this.http.get<RelatedProducts[]>(url, { params });
+  }
+
+  getRecentlyViewed(userId: string, pageSize: number): Observable<RecentlyViewed[]> {
+    var url = this.baseURL + 'api/RecentlyViewed';
+    var params = new HttpParams()
+      .set("userId", userId)
+      .set("pageSize", pageSize.toString())
+    return this.http.get<RecentlyViewed[]>(url, { params });
+
+  }
+
+  postRecentlyViewed(formBody: any) {
+    var url = this.baseURL + 'api/RecentlyViewed';
+    return this.http.post(url, formBody);
+  }
+
+  submitContactUs(formBody: ContactUs) {
+    var url = this.baseURL + 'api/Contact/Add';
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json",
+    });
+    return this.http.post(url, formBody, { headers });
   }
 }

@@ -4,12 +4,13 @@ import { Router, RouterModule } from '@angular/router';
 import { CategoryService } from '../../services/category.service';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
-    selector: 'app-navbar',
-    imports: [CommonModule, RouterModule],
-    templateUrl: './navbar.component.html',
-    styleUrl: './navbar.component.css'
+  selector: 'app-navbar',
+  imports: [CommonModule, RouterModule],
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.css'
 })
 export class NavbarComponent implements OnInit {
 
@@ -20,29 +21,37 @@ export class NavbarComponent implements OnInit {
   isMenDropdownOpenMobile = false;
   isWomenDropdownOpenMobile = false;
 
-  subCategories: any = {
-    men: {},
-    women: {},
-  };
-  mnCategories:any[]=[];
-  wnCategories:any[]=[];
-  asCategories:any[]=[];
-  waCategories:any[]=[];
-  bsCategories:any[]=[];
-  haCategories:any[]=[];
+  mnCategories: any[] = [];
+  wnCategories: any[] = [];
+  asCategories: any[] = [];
+  waCategories: any[] = [];
+  bsCategories: any[] = [];
+  haCategories: any[] = [];
 
   cartItemCount: number = 0;
 
-  constructor(private categoryService: CategoryService, private router: Router, private cartService: CartService, private productService:ProductService) { }
+  constructor(private categoryService: CategoryService, private router: Router, private cartService: CartService, private productService: ProductService) { }
   ngOnInit(): void {
-    this.productService.getDepartmentGroupBy('70610').subscribe(response => {
-      let menShoes=response;
-       this.mnCategories = menShoes.filter(x => x.departmentId > 7000); })
-    this.productService.getDepartmentGroupBy('70710').subscribe(response => { this.wnCategories = response.filter(x => x.departmentId > 7000) })
-    this.productService.getDepartmentGroupBy('70340').subscribe(response => { this.asCategories = response.filter(x => x.departmentId > 7000) })
-    this.productService.getDepartmentGroupBy('70510').subscribe(response => { this.waCategories = response.filter(x => x.departmentId > 7000) })
-    this.productService.getDepartmentGroupBy('70220').subscribe(response => { this.bsCategories = response.filter(x => x.departmentId > 7000) })
-    this.productService.getDepartmentGroupBy('70010').subscribe(response => { this.haCategories = response.filter(x => x.departmentId > 7000) })
+
+    forkJoin({
+      mnCategories: this.productService.getDepartmentGroupBy('70610'),
+      wnCategories: this.productService.getDepartmentGroupBy('70710'),
+      asCategories: this.productService.getDepartmentGroupBy('70340'),
+      waCategories: this.productService.getDepartmentGroupBy('70510'),
+      bsCategories: this.productService.getDepartmentGroupBy('70220'),
+      haCategories: this.productService.getDepartmentGroupBy('70010'),
+    }).subscribe({
+      next: ({ mnCategories, wnCategories, asCategories, waCategories, bsCategories, haCategories }) => {
+        this.mnCategories = mnCategories;
+        this.wnCategories = wnCategories;
+        this.asCategories = asCategories;
+        this.waCategories = waCategories;
+        this.bsCategories = bsCategories;
+        this.haCategories = haCategories;
+      },
+      error: (err) => console.error("There was an error!", err),
+    });
+    this.getCartItemCount();
   }
 
   toggleMobileMenu() {
@@ -120,7 +129,7 @@ export class NavbarComponent implements OnInit {
     this.toggleDropdown("menDropdown");
     this.isMenuOpen = false; // Close the menu on selection
     this.navigateTo("/men/new-arrivals");
-    this.router.navigate(['/category','70610','7'])
+    this.router.navigate(['/category', '70610', '7'])
   }
 
   navigateTo(url: string): void {
@@ -143,12 +152,12 @@ export class NavbarComponent implements OnInit {
         : null;
       this.router.navigate(["/category", destinationUrl]); // Navigate with 'id'
     } else {
-      this.router.navigate(["/category","70710-Women-Shoes"]); // Navigate without 'id'
+      this.router.navigate(["/category", "70710-Women-Shoes"]); // Navigate without 'id'
     }
   }
 
   navigateToAccessories() {
-    this.router.navigate(["/category","70340-Accessories"]);
+    this.router.navigate(["/category", "70340-Accessories"]);
   }
 
   navigateToAcc() {
@@ -165,7 +174,6 @@ export class NavbarComponent implements OnInit {
     this.cartService.getCartItems().subscribe({
       next: (cartItems: any[]) => {
         this.cartItemCount = cartItems.length;
-        console.log("Cart item count:", this.cartItemCount); // Debugging
       },
       error: (err) => {
         console.error("Error fetching cart items:", err); // Debugging

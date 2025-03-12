@@ -4,24 +4,23 @@ declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { CartService } from "../services/cart.service";
 import { ChangeDetectorRef } from "@angular/core";
 import { FlowbiteService } from "../services/flowbite.service";
 import { SeoService } from "../services/seo.service";
 import { ProductService } from "../services/product.service";
-import { Prodlist } from "../models/models";
+import { Prodlist, ProductImages, RecentlyViewed, RelatedProducts, Sizelist } from "../models/models";
 
 @Component({
   selector: "app-product-details",
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, ],
   templateUrl: "./product-details.component.html",
   styleUrls: ["./product-details.component.css"]
 })
 export class ProductDetailsComponent implements OnInit, AfterViewInit {
   size: any;
   isSimilarId: any;
-  productSizes: any;
+  productSizes: Sizelist[] = [];
   isMenuOpen = false;
   dataLoaded = false;
   productImages: any;
@@ -39,8 +38,8 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   prodId: number = 0;
   availableSizesTagString: string = "";
   selectedColorId: string | null = null;
-  recommendedProducts: any[] = []; // Adjust type as needed
-
+  recommendedProducts: RelatedProducts[] = [];  
+  departmentId: number = 0;
   randomId: any;
   loader: boolean = false;
   showWomen: boolean = true;
@@ -60,7 +59,8 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   trackingId: string | null = null;
   isSizeLoading: boolean = true;
   selectedSize: string | null = null;
-  itemGroupSizeId: string | null = null;
+  itemGroupSizeId: number = 0;
+  pageSize: number = 8;
 
 
   showSizeGuideImage: boolean = false;
@@ -80,20 +80,18 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   // Example method to check if the size is selected
 
   // Example method to handle size selection
-  selectSize(size: string, sizeCode: string, quantity: number, itemGroupSizeId?: string): void {
+  selectSize(size: string, sizeCode: string, quantity: number, itemGroupSizeId: number): void {
     this.selectedSize = size;
     this.selectedSizeId = sizeCode;
     this.productSize = size;
     this.isSizeSelected = true;
-    this.itemGroupSizeId = itemGroupSizeId || null;
+    this.itemGroupSizeId = itemGroupSizeId;
     this.selectedSizeQty = quantity;
   }
 
   constructor(
     private router: Router,
-    private httpClient: HttpClient,
     private route: ActivatedRoute,
-    private http: HttpClient,
     private cartService: CartService,
     private cdr: ChangeDetectorRef,
     private flowbiteService: FlowbiteService,
@@ -124,6 +122,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.getproductSizes();
     this.recentlyViewedPost();
     this.getRecommendedProducts();
+    this.selectedColorId = this.productDetails.colorDesc;
 
     setTimeout(() => {
       this.dataLoaded = true;
@@ -132,21 +131,12 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
   getRecommendedProducts(): void {
-    this.httpClient
-      .get<any[]>(
-        "https://friday.kubona.ng/api/RelatedProducts?departmentId=0&itemGroupId=0&pageSize=8"
-      )
-      .subscribe(
-        (data) => {
-          // Assign data to recommendedProducts
-          this.recommendedProducts = data;
-
-          setTimeout(() => this.initializeCarouselRecommended(), 0);
-        },
-        (error) => {
-          console.error("Error fetching recommended products:", error);
-        }
-      );
+    this.productService.getRelatedProducts(this.departmentId, this.prodId, this.pageSize).subscribe(response => {
+      this.recommendedProducts = response;
+      setTimeout(() => this.initializeCarouselRecommended(), 0);
+    }, error => {
+      console.error("Error fetching recommended products:", error);
+    });
   }
 
   addItemToCart(item: any) {
@@ -174,22 +164,17 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
     const formBody2 = {
       userId: userId,
-      itemId: Number(this.productId?.split("-")[0]),
+      itemId: this.prodId,
       viewDate: new Date().toISOString(),
       numOfViews: "0",
     };
 
     // Send data to the API
-    this.httpClient
-      .post("https://friday.kubona.ng/api/RecentlyViewed", formBody2)
-      .subscribe(
-        (response) => {
-          this.getRecentlyViewed(); // Fetch recently viewed products after submission
-        },
-        (error) => {
-          console.error("Error submitting form", error);
-        }
-      );
+    this.productService.postRecentlyViewed(formBody2).subscribe(response=>{
+      this.getRecentlyViewed();
+    }, error => {
+      console.error("Error submitting form", error);
+    });
   }
 
   // Method to get and display the recently viewed products
@@ -197,39 +182,22 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     // Retrieve userId from local storage
     const userId = localStorage.getItem("userId");
     if (userId) {
-      this.httpClient
-        .get(
-          `https://friday.kubona.ng/api/RecentlyViewed?userId=${userId}&pageSize=5`
-        )
-        .subscribe({
-          next: (response: any) => {
-            // Assuming response contains the list of products
-            this.recentlyViewed = response; // Assign the response to the property
-            console.log(JSON.stringify(this.recentlyViewed));
-            this.isRecentlyViewed = this.recentlyViewed.length > 0; // Update the flag based on data presence
-            console.log("recentlyViewed", this.recentlyViewed);
-            if (this.isRecentlyViewed) {
-              setTimeout(() => this.initializeCarouselRecentlyViewed(), 0); // Initialize carousel if there are recently viewed items
-            }
-          },
-          error: (error) => {
-            console.error("Error fetching recently viewed products", error);
-          },
-        });
+
+      this.productService.getRecentlyViewed(userId, this.pageSize).subscribe({
+        next: (response: RecentlyViewed[]) => {
+          this.recentlyViewed = response;
+          this.isRecentlyViewed = this.recentlyViewed.length > 0;
+          if (this.isRecentlyViewed) {
+            setTimeout(() => this.initializeCarouselRecentlyViewed(), 0);
+          }
+        }, error: (error) => {
+          console.error("Error fetching recently viewed products", error);
+        },
+      });
     } else {
     }
   }
 
-  getProduct(): void {
-    this.http.get<any>("https://friday.kubona.ng/api/Product/70710").subscribe(
-      (data) => {
-        this.productTitle = data.name; // Adjust the property name as per your API response
-      },
-      (error) => {
-        console.error("Error fetching product:", error);
-      }
-    );
-  }
 
   selectColor(color: string) {
     this.selectedColorId = color;
@@ -251,52 +219,42 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
   getProductImageSize(productId: string) {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/Product/Sizes/" + productId)
-      .subscribe({
-        next: (res) => {
-          this.productSizes = res;
-
-          if (Array.isArray(res)) {
-            this.availableSizesTagString = res
-              .filter((v) => v.quantity > 0)
-              .map(
-                (item) => `${item.sizeDesc.split(" ")[1]} (${item.trackingId})`
-              )
-              .join(", ");
-          }
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.productService.getProductSizes(productId).subscribe({
+      next: (response: Sizelist[]) => {
+        this.productSizes = response;
+        if (Array.isArray(response)) {
+          this.availableSizesTagString = response
+            .filter((v) => v.quantity > 0)
+            .map(
+              (item) => `${item.sizeDesc.split(" ")[1]} (${item.trackingId})`
+            )
+            .join(", ");
+        }
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
 
   getproductImagesByColor(urlId: string) {
     this.destroyCarousel();
-
-    this.httpClient
-      .get("https://friday.kubona.ng/api/ProductImages?Id=" + urlId)
-      .subscribe({
-        next: (res) => {
-          // Update product images
-          this.productImages = res;
-          if (Array.isArray(res)) {
-            this.productImage = res[0]?.image;
-          }
-
-          // Trigger change detection
-          this.cdr.detectChanges();
-
-          // Initialize carousel after a short delay to ensure DOM is updated
-          setTimeout(() => {
-            this.initializeCarousel3();
-          }, 100); // Increase delay if necessary
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.productService.getProductImages(urlId).subscribe({
+      next: (response: ProductImages[]) => {
+        this.productImages = response;
+        if (Array.isArray(response)) {
+          this.productImage = response[0]?.image;
+        }
+        //Trigger change detection
+        this.cdr.detectChanges();
+        // Initialize carousel after a short delay to ensure DOM is updated
+        setTimeout(() => {
+          this.initializeCarousel3();
+        }, 100); // Increase delay if necessary
+      }, error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
 
   destroyCarousel() {
@@ -406,8 +364,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
   addToCartOld(hasSize: Boolean = true) {
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    console.log("this.selectedColorId", this.productColors);
+    this.selectedColorId = this.productDetails.colorDesc;
 
     if (this.productColors && this.selectedColorId === null) {
       alert("Please select color.");
@@ -423,10 +380,9 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
       }
     }
 
-    // alert(this.itemGroupId);
 
     const item = {
-      productId: Number(this.productId?.split("-")[0]),
+      productId: this.itemGroupId,
       productTitle: this.productTitle,
       productCategoryTitle: this.productCategoryTitle,
       productCategoryName: this.productCategoryName,
@@ -453,42 +409,41 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
   getproductImages() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/ProductImages?Id=" + this.productId)
-      .subscribe({
-        next: (res) => {
-          this.productImages = res;
-
-          this.productImage = this.productImages[0]?.image;
-          setTimeout(() => this.initializeCarousel2(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+   if(this.productId){
+    this.productService.getProductImages(this.productId).subscribe({
+      next: (response: any) => {
+        this.productImages = response;
+        this.productImage = this.productImages[0].image;
+        setTimeout(() => this.initializeCarousel2(), 0);
+      }, error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
+   }
   }
 
-  getAccessoryByDepartment(departmentId: any) {
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/DepartmentGroupBy?urlId=" +
-        this.accessoryDepartmentId
-      )
-      .subscribe({
-        next: (res) => {
-          let isAccessory = false;
 
-          if (Array.isArray(res)) {
-            isAccessory = res.some((v) => v.departmentId === departmentId);
-          }
+  // getAccessoryByDepartment(departmentId: any) {
+  //   this.httpClient
+  //     .get(
+  //       "https://friday.kubona.ng/api/DepartmentGroupBy?urlId=" +
+  //       this.accessoryDepartmentId
+  //     )
+  //     .subscribe({
+  //       next: (res) => {
+  //         let isAccessory = false;
 
-          this.isAccessory = isAccessory;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
+  //         if (Array.isArray(res)) {
+  //           isAccessory = res.some((v) => v.departmentId === departmentId);
+  //         }
+
+  //         this.isAccessory = isAccessory;
+  //       },
+  //       error: (err) => {
+  //         console.error("There was an error!", err);
+  //       },
+  //     });
+  // }
 
   loadRecentlyViewed() {
     // Load recently viewed products from local storage or an API
@@ -596,6 +551,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
         this.trackingId = this.productDetails.trackingId;
         this.productTitle = this.productDetails.title;
         this.isSimilarId = this.productDetails.similarId;
+        this.departmentId = this.productDetails.departmentId;
         if (this.isSimilarId !== null) {
           this.getProductColors(this.isSimilarId);
         }
@@ -618,64 +574,39 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
   getProductColors(similarId: string) {
 
-    this.productService.getOtherColors(this.isSimilarId, this.prodId).subscribe((res: any) => {
+    this.productService.getOtherColors(similarId, this.prodId).subscribe((res: any) => {
       this.productColors = res;
+      if (this.productColors.length === 1) {
+        this.selectColors(this.productColors[0].title, this.productColors[0].urlId, this.productColors[0].productId)
+      }
     });
-
-    this.httpClient
-      .get(
-        "https://friday.kubona.ng/api/OtherColors/ProdColors?similarId=" +
-        this.isSimilarId
-      )
-      .subscribe({
-        next: (res) => {
-          this.productColors = res;
-
-          if (this.productColors.length === 1) {
-            this.selectColors(this.productColors[0]?.title, this.productColors[0]?.urlId, this.productColors[0]?.productId)
-          }
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
   }
-  getproductSizes() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/Product/Sizes/" + this.productId)
-      .subscribe({
-        next: (res) => {
-          this.productSizes = res || "Out Of Stock";
 
-          if (Array.isArray(res)) {
-            this.availableSizesTagString = res
-              .filter((v) => v.quantity > 0)
-              .map(
-                (item) => `${item.sizeDesc.split(" ")[1]} (${item.trackingId})`
-              )
-              .join(", ");
-          }
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
+  getproductSizes() {
+    if (this.productId) {
+      this.productService.getProductSizes(this.productId).subscribe((res: Sizelist[]) => {
+        this.productSizes = res;
+        if (Array.isArray(res)) {
+          this.availableSizesTagString = res
+            .filter((v) => v.quantity > 0)
+            .map(
+              (item) => `${item.sizeDesc.split(" ")[1]} (${item.trackingId})`
+            )
+            .join(", ");
+        }
       });
+    }
   }
 
   checkinStock() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/Product/Sizes/" + this.prodId)
-      .subscribe({
-        next: (res) => {
-          this.productSizes = res;
-          if (this.productSizes[0]["itemGroupSizeId"]) {
-            this.itemGroupSizeId = this.productSizes[0]["itemGroupSizeId"];
-          }
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
+    if (this.productId) {
+      this.productService.getProductSizes(this.productId).subscribe((res: Sizelist[]) => {
+        this.productSizes = res;
+        if (this.productSizes[0]["itemGroupSizeId"]) {
+          this.itemGroupSizeId = this.productSizes[0]["itemGroupSizeId"];
+        }
       });
+    }
   }
 
   initializeCarouselRecentlyViewed() {

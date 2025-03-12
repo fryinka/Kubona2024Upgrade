@@ -197,7 +197,8 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   onChange(event: Event) {
     let x =event.target as HTMLSelectElement;
     let destinationUrl = x.value;
-    this.router.navigate(['category', destinationUrl]);
+      this.router.navigate(["/category", destinationUrl]).then(() => { });
+    
   }
 
   getStyle() {
@@ -442,9 +443,11 @@ if(this.displayedProducts&&!this.isLoading){
   }
 
   navigateToCategory(destinationUrl?: string) {
-    this.router.navigate(["/category", destinationUrl]);
-    this.getSubCategoryList();
-    $('.owl-style').trigger('refresh.owl.carousel');
+    this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
+      this.router.navigate(["/category", destinationUrl]);
+      this.getSubCategoryList();
+      $('.owl-style').trigger('refresh.owl.carousel');    });
+    
   }
 
   initializeCarousel3() {

@@ -1,34 +1,19 @@
-import {
-  Component,
-  AfterViewInit,
-  OnInit,
-  Inject,
-  PLATFORM_ID,
-  afterNextRender,
-} from "@angular/core";
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from "@angular/forms"; // Import ReactiveFormsModule
-import {
-  HttpClient,
-  HttpClientModule,
-  HttpHeaders,
-} from "@angular/common/http";
+import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender } from "@angular/core";
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angular/forms"; // Import ReactiveFormsModule
+import { HttpClient } from "@angular/common/http";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { FlowbiteService } from "../services/flowbite.service";
-
+import { ProductService } from "../services/product.service";
+import { ContactUs } from "../models/models";
 @Component({
-    selector: "app-contact-us",
-    imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
-    templateUrl: "./contact-us.component.html",
-    styleUrls: ["./contact-us.component.css"]
+  selector: "app-contact-us",
+  imports: [FormsModule, CommonModule, ReactiveFormsModule], // Include ReactiveFormsModule
+  templateUrl: "./contact-us.component.html",
+  styleUrls: ["./contact-us.component.css"]
 })
 export class ContactUsComponent implements OnInit, AfterViewInit {
   dataLoaded = false;
@@ -41,13 +26,13 @@ export class ContactUsComponent implements OnInit, AfterViewInit {
     private router: Router,
     private fb: FormBuilder,
     private flowbiteService: FlowbiteService,
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private productService: ProductService
   ) {
     this.contactForm = this.fb.group({
       username: ["", Validators.required],
       email: ["", [Validators.required, Validators.email]],
-      phone: ["", Validators.required],
+      phone: ["", [Validators.required, Validators.pattern("^0?[7-9]?[0-9]{9}$")],],
       message: ["", Validators.required],
     });
 
@@ -58,39 +43,28 @@ export class ContactUsComponent implements OnInit, AfterViewInit {
 
   onSubmit() {
     if (this.contactForm.valid) {
-      const headers = new HttpHeaders({
-        "Content-Type": "application/json",
-      });
-
       const username = this.contactForm.get("username")?.value;
       const email = this.contactForm.get("email")?.value;
-
       const phone = this.contactForm.get("phone")?.value?.toString() || "";
       const message = this.contactForm.get("message")?.value;
-      const formBody = {
+      const formBody: ContactUs = {
         name: username,
         email: email,
         phoneNumber: phone,
         message: message,
       };
-      this.http
-        .post("https://friday.kubona.ng/api/Contact/Add/", formBody)
-        .subscribe(
-          (response) => {
-            console.log("Form submitted successfully!", response);
-            this.contactFormSuccess = "Message has been sent succesffully";
-            if (response) {
-              this.responseShow = true;
-            }
-            // Handle success, show a message, etc.
-          },
-          (error) => {
-            console.error("Error submitting form", error);
-            this.contactFormSuccess = "Message has been sent succesffully";
-            this.responseShow = true;
-            // Handle error, show a message, etc.
-          }
-        );
+      this.productService.submitContactUs(formBody).subscribe(
+        (response) => {
+          console.log("Form submitted successfully!", response);
+          this.contactFormSuccess = "Message has been sent succesffully";
+          this.responseShow = true;
+        },
+        (error) => {
+          console.error("Error submitting form", error);
+          this.contactFormSuccess = "Message has been sent succesffully";
+          this.responseShow = true;
+        }
+      );
     } else {
       console.log("Form is not valid");
     }
