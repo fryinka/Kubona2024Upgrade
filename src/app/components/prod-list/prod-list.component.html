@@ -161,7 +161,7 @@
             (click)="viewProduct(item.destinationUrl)">
             <div class="relative overflow-hidden bg-white shadow-lg rounded-lg h-full flex flex-col">
               <!-- Responsive Image -->
-              <img *ngIf="item.image1Url" src="{{ item.image1Url }}" alt="Image 1"
+              <img *ngIf="item.image1Url" src="{{ item.image1Url }}" alt="{{item.title}}"
                 class="w-full h-full object-contain" />
 
               <img *ngIf="!item.image1Url" src="assets/images/placeholder.png" alt="Placeholder Image"

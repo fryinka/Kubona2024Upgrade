@@ -1,39 +1,41 @@
-import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender } from "@angular/core";
+import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import * as AOS from "aos";
-import { ActivatedRoute, NavigationEnd, Router } from "@angular/router";
-import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { NavigationEnd, Router } from "@angular/router";
 import { FlowbiteService } from "../services/flowbite.service";
+import { SeoService } from "../services/seo.service";
+import { ColorsGroup, MaterialGroup, Prodlist, SizeGroup, StylesGroup } from "../models/models";
+import { forkJoin } from "rxjs";
+import { ProductService } from "../services/product.service";
 
 @Component({
-    selector: "app-search",
-    imports: [CommonModule, HttpClientModule, FormsModule, ReactiveFormsModule],
-    templateUrl: "./search.component.html",
-    styleUrls: ["./search.component.css"]
+  selector: "app-search",
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  templateUrl: "./search.component.html",
+  styleUrls: ["./search.component.css"]
 })
 export class SearchComponent implements OnInit, AfterViewInit {
   advancedFilters = false;
   dataLoaded = false;
-  searchResults: any[] = []; // Adjust type as needed
+  searchResults: Prodlist[] = []; // Adjust type as needed
   searchQuery: string = "";
-  urlId: any;
-  displayedProducts: any[] = [];
+  urlId: string = "";
+  displayedProducts: Prodlist[] = [];
   productsPerPage = 12;
   currentPage = 1;
   hasMoreProducts = false;
   isProducts = false;
   isLoading = false; // <-- Add loading state
 
-  sizes: any = [];
-  sizesWomen: any = [];
+  sizes: SizeGroup[] = [];
   selectedSize: string = "0";
   selectedCategory: string | null = null;
-  colors: any = [];
+  colors: ColorsGroup[] = [];
   selectedColors: string = "0";
-  styles: any = [];
+  styles: StylesGroup[] = [];
   selectedStyles: string = "0";
-  materials: any = [];
+  materials: MaterialGroup[] = [];
   selectedMaterial: string = "0";
   sorts: any = [
     {
@@ -67,20 +69,15 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.advancedFilters = !this.advancedFilters; // Toggles the state
   }
 
-  constructor(
-    private router: Router,
-    private http: HttpClient,
-    private flowbiteService: FlowbiteService,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {}
+  constructor(private router: Router, private flowbiteService: FlowbiteService,
+    @Inject(PLATFORM_ID) private platformId: Object, private seoService: SeoService, private productService: ProductService,) { }
 
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here
-      console.log("Flowbite loaded", flowbite);
+      // console.log("Flowbite loaded", flowbite);
     });
     this.getSizing();
-    this.getSizingWomen();
     this.getColor();
     this.getStyle();
     this.getMaterial();
@@ -88,65 +85,51 @@ export class SearchComponent implements OnInit, AfterViewInit {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded
     }, 1000); // Adjust timeout as necessary
+
+    this.seoService.updateDescription('Product Search');
+    this.seoService.updateTitle('Product Search - Kubona - Premium Italian Leather Shoes.');
   }
 
   selectedSizeClick(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedSize = selectElement.value;
-    console.log("Selected Size:", this.selectedSize);
+    // console.log("Selected Size:", this.selectedSize);
     this.getFilterproducts();
   }
 
   onSearchChange() {
-    console.log(this.searchQuery);
+    // console.log(this.searchQuery);
     this.getFilterproducts();
   }
 
-  viewProduct(productId: number) {
-    this.router.navigate(["/product-details", productId]);
+  viewProduct(productId: string) {
+    this.router.navigate(["/product", productId]);
   }
 
   openAdvancedFilters() {
     this.advancedFilters = !this.advancedFilters;
   }
   getSizing() {
-    this.http
-      .get("https://friday.kubona.ng/api/SizingGroupBy/70610")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.sizes = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    forkJoin({
+      men: this.productService.getSizingGroupBy("70610"),
+      women: this.productService.getSizingGroupBy("70710"),
+    }).subscribe({
+      next: ({ men, women }) => {
+        this.sizes = [...women, ...men].sort((a, b) => a.sizeCode - b.sizeCode);
+      },
+      error: (err) => console.error("There was an error!", err),
+    });
   }
-  getSizingWomen() {
-    this.http
-      .get("https://friday.kubona.ng/api/SizingGroupBy/70710")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.sizesWomen = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
-  }
+
   getColor() {
-    this.http
-      .get("https://friday.kubona.ng/api/ColorsGroupBy/70710")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.colors = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.productService.getColorGroupBy("70000").subscribe({
+      next: (res) => {
+        this.colors = res;
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
   onColorChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
@@ -155,17 +138,14 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.getFilterproducts();
   }
   getStyle() {
-    this.http
-      .get("https://friday.kubona.ng/api/StylesGroupBy/70710")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.styles = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.productService.getStyleGroupBy("70000").subscribe({
+      next: (res) => {
+        this.styles = res;
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
   onStyleChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
@@ -174,85 +154,56 @@ export class SearchComponent implements OnInit, AfterViewInit {
     this.getFilterproducts();
   }
   getMaterial() {
-    this.http
-      .get("https://friday.kubona.ng/api/MaterialGroupBy/70710")
-      .subscribe({
-        next: (res) => {
-          console.log(res);
-          this.materials = res;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });
+    this.productService.geMaterialGroupBy("70000").subscribe({
+      next: (res) => {
+        this.materials = res;
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+      },
+    });
   }
+
   onMaterialChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedMaterial = selectElement.value;
-    console.log("Selected Material:", this.selectedMaterial);
     this.getFilterproducts();
   }
   onSortChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedSort = selectElement.value;
-    console.log("Selected Sort:", this.selectedSort);
     this.getFilterproducts();
   }
 
   getFilterproducts() {
-    if (this.selectedSize == null || this.selectedSize == "") {
-      this.selectedSize = "0";
-    }
+    const defaultVal = "0";
 
-    if (this.selectedColors == null || this.selectedColors == "") {
-      this.selectedColors = "0";
-    }
+    this.selectedSize ??= defaultVal;
+    this.selectedColors ??= defaultVal;
+    this.selectedStyles ??= defaultVal;
+    this.selectedMaterial ??= defaultVal;
 
-    if (this.selectedStyles == null || this.selectedStyles == "") {
-      this.selectedStyles = "0";
-    }
+    this.urlId = `0-${this.selectedSize}-${this.selectedColors}-${this.selectedStyles}-${this.selectedMaterial}`;
 
-    if (this.selectedMaterial == null || this.selectedMaterial == "") {
-      this.selectedMaterial = "0";
-    }
-
-    this.urlId =
-      "0" +
-      "-" +
-      this.selectedSize +
-      "-" +
-      this.selectedColors +
-      "-" +
-      this.selectedStyles +
-      "-" +
-      this.selectedMaterial;
-    if (this.searchQuery == null || this.searchQuery == "") {
+    if (!this.searchQuery) {
       alert("Please type to search");
-    } else {
-      this.isLoading = true; // <-- Start loading
-      this.http
-        .get<any[]>(
-          "https://friday.kubona.ng/api/Product/Search?query=" +
-            this.searchQuery +
-            "&urlId=" +
-            this.urlId
-        )
-        .subscribe({
-          next: (res) => {
-            console.log("Products", res);
-            this.searchResults = res;
-            this.loadProducts();
-            this.isProducts = this.searchResults.length > 0;
-          },
-          error: (err) => {
-            console.error("There was an error!", err);
-          },
-          complete: () => {
-            this.isLoading = false; // <-- Stop loading
-          },
-        });
+      return;
     }
+
+    this.isLoading = true;
+
+    this.productService.searchProduct(this.urlId, this.searchQuery).subscribe({
+      next: (res) => {
+        // console.log("Products", res);
+        this.searchResults = res;
+        this.loadProducts();
+        this.isProducts = this.searchResults.length > 0;
+      },
+      error: (err) => console.error("There was an error!", err),
+      complete: () => (this.isLoading = false),
+    });
   }
+
 
   loadProducts() {
     if (Array.isArray(this.searchResults)) {
@@ -286,8 +237,8 @@ export class SearchComponent implements OnInit, AfterViewInit {
     if (isPlatformBrowser(this.platformId)) {
       if (
         (document?.getElementById("products")?.clientHeight ?? 0) +
-          (document?.getElementById("products")?.scrollTop ?? 0) >=
-          (document?.getElementById("products")?.scrollHeight ?? 0) &&
+        (document?.getElementById("products")?.scrollTop ?? 0) >=
+        (document?.getElementById("products")?.scrollHeight ?? 0) &&
         this.hasMoreProducts
       ) {
         // 100px buffer before reaching the bottom

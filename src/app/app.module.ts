@@ -9,7 +9,7 @@ import { HomeComponent } from './home/home.component';
 import { SearchComponent } from './search/search.component';
 import { ProductsComponent } from './products/products.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
-import { CategoryComponent } from './category/category.component';
+import { CategoryComponent } from './to_be_deleted/category/category.component';
 import { AddToCartComponent } from './add-to-cart/add-to-cart.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { Util } from './util/util.component';

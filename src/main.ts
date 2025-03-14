@@ -10,12 +10,7 @@ bootstrapApplication(AppComponent, {
   providers: [provideHttpClient(),provideRouter(routes), provideClientHydration(), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
-          }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          }), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          })]
+          })
+        ]
 })
 .catch(err => console.error(err));

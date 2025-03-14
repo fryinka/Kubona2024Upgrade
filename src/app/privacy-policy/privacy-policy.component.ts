@@ -1,34 +1,39 @@
-import { Component,AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender } from '@angular/core';
+import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 declare var $: any;
 import * as AOS from 'aos';
 import 'aos/dist/aos.css';
 import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../services/flowbite.service';
+import { SeoService } from '../services/seo.service';
 
 @Component({
-    selector: 'app-privacy-policy',
-    imports: [],
-    templateUrl: './privacy-policy.component.html',
-    styleUrl: './privacy-policy.component.css'
+  selector: 'app-privacy-policy',
+  imports: [],
+  templateUrl: './privacy-policy.component.html',
+  styleUrl: './privacy-policy.component.css'
 })
-export class PrivacyPolicyComponent implements OnInit ,AfterViewInit {
+export class PrivacyPolicyComponent implements OnInit, AfterViewInit {
   dataLoaded = false;
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private flowbiteService: FlowbiteService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object,
+    private flowbiteService: FlowbiteService, private seoService: SeoService) { }
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here
-      console.log("Flowbite loaded", flowbite);
+      // console.log("Flowbite loaded", flowbite);
     });
-    
+
     setTimeout(() => {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded
     }, 1000); // Adjust timeout as necessary
-    
+
+    this.seoService.updateDescription('Privacy');
+    this.seoService.updateTitle('Privacy - Kubona - Premium Italian Leather Shoes.');
+
   }
 
-  
+
 
   ngAfterViewInit(): void {
 
@@ -43,8 +48,8 @@ export class PrivacyPolicyComponent implements OnInit ,AfterViewInit {
         AOS.refresh();
       }
     });
-    
-    
+
+
   }
 
 }

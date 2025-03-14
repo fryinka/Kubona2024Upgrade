@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { CategoryTitle, ColorsGroup, ContactUs, HeelHeightGroup, ImageRotators, MaterialGroup, OtherColors, Prodlist, ProductImages, RecentlyViewed, RelatedProducts, SizeGroup, Sizelist, SlideShowImages, StylesGroup } from '../models/models';
+import { CategoryTitle, ColorsGroup, ContactUs, HeelHeightGroup, ImageRotators, MaterialGroup, OtherColors, Prodlist, ProductImages, RecentlyViewed, RelatedProducts, Reviews, SizeGroup, Sizelist, SlideShowImages, StylesGroup } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -80,7 +80,7 @@ export class ProductService {
     var url = this.baseURL + 'api/Image/ImageRotators';
     var params = new HttpParams()
       .set("rotatorId", rotatorId.toString())
-      .set("pageSize", pageSize.toString())
+      .set("pageSize", pageSize.toString());
     return this.http.get<ImageRotators[]>(url, { params });
   }
 
@@ -126,5 +126,18 @@ export class ProductService {
       "Content-Type": "application/json",
     });
     return this.http.post(url, formBody, { headers });
+  }
+
+  getReviews(): Observable<Reviews[]> {
+    var url = this.baseURL + 'api/Reviews/GetAll';
+    return this.http.get<Reviews[]>(url)
+  }
+
+  searchProduct(urlId: string, query: string): Observable<Prodlist[]> {
+    var url = this.baseURL + 'api/Product/Search'
+    const params = new HttpParams()
+      .set("query", query)
+      .set("urlId", urlId)
+    return this.http.get<Prodlist[]>(url, { params });
   }
 }

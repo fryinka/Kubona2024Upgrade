@@ -12,10 +12,11 @@ import { CategoryService } from "../../services/category.service";
 import { FlowbiteService } from "../../services/flowbite.service";
 import { ProductService } from "../../services/product.service";
 import { ColorsGroup, HeelHeightGroup, MaterialGroup, Prodlist, SizeGroup, StylesGroup } from "../../models/models";
+import { SeoService } from "../../services/seo.service";
 
 @Component({
   selector: 'app-prod-list',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule,RouterModule,],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule,],
   templateUrl: './prod-list.component.html',
   styleUrl: './prod-list.component.css'
 })
@@ -40,7 +41,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   styles: StylesGroup[] = [];
   selectedStyles: string = "0";
   materials: MaterialGroup[] = [];
-  heels:HeelHeightGroup[]=[];
+  heels: HeelHeightGroup[] = [];
   selectedMaterial: string = "0";
   hasCategoryId: boolean = false;
   sorts: any = [
@@ -96,26 +97,10 @@ export class ProdListComponent implements OnInit, AfterViewInit {
 
 
 
-  constructor(
-    private router: Router,
-    private httpClient: HttpClient,
-    private http: HttpClient,
-    private route: ActivatedRoute,
-    private titleService: Title,
-    private metaService: Meta,
-    private categoryService: CategoryService,
-    private flowbiteService: FlowbiteService,
-    private productService: ProductService,
-    @Inject(PLATFORM_ID) private platformId: Object
-  ) {
-    this.titleService.setTitle("Mens Category");
-    this.metaService.addTags([
-      { name: "keywords", content: "Mens Category" },
-      {
-        name: "description",
-        content: "Mens Category page description content",
-      },
-    ]);
+  constructor(private router: Router, private route: ActivatedRoute, private titleService: Title, private metaService: Meta,
+    private categoryService: CategoryService, private flowbiteService: FlowbiteService,
+    private productService: ProductService, @Inject(PLATFORM_ID) private platformId: Object, private seoService: SeoService) {
+
   }
 
   onScroll(event: Event) {
@@ -159,7 +144,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
       this.selectedSize = sizeCode;
       this.getFilterproducts();
     } else {
-      this.getproducts();
+      this.getProductList();
     }
   }
   checkViewport(): void {
@@ -195,10 +180,13 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     });
   }
   onChange(event: Event) {
-    let x =event.target as HTMLSelectElement;
+    let x = event.target as HTMLSelectElement;
     let destinationUrl = x.value;
+
+    this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
       this.router.navigate(["/category", destinationUrl]).then(() => { });
-    
+    });
+
   }
 
   getStyle() {
@@ -221,8 +209,8 @@ export class ProdListComponent implements OnInit, AfterViewInit {
       this.materials = response;;
     });
   }
-  
-  getHeelHeight(){
+
+  getHeelHeight() {
     this.route.paramMap.pipe(
       switchMap((params: ParamMap) => {
         const catId = params.get("categoryId") ?? "";
@@ -242,48 +230,60 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   getProductList() {
     this.isProductLoading = true;
     this.isProducts = false;
-    this.route.paramMap.pipe(switchMap((params: ParamMap) =>
-      this.productService.getProducts(params.get("categoryId") || "70000", 0, 0, Number(params.get("sortId")), 0, this.grandSize)
-    )).subscribe((response) => {
-      if (response.length > 0) {
-        this.prodlistsArr = response;
-            this.arrayLength = this.prodlistsArr.length > this.pageSize ? this.pageSize : this.prodlistsArr.length;
-            this.isLoadingMore = this.prodlistsArr.length > this.pageSize ? true : false;
-            this.pageIndex = 0;
-            this.displayedProducts = this.prodlistsArr.splice(this.pageIndex, this.arrayLength);
-            this.isProductLoading = false;
-            this.isProducts = this.displayedProducts.length > 0;
-      }
-    });
-  }
 
-  getproducts() {
-    this.isProductLoading = true;
-    this.isProducts = false;
-
-    const searchQuery = this.constructQuery();
-
-    const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
-
-    this.httpClient.get<any[]>(API_URL).subscribe({
-      next: (res) => {
-        console.log("Products", res);
-        this.products = res;
-        this.displayedProducts = res;
-        this.isProducts = this.products.length > 0;
+    this.route.paramMap
+      .pipe(
+        switchMap((params: ParamMap) => {
+          this.urlId = params.get("categoryId") || "70000";
+          const sortId = Number(params.get("sortId")) || 0;
+          return this.productService.getProducts(this.urlId, 0, 0, sortId, 0, this.grandSize);
+        })
+      )
+      .subscribe((response) => {
         this.isProductLoading = false;
-        this.isProducts = true;
-        if (this.products.length > 0) {
-          this.page++; // Increment the page number
-          this.isProducts = true;
+
+        if (response.length > 0) {
+          this.prodlistsArr = response;
+          this.arrayLength = Math.min(this.pageSize, this.prodlistsArr.length);
+          this.isLoadingMore = this.prodlistsArr.length > this.pageSize;
+          this.pageIndex = 0;
+          this.displayedProducts = this.prodlistsArr.splice(this.pageIndex, this.arrayLength);
+          this.isProducts = this.displayedProducts.length > 0;
         }
-      },
-      error: (err) => {
-        console.error("There was an error!", err);
+      }, (error) => {
+        console.error("Error fetching products:", error);
         this.isProductLoading = false;
-      },
-    });
+      });
   }
+
+
+  // getproducts() {
+  //   this.isProductLoading = true;
+  //   this.isProducts = false;
+
+  //   const searchQuery = this.constructQuery();
+
+  //   const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
+
+  //   this.httpClient.get<any[]>(API_URL).subscribe({
+  //     next: (res) => {
+  //       console.log("Products", res);
+  //       this.products = res;
+  //       this.displayedProducts = res;
+  //       this.isProducts = this.products.length > 0;
+  //       this.isProductLoading = false;
+  //       this.isProducts = true;
+  //       if (this.products.length > 0) {
+  //         this.page++; // Increment the page number
+  //         this.isProducts = true;
+  //       }
+  //     },
+  //     error: (err) => {
+  //       console.error("There was an error!", err);
+  //       this.isProductLoading = false;
+  //     },
+  //   });
+  // }
 
   getproductsBySizes(sizeId: any) {
     this.isProductLoading = true;
@@ -293,8 +293,8 @@ export class ProdListComponent implements OnInit, AfterViewInit {
 
   filterProductsForSizes(destinationUrl: string) {
     if (destinationUrl == "All") {
-      this.selectedSize = destinationUrl;
-      this.getproducts();
+      this.selectedSize = "0";
+      this.getProductList();
     } else {
       this.router.navigate(['category', destinationUrl]);
     }
@@ -304,90 +304,42 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     this.isProductLoading = true;
     this.isProducts = false;
 
-    if (
-      this.selectedSize == null ||
-      this.selectedSize == "" ||
-      this.selectedSize == undefined
-    ) {
-      this.selectedSize = "0";
-    }
+    let fast = this.urlId.split("-");
+    this.selectedCategory = fast[0];
+    this.selectedSize = fast[1];
+    this.selectedColors = fast[2];
+    this.selectedStyles = fast[3];
+    this.selectedMaterial = fast[4];
+    let heel = fast[5]
 
-    if (
-      this.selectedColors == null ||
-      this.selectedColors == "" ||
-      this.selectedColors == undefined
-    ) {
-      this.selectedColors = "0";
-    }
-
-    if (
-      this.selectedStyles == null ||
-      this.selectedStyles == "" ||
-      this.selectedStyles == undefined
-    ) {
-      this.selectedStyles = "0";
-    }
-
-    if (
-      this.selectedMaterial == null ||
-      this.selectedMaterial == "" ||
-      this.selectedMaterial == undefined
-    ) {
-      this.selectedMaterial = "0";
-    }
-
-    if (
-      this.selectedCategory == null ||
-      this.selectedCategory == "" ||
-      this.selectedCategory == undefined
-    ) {
-      this.selectedCategory = "70610";
-    }
-
-    this.searchQuery =
-      this.selectedCategory +
-      "-" +
-      this.selectedSize +
-      "-" +
-      this.selectedColors +
-      "-" +
-      this.selectedStyles +
-      "-" +
-      this.selectedMaterial;
+    this.searchQuery = `${this.selectedCategory}-${this.selectedSize}-${this.selectedColors}-${this.selectedStyles}-${this.selectedMaterial}-${heel}`
     console.log("query" + this.searchQuery);
 
-    this.httpClient
-      .get<any[]>(
-        "https://friday.kubona.ng/api/Product/Products/" +
-        this.searchQuery +
-        "&sortId=" +
-        this.selectedSort
-      )
-      .subscribe({
-        next: (res) => {
-          this.products = res;
-          this.displayedProducts = res;
-          this.isProducts = this.products.length > 0;
-          this.isProductLoading = false;
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-          this.isProductLoading = false;
-        },
-      });
+    this.productService.getProducts(this.searchQuery, 0, 0, Number(this.selectedSort), this.pageIndex, this.pageSize).subscribe({
+      next: (res) => {
+        this.products = res;
+        this.displayedProducts = res;
+        this.isProducts = this.products.length > 0;
+        this.isProductLoading = false;
+      },
+      error: (err) => {
+        console.error("There was an error!", err);
+        this.isProductLoading = false;
+      },
+    });
   }
 
   loadMore() {
-if(this.displayedProducts&&!this.isLoading){
-  this.isLoading = true;
-  let big = this.prodlistsArr.splice(0, this.pageSize);
-    if (big.length > 0) {
-      let Arr = this.displayedProducts.concat(big);
-      this.displayedProducts = Arr;
+    if (this.displayedProducts && !this.isLoading) {
+      this.isLoading = true;
+      let big = this.prodlistsArr.splice(0, this.pageSize);
+      if (big.length > 0) {
+        let Arr = this.displayedProducts.concat(big);
+        this.displayedProducts = Arr;
+      }
+      this.isLoading = false;
+      this.isLoadingMore = false;
     }
-    this.isLoading = false;
-    this.isLoadingMore = false;
-}
 
   }
   initializeCarousel() {
@@ -446,8 +398,9 @@ if(this.displayedProducts&&!this.isLoading){
     this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
       this.router.navigate(["/category", destinationUrl]);
       this.getSubCategoryList();
-      $('.owl-style').trigger('refresh.owl.carousel');    });
-    
+      $('.owl-style').trigger('refresh.owl.carousel');
+    });
+
   }
 
   initializeCarousel3() {

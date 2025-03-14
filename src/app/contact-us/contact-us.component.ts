@@ -9,6 +9,7 @@ import { FormsModule } from "@angular/forms";
 import { FlowbiteService } from "../services/flowbite.service";
 import { ProductService } from "../services/product.service";
 import { ContactUs } from "../models/models";
+import { SeoService } from "../services/seo.service";
 @Component({
   selector: "app-contact-us",
   imports: [FormsModule, CommonModule, ReactiveFormsModule], // Include ReactiveFormsModule
@@ -22,12 +23,8 @@ export class ContactUsComponent implements OnInit, AfterViewInit {
   contactFormSuccess = "Message Sending";
   responseShow: boolean = false;
 
-  constructor(
-    private router: Router,
-    private fb: FormBuilder,
-    private flowbiteService: FlowbiteService,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private productService: ProductService
+  constructor(private router: Router, private fb: FormBuilder, private flowbiteService: FlowbiteService,
+    @Inject(PLATFORM_ID) private platformId: Object, private productService: ProductService, private seoService: SeoService,
   ) {
     this.contactForm = this.fb.group({
       username: ["", Validators.required],
@@ -38,6 +35,33 @@ export class ContactUsComponent implements OnInit, AfterViewInit {
 
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
+    });
+  }
+
+  ngOnInit() {
+    this.flowbiteService.loadFlowbite((flowbite) => {
+      // Your custom code here
+      console.log("Flowbite loaded", flowbite);
+    });
+    setTimeout(() => {
+      this.dataLoaded = true;
+      AOS.refresh(); // Refresh AOS after data is loaded
+    }, 1000); // Adjust timeout as necessary
+    this.seoService.updateDescription('Contact Kubona');
+    this.seoService.updateTitle('Contact Kubona - Kubona - Premium Italian Leather Shoes.');
+  }
+
+  ngAfterViewInit(): void {
+    AOS.init({
+      duration: 1200, // Adjust animation duration if needed
+      once: false, // Whether animation should happen only once - while scrolling down
+      mirror: false, // Whether elements should animate out while scrolling past them
+    });
+
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        AOS.refresh();
+      }
     });
   }
 
@@ -70,28 +94,5 @@ export class ContactUsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  ngOnInit() {
-    this.flowbiteService.loadFlowbite((flowbite) => {
-      // Your custom code here
-      console.log("Flowbite loaded", flowbite);
-    });
-    setTimeout(() => {
-      this.dataLoaded = true;
-      AOS.refresh(); // Refresh AOS after data is loaded
-    }, 1000); // Adjust timeout as necessary
-  }
 
-  ngAfterViewInit(): void {
-    AOS.init({
-      duration: 1200, // Adjust animation duration if needed
-      once: false, // Whether animation should happen only once - while scrolling down
-      mirror: false, // Whether elements should animate out while scrolling past them
-    });
-
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        AOS.refresh();
-      }
-    });
-  }
 }

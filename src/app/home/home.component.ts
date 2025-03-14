@@ -12,7 +12,7 @@ import { NewlyArrivedComponent } from "../components/newly-arrived/newly-arrived
 import { SeoService } from "../services/seo.service";
 import { ProductService } from "../services/product.service";
 import { forkJoin } from "rxjs";
-import { ImageRotators, Prodlist, SlideShowImages } from "../models/models";
+import { ImageRotators, Prodlist, Reviews, SlideShowImages } from "../models/models";
 @Component({
     selector: "app-home",
     imports: [CommonModule, HttpClientModule, ReactiveFormsModule, RouterModule, NewlyArrivedComponent], // Include ReactiveFormsModule
@@ -48,11 +48,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
     });
-    this.titleService.setTitle("Homepage");
-    this.metaService.addTags([
-      { name: "keywords", content: "Homepage" },
-      { name: "description", content: "Home page description content" },
-    ]);
   }
 
   selectedSizeClick(sizeCode: string) {
@@ -107,7 +102,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   womenRelatedProducts: Prodlist[] = [];
   accRelatedProducts: any = [];
   slideShowImages: SlideShowImages[] = [];
-  allReviews: any = [];
+  allReviews: any[] = [];
   allCategories: ImageRotators[] = [];
   allStyles: any = [];
   allStylesWomen: any = [];
@@ -195,18 +190,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
     get_reviews() {
-    this.httpClient
-      .get("https://friday.kubona.ng/api/Reviews/GetAll")
-      .subscribe({
+      this.productService.getReviews().subscribe({
         next: (res) => {
-          console.log(res);
           this.allReviews = res;
           setTimeout(() => this.initializeCarousel3(), 0);
         },
         error: (err) => {
           console.error("There was an error!", err);
         },
-      });
+      });      
   }
 
   get_sizes() {

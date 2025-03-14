@@ -1,18 +1,6 @@
-import {
-  Component,
-  AfterViewInit,
-  OnInit,
-  Inject,
-  PLATFORM_ID,
-  afterNextRender,
-} from "@angular/core";
+import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender, } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from "@angular/forms"; // Import ReactiveFormsModule
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, } from "@angular/forms"; // Import ReactiveFormsModule
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { FormsModule } from "@angular/forms";
 declare var $: any;
@@ -21,24 +9,21 @@ import "aos/dist/aos.css";
 import { NavigationEnd, Router } from "@angular/router";
 import { platformBrowser } from "@angular/platform-browser";
 import { FlowbiteService } from "../services/flowbite.service";
+import { SeoService } from "../services/seo.service";
 
 @Component({
-    selector: "app-about-us",
-    imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
-    templateUrl: "./about-us.component.html",
-    styleUrl: "./about-us.component.css"
+  selector: "app-about-us",
+  imports: [FormsModule, CommonModule, HttpClientModule, ReactiveFormsModule], // Include ReactiveFormsModule
+  templateUrl: "./about-us.component.html",
+  styleUrl: "./about-us.component.css"
 })
 export class AboutUsComponent implements OnInit, AfterViewInit {
   dataLoaded = false;
   newsletterForm: FormGroup;
   newsletterSuccess: any;
 
-  constructor(
-    private router: Router,
-    private fb: FormBuilder,
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private flowbiteService: FlowbiteService
+  constructor(private router: Router, private fb: FormBuilder, private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object, private flowbiteService: FlowbiteService, private seoService: SeoService
   ) {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
@@ -53,6 +38,8 @@ export class AboutUsComponent implements OnInit, AfterViewInit {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded
     }, 1000); // Adjust timeout as necessary
+    this.seoService.updateDescription('About Kubona.ng');
+    this.seoService.updateTitle('About Kubona.ng - Kubona - Premium Italian Leather Shoes.');
   }
 
   onSubscribe() {

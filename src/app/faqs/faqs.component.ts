@@ -1,11 +1,4 @@
-import {
-  Component,
-  AfterViewInit,
-  OnInit,
-  Inject,
-  PLATFORM_ID,
-  afterNextRender,
-} from "@angular/core";
+import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender, } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 declare var $: any;
 import * as AOS from "aos";
@@ -15,19 +8,17 @@ import { FlowbiteService } from "../services/flowbite.service";
 import { SeoService } from "../services/seo.service";
 
 @Component({
-    selector: "app-faqs",
-    imports: [],
-    templateUrl: "./faqs.component.html",
-    styleUrl: "./faqs.component.css"
+  selector: "app-faqs",
+  imports: [],
+  templateUrl: "./faqs.component.html",
+  styleUrl: "./faqs.component.css"
 })
 export class FaqsComponent implements OnInit, AfterViewInit {
   dataLoaded = false;
-  constructor(
-    private router: Router,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private flowbiteService: FlowbiteService,
-    private seoService:SeoService
-  ) {}
+
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object,
+    private flowbiteService: FlowbiteService, private seoService: SeoService,) { }
+
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here

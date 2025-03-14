@@ -5,6 +5,7 @@ import * as AOS from 'aos';
 import 'aos/dist/aos.css';
 import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../services/flowbite.service';
+import { SeoService } from '../services/seo.service';
 
 @Component({
     selector: 'app-how-to-place-an-order',
@@ -14,7 +15,7 @@ import { FlowbiteService } from '../services/flowbite.service';
 })
 export class HowToPlaceAnOrderComponent  implements OnInit ,AfterViewInit {
   dataLoaded = false;
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private flowbiteService: FlowbiteService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private flowbiteService: FlowbiteService, private seoService:SeoService) {}
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here
@@ -24,6 +25,9 @@ export class HowToPlaceAnOrderComponent  implements OnInit ,AfterViewInit {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded
     }, 1000); // Adjust timeout as necessary
+
+    this.seoService.updateDescription('How Kubona.ng works');
+    this.seoService.updateTitle('How Kubona.ng works - Kubona - Premium Italian Leather Shoes.');
     
   }
 

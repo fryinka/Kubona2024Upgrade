@@ -150,3 +150,18 @@ export interface CategoryTitle {
     phoneNumber: string;
     message: string;
   }
+  export interface Reviews 
+    {
+      reviewId: number,
+      customerGSM: string,
+      reviewerName: string,
+      productId: number,
+      rating: number,
+      imageUrl: string,
+      reviewTitle: string,
+      dateAdded: Date,
+      datePurchased: Date,
+      isApproved: boolean,
+      fullReview: string,
+      addedby: string
+    }

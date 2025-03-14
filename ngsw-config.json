@@ -1,6 +1,26 @@
 {
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
+  "dataGroups": [
+    {
+      "name": "productApis",
+      "urls": [
+        "https://friday.kubona.ng/api/Product/**",
+        "https://friday.kubona.ng/api/Product/Products/**",
+        "https://friday.kubona.ng/api/**"
+      ],
+      "cacheConfig": {
+        "maxSize": 200,
+        "maxAge": "6h",
+        "strategy": "performance",
+        "timeout": "5s",
+        "cacheOpaqueResponses": true
+      },
+      "cacheQueryOptions": {
+        "ignoreSearch": true
+      }
+    }
+  ],
   "assetGroups": [
     {
       "name": "app",
@@ -22,6 +42,7 @@
       "updateMode": "prefetch",
       "resources": {
         "files": [
+          "/assets/**",
           "/**/*.(svg|cur|jpg|jpeg|png|apng|webp|avif|gif|otf|ttf|woff|woff2)"
         ]
       }
