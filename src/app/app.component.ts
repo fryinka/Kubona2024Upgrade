@@ -7,7 +7,7 @@ import { FormsModule } from "@angular/forms";
 import { ScrollService } from "./services/scroll.service";
 import { RouterModule } from "@angular/router";
 import { CartService } from "./services/cart.service";
-import { CategoryService } from "./services/category.service";
+import { CategoryService } from "./to_be_deleted/category.service";
 import { FooterComponent } from "./components/footer/footer.component";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { SwUpdate, VersionEvent, VersionReadyEvent } from "@angular/service-worker";

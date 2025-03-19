@@ -13,7 +13,7 @@ import { Prodlist, ProductImages, RecentlyViewed, RelatedProducts, Sizelist } fr
 
 @Component({
   selector: "app-product-details",
-  imports: [CommonModule, ],
+  imports: [CommonModule,],
   templateUrl: "./product-details.component.html",
   styleUrls: ["./product-details.component.css"]
 })
@@ -38,7 +38,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   prodId: number = 0;
   availableSizesTagString: string = "";
   selectedColorId: string | null = null;
-  recommendedProducts: RelatedProducts[] = [];  
+  recommendedProducts: RelatedProducts[] = [];
   departmentId: number = 0;
   randomId: any;
   loader: boolean = false;
@@ -123,6 +123,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.recentlyViewedPost();
     this.getRecommendedProducts();
     this.selectedColorId = this.productDetails.colorDesc;
+    this.loadRecentlyViewed();
 
     setTimeout(() => {
       this.dataLoaded = true;
@@ -156,7 +157,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     // If userId does not exist, create a new one based on current date/time
     if (!userId) {
       const currentDate = new Date();
-      userId = currentDate.toISOString();
+      userId = currentDate.getTime().toString();
       localStorage.setItem("userId", userId);
     }
 
@@ -164,13 +165,13 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
     const formBody2 = {
       userId: userId,
-      itemId: this.prodId,
+      itemId: this.productId?.split("-")[0],
       viewDate: new Date().toISOString(),
       numOfViews: "0",
     };
 
     // Send data to the API
-    this.productService.postRecentlyViewed(formBody2).subscribe(response=>{
+    this.productService.postRecentlyViewed(formBody2).subscribe(response => {
       this.getRecentlyViewed();
     }, error => {
       console.error("Error submitting form", error);
@@ -194,6 +195,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
           console.error("Error fetching recently viewed products", error);
         },
       });
+
     } else {
     }
   }
@@ -358,7 +360,10 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     };
 
     cart.push(item);
-    this.cartService.addToCart(item);
+    this.cartService.addToCart(item).subscribe(response => {
+      console.log(response);
+      alert(response);
+    });
     localStorage.setItem("cart", JSON.stringify(cart));
   }
 
@@ -409,17 +414,17 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
   getproductImages() {
-   if(this.productId){
-    this.productService.getProductImages(this.productId).subscribe({
-      next: (response: any) => {
-        this.productImages = response;
-        this.productImage = this.productImages[0].image;
-        setTimeout(() => this.initializeCarousel2(), 0);
-      }, error: (err) => {
-        console.error("There was an error!", err);
-      },
-    });
-   }
+    if (this.productId) {
+      this.productService.getProductImages(this.productId).subscribe({
+        next: (response: any) => {
+          this.productImages = response;
+          this.productImage = this.productImages[0].image;
+          setTimeout(() => this.initializeCarousel2(), 0);
+        }, error: (err) => {
+          console.error("There was an error!", err);
+        },
+      });
+    }
   }
 
 

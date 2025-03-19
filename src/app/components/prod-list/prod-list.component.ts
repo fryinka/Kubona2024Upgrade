@@ -1,14 +1,11 @@
-import { Component, AfterViewInit, OnInit, HostListener, Inject, PLATFORM_ID, afterNextRender, } from "@angular/core";
+import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, } from "@angular/core";
 import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { ActivatedRoute, NavigationEnd, ParamMap, Router, RouterModule } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
-import { Meta, Title } from "@angular/platform-browser";
-import { filter, switchMap } from "rxjs/operators";
-import { CategoryService } from "../../services/category.service";
+import { switchMap } from "rxjs/operators";
 import { FlowbiteService } from "../../services/flowbite.service";
 import { ProductService } from "../../services/product.service";
 import { ColorsGroup, HeelHeightGroup, MaterialGroup, Prodlist, SizeGroup, StylesGroup } from "../../models/models";
@@ -94,13 +91,12 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   grandSize: number = 2000;
   arrayLength: number = 0;
   urlId: string = '';
+  title: string = '';
 
 
 
-  constructor(private router: Router, private route: ActivatedRoute, private titleService: Title, private metaService: Meta,
-    private categoryService: CategoryService, private flowbiteService: FlowbiteService,
+  constructor(private router: Router, private route: ActivatedRoute, private flowbiteService: FlowbiteService,
     private productService: ProductService, @Inject(PLATFORM_ID) private platformId: Object, private seoService: SeoService) {
-
   }
 
   onScroll(event: Event) {
@@ -257,34 +253,6 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   }
 
 
-  // getproducts() {
-  //   this.isProductLoading = true;
-  //   this.isProducts = false;
-
-  //   const searchQuery = this.constructQuery();
-
-  //   const API_URL = `https://friday.kubona.ng/api/Product/Products/${searchQuery}?pageIndex=${this.page}`;
-
-  //   this.httpClient.get<any[]>(API_URL).subscribe({
-  //     next: (res) => {
-  //       console.log("Products", res);
-  //       this.products = res;
-  //       this.displayedProducts = res;
-  //       this.isProducts = this.products.length > 0;
-  //       this.isProductLoading = false;
-  //       this.isProducts = true;
-  //       if (this.products.length > 0) {
-  //         this.page++; // Increment the page number
-  //         this.isProducts = true;
-  //       }
-  //     },
-  //     error: (err) => {
-  //       console.error("There was an error!", err);
-  //       this.isProductLoading = false;
-  //     },
-  //   });
-  // }
-
   getproductsBySizes(sizeId: any) {
     this.isProductLoading = true;
     this.selectedSize = sizeId === "All" ? null : sizeId;
@@ -439,67 +407,18 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     this.getStyle();
     this.getMaterial();
     this.getHeelHeight();
+    this.getCategoryTitle();
     this.isMobileView = window.innerWidth < 768; // Adjust the breakpoint as needed
     window.addEventListener("resize", () => {
       this.isMobileView = window.innerWidth < 768;
     });
 
-
-    this.route.paramMap.subscribe((params) => {
-      const slug = params.get("slug");
-      const id = this.categoryService.getCategoryId();
-      if (slug && id) {
-        this.hasCategoryId = true;
-        const formattedTitle = `Men's Collection - ${this.formatSlug(slug)}`;
-        this.titleService.setTitle(formattedTitle);
-        this.metaService.updateTag({
-          name: "description",
-          content: `Explore men's collection for ${this.formatSlug(
-            slug
-          )} and find the perfect items.`,
-        });
-      } else {
-        this.hasCategoryId = false; // If no 'id' is found, set 'hasId' to false
-        // this.getproducts();
-        this.getProductList();
-        const formattedTitle = `Men's Collection`;
-        this.titleService.setTitle(formattedTitle);
-        this.metaService.updateTag({
-          name: "description",
-          content: `Explore men's collection and find the perfect items.`,
-        });
-      }
-    });
     setTimeout(() => {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded
     }, 1000); // Adjust timeout as necessary
   }
 
-  formatSlug(slug: string): string {
-    // Convert slug to a user-friendly format (e.g., replace hyphens with spaces and capitalize)
-    return slug
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  }
-
-  constructQuery(): string {
-    const queryParts = [
-      this.selectedCategory,
-      this.selectedSize === "All" ? null : this.selectedSize,
-      this.selectedColors,
-      this.selectedStyles,
-      this.selectedMaterial,
-    ];
-
-    // Filter out null or undefined values and join the remaining parts
-    const query = queryParts
-      .filter((part) => part !== null && part !== undefined)
-      .join("-");
-
-    return `${query}&sortId=${this.selectedSort}`;
-  }
 
   ngAfterViewInit(): void {
     AOS.init({
@@ -523,10 +442,44 @@ export class ProdListComponent implements OnInit, AfterViewInit {
       })
     ).subscribe(response => {
       this.subCategories = response.filter(x => x.imageUrl);
-      console.log("subCategories", this.subCategories);
       this.isCategoryLoading = false;
       setTimeout(() => this.initializeCarousel(), 0);
     });
+  }
+
+  getCategoryTitle() {
+    this.productService.getCategoryTitle(this.urlId)
+      .subscribe(result => {
+        this.title = result.categoryDesc;
+        this.title = this.updateTitle(this.title);
+        this.urlId = result.urlId;
+        this.seoService.updateTitle('Shop ' + this.title);
+        this.seoService.updateDescription(this.urlId);
+      }, error => console.error(error));
+  }
+
+  updateTitle(title: string): string {
+    const words = title.split(" ");
+    const wordCount: Record<string, number> = {};
+    const duplicateWords = new Set<string>();
+
+    for (let i = 0; i < words.length; i++) {
+      if (wordCount[words[i]]) {
+        wordCount[words[i]]++;
+        duplicateWords.add(words[i]);
+      } else {
+        wordCount[words[i]] = 1;
+      }
+    }
+
+    for (let i = 0; i < words.length; i++) {
+      if (duplicateWords.has(words[i])) {
+        words.splice(i, 1);
+        break;
+      }
+    }
+
+    return words.join(" ");
   }
 
 }

@@ -60,7 +60,7 @@ export class AddToCartComponent implements OnInit {
   }
 
   fetchRecommendedProducts(): void {
-    this.productService.getRelatedProducts(0, 0, 8).subscribe(response => {
+    this.productService.getRelatedProducts(70000, 0, 8).subscribe(response => {
       this.recommendedProducts = response;
     }, (error) => {
       console.error("Error fetching recommended products:", error);

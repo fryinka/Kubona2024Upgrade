@@ -5,8 +5,8 @@ import * as AOS from 'aos';
 import 'aos/dist/aos.css';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { HttpClient,HttpClientModule } from '@angular/common/http';
-import { CartService } from '../services/cart.service';
-import { FlowbiteService } from '../services/flowbite.service';
+import { CartService } from '../../services/cart.service';
+import { FlowbiteService } from '../../services/flowbite.service';
 
 
 @Component({
@@ -266,24 +266,6 @@ export class ProductDetailsComponent implements OnInit ,AfterViewInit {
     }
   }
   
-
-
-  
-  getProduct(): void {
-    this.http.get<any>("https://friday.kubona.ng/api/Product/70710").subscribe(
-      data => {
-        this.productTitle = data.name; // Adjust the property name as per your API response
-      },
-      error => {
-        console.error('Error fetching product:', error);
-      }
-    );
-  }
-
-
-
- 
-
   
 
   selectColor(color: string) {
@@ -304,8 +286,6 @@ export class ProductDetailsComponent implements OnInit ,AfterViewInit {
     this.selectedSizeId == null;
     this.selectedSize == null;
 
-
-   
   }
 
   getProductImageSize(productId:string){
@@ -403,10 +383,6 @@ export class ProductDetailsComponent implements OnInit ,AfterViewInit {
     });
   }
 
-
-
-
-  
   addToCart(){
     
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -468,12 +444,6 @@ addToCartOld(hasSize: Boolean = true){
     }
   }
   
-  
-
-  
-
-  // alert(this.itemGroupId);
-
   const item = {
     "productId": Number(this.productId?.split('-')[0]),
     "productTitle": this.productTitle,

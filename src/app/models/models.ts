@@ -165,3 +165,51 @@ export interface CategoryTitle {
       fullReview: string,
       addedby: string
     }
+    export interface HeelHeight {
+      heelHeightId: number;
+      desc: string;
+    }
+    export interface CustDetails {
+      curationId: string;
+      customerName: string;
+    }
+    
+    export interface CuratedForCust {
+      itemgroupId: number;
+      title: string;
+      internetPrice: number;
+      imageUrl: string;
+      destinationUrl: string;
+    }
+    
+    export interface UserData {
+      client_ip_address: string;
+      client_user_agent: string;
+      fbc: string;
+      fbp: string;
+      em: string[];
+    }
+    
+    export interface CustomData {
+      currency: string;
+      value: string;
+    }
+    
+    export interface EventData {
+      event_name: string;
+      event_time: number;
+      action_source: string;
+      event_id: string;
+      original_event_data: {
+        event_name: string;
+        event_time: number;
+      };
+      event_source_url: string;
+      user_data: UserData;
+      custom_data: CustomData;
+    }
+    
+    export interface EventOutput {
+      data: EventData[];
+      test_event_code: string;
+    }

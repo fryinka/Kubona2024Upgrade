@@ -46,11 +46,13 @@ export class CartService {
   }
 
   // Add an item to the cart and update localStorage
-  addToCart(item: any): void {
+  addToCart(item: any): Observable<any> {
     const currentItems = this.cartItems.getValue();
     const updatedItems = [...currentItems, item];
     this.cartItems.next(updatedItems); // Update BehaviorSubject
     this.updateLocalStorage(updatedItems); // Update localStorage
+    const url = this.baseURL + 'api/Order';
+    return this.http.post(url, updatedItems);
   }
 
   // Remove an item from the cart and update localStorage
@@ -61,11 +63,11 @@ export class CartService {
     this.updateLocalStorage(updatedItems); // Update localStorage
   }
 
-  onCheckoutWhatsapp(email: string, phoneNumber: string, productData: any){
+  onCheckoutWhatsapp(email: string, phoneNumber: string, productData: any) {
     const params = new HttpParams()
-        .set("userId", email.toString())
-        .set("phoneNumber", phoneNumber);
-        const url = this.baseURL + "api/checkoutWithWhatsApp";
-        return this.http.post(url, productData, {params});
+      .set("userId", email.toString())
+      .set("phoneNumber", phoneNumber);
+    const url = this.baseURL + "api/checkoutWithWhatsApp";
+    return this.http.post(url, productData, { params });
   }
 }
