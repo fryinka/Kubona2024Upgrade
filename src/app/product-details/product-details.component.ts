@@ -10,6 +10,8 @@ import { FlowbiteService } from "../services/flowbite.service";
 import { SeoService } from "../services/seo.service";
 import { ProductService } from "../services/product.service";
 import { Prodlist, ProductImages, RecentlyViewed, RelatedProducts, Sizelist } from "../models/models";
+import { AnonymousUserService } from "../services/anonUser.service";
+import { CookieService } from "ngx-cookie-service";
 
 @Component({
   selector: "app-product-details",
@@ -23,7 +25,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   productSizes: Sizelist[] = [];
   isMenuOpen = false;
   dataLoaded = false;
-  productImages: any;
+  productImages: ProductImages[]=[];
   productDetails!: Prodlist;
   recentlyViewed: any;
   selectedSizeId: any;
@@ -31,7 +33,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   isRecentlyViewed = false;
   recentlyViewedProducts: any;
   isAccessory: boolean = false;
-  accessoryDepartmentId = "70340";
   isSizeSelected: boolean = false;
   isColorSelected: boolean = false;
   productId: string | null = null;
@@ -44,6 +45,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   loader: boolean = false;
   showWomen: boolean = true;
   showMen: boolean = false;
+  userId:string | null="";
 
   // Products Data
 
@@ -97,7 +99,8 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     private flowbiteService: FlowbiteService,
     private seoService: SeoService,
     private productService: ProductService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private cookieService:CookieService,
   ) {
     this.randomId = this.generateRandomId();
     localStorage.setItem("GUID", this.randomId);
@@ -120,16 +123,18 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.getProductDetails();
     this.getproductImages();
     this.getproductSizes();
-    this.recentlyViewedPost();
-    this.getRecommendedProducts();
+    // this.recentlyViewedPost();
     this.selectedColorId = this.productDetails.colorDesc;
     this.loadRecentlyViewed();
+    this.getUserId();
 
     setTimeout(() => {
       this.dataLoaded = true;
       AOS.refresh(); // Refresh AOS after data is loaded
     }, 1000); // Adjust timeout as necessary
   }
+
+
 
   getRecommendedProducts(): void {
     this.productService.getRelatedProducts(this.departmentId, this.prodId, this.pageSize).subscribe(response => {
@@ -150,41 +155,9 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.cartCount = this.cartService.getCartCount();
   }
 
-  recentlyViewedPost() {
-    // Retrieve userId from local storage or create a new one if not present
-    let userId = localStorage.getItem("userId");
-
-    // If userId does not exist, create a new one based on current date/time
-    if (!userId) {
-      const currentDate = new Date();
-      userId = currentDate.getTime().toString();
-      localStorage.setItem("userId", userId);
-    }
-
-    // Prepare the data to be sent
-
-    const formBody2 = {
-      userId: userId,
-      itemId: this.productId?.split("-")[0],
-      viewDate: new Date().toISOString(),
-      numOfViews: "0",
-    };
-
-    // Send data to the API
-    this.productService.postRecentlyViewed(formBody2).subscribe(response => {
-      this.getRecentlyViewed();
-    }, error => {
-      console.error("Error submitting form", error);
-    });
-  }
-
   // Method to get and display the recently viewed products
   getRecentlyViewed() {
-    // Retrieve userId from local storage
-    const userId = localStorage.getItem("userId");
-    if (userId) {
-
-      this.productService.getRecentlyViewed(userId, this.pageSize).subscribe({
+      this.productService.getRecentlyViewed(this.pageSize).subscribe({
         next: (response: RecentlyViewed[]) => {
           this.recentlyViewed = response;
           this.isRecentlyViewed = this.recentlyViewed.length > 0;
@@ -195,9 +168,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
           console.error("Error fetching recently viewed products", error);
         },
       });
-
-    } else {
-    }
   }
 
 
@@ -416,7 +386,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   getproductImages() {
     if (this.productId) {
       this.productService.getProductImages(this.productId).subscribe({
-        next: (response: any) => {
+        next: (response: ProductImages[]) => {
           this.productImages = response;
           this.productImage = this.productImages[0].image;
           setTimeout(() => this.initializeCarousel2(), 0);
@@ -428,27 +398,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
 
-  // getAccessoryByDepartment(departmentId: any) {
-  //   this.httpClient
-  //     .get(
-  //       "https://friday.kubona.ng/api/DepartmentGroupBy?urlId=" +
-  //       this.accessoryDepartmentId
-  //     )
-  //     .subscribe({
-  //       next: (res) => {
-  //         let isAccessory = false;
-
-  //         if (Array.isArray(res)) {
-  //           isAccessory = res.some((v) => v.departmentId === departmentId);
-  //         }
-
-  //         this.isAccessory = isAccessory;
-  //       },
-  //       error: (err) => {
-  //         console.error("There was an error!", err);
-  //       },
-  //     });
-  // }
 
   loadRecentlyViewed() {
     // Load recently viewed products from local storage or an API
@@ -563,6 +512,11 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
         this.productPrice = this.productDetails.internetPrice;
         this.seoService.updateTitle("Shop " + this.productTitle);
         this.seoService.updateDescription(this.productDetails.title);
+        this.productService.insertRecentlyViewed(this.prodId.toString()).subscribe(response=>{
+          // console.log(response)
+          this.getRecentlyViewed();
+        });
+        this.getRecommendedProducts();
       });
     }
   }
@@ -612,6 +566,10 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
         }
       });
     }
+  }
+
+  getUserId(){
+    this.userId = this.cookieService.get('kubona_shopper');
   }
 
   initializeCarouselRecentlyViewed() {

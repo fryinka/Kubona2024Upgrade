@@ -6,18 +6,17 @@ import * as AOS from "aos";
 import "aos/dist/aos.css";
 import { ActivatedRoute, NavigationEnd, Router, RouterModule } from "@angular/router";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { Meta, Title } from "@angular/platform-browser";
-import { filter } from "rxjs/operators";
 import { NewlyArrivedComponent } from "../components/newly-arrived/newly-arrived.component";
-import { SeoService } from "../services/seo.service";
 import { ProductService } from "../services/product.service";
 import { forkJoin } from "rxjs";
 import { ImageRotators, Prodlist, Reviews, SlideShowImages } from "../models/models";
+import { GoogleAnalyticsService } from "../services/google-analytics.service";
 @Component({
     selector: "app-home",
-    imports: [CommonModule, HttpClientModule, ReactiveFormsModule, RouterModule, NewlyArrivedComponent], // Include ReactiveFormsModule
+    imports: [CommonModule, ReactiveFormsModule, RouterModule, NewlyArrivedComponent,], // Include ReactiveFormsModule
     templateUrl: "./home.component.html",
-    styleUrls: ["./home.component.css"]
+    styleUrls: ["./home.component.css"],
+    providers: [GoogleAnalyticsService]
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   showMen: boolean = true;
@@ -43,8 +42,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   products: any;
   isProducts: boolean = false;
 
-  constructor(private router: Router, private httpClient: HttpClient, private fb: FormBuilder,
-    private titleService: Title, private metaService: Meta, private route: ActivatedRoute, private seoService:SeoService, private productService: ProductService) {
+  constructor(private router: Router, private httpClient: HttpClient, private fb: FormBuilder, private productService: ProductService, private googleService:GoogleAnalyticsService) {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
     });
@@ -53,13 +51,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
   selectedSizeClick(sizeCode: string) {
     console.log(sizeCode);
     this.selectedSize = sizeCode;
-    // this.getFilterproducts();
   }
 
-  seeShopBySize(sizeCode: number) {
-    console.log(`Selected size code: ${sizeCode}`);
-    // Implement any additional size selection logic here
-  }
+  
   extractSizeNumber(sizeDesc: string): string {
     const match = sizeDesc.match(/\d+/); // Match only the numbers
     return match ? match[0] : sizeDesc; // Return the matched number or original if none
@@ -240,22 +234,20 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
    
 
-  viewShopByStyle(destUrl: string) {
+  viewShopByStyle(destUrl: string, eventLabel:string) {
     this.router.navigate(["/category", destUrl]);
+    this.googleService.homepageEventEmitter("front_page", "shop_by_style", eventLabel);
   }
 
-  viewShopBySizeMen(destUrl: string, sizeCode: number) {
+  viewShopBySize(destUrl: string, sizeCode: number, eventLabel:string) {
     let deptId = destUrl.split('-')[0];
     this.router.navigate(["/category", `${deptId}-${sizeCode}-0-0-0-0`]);
+    this.googleService.homepageEventEmitter("front_page", "shop_by_size", eventLabel);
   }
 
-  viewShopBySizeWomen(destUrl: string, sizeCode: number) {
-    let deptId = destUrl.split('-')[0];
-    this.router.navigate(["/category", `${deptId}-${sizeCode}-0-0-0-0`]);
-  }
-
-  viewShopByDepartments(routeId: string) {
+  viewShopByDepartments(routeId: string, eventLabel:string) {
     this.router.navigate(["/category", routeId]);
+    this.googleService.homepageEventEmitter("front_page", "widget_click", eventLabel);
   }
 
   initializeCarousel() {
@@ -530,4 +522,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
     this.onSubscribe();
   }
+
+  sendWidgetClickEvent(eventLocation: string, eventLabel: string) {
+    this.googleService.homepageEventEmitter("front_page", eventLocation, eventLabel);
+  }
+
 }

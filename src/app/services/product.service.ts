@@ -2,15 +2,19 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { CategoryTitle, ColorsGroup, ContactUs, HeelHeightGroup, ImageRotators, MaterialGroup, OtherColors, Prodlist, ProductImages, RecentlyViewed, RelatedProducts, Reviews, SizeGroup, Sizelist, SlideShowImages, StylesGroup } from '../models/models';
+import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
 
-  baseURL: string = 'https://friday.kubona.ng/';
+  baseURL: string = 'https://localhost:44397/';
+  userId: string = ""
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private cookieService:CookieService) {
+    this.userId = cookieService.get('kubona_shopper');
+   }
 
   getProducts(urlId: string, lowerPrice: number, upperPrice: number, sortId: number, pageIndex: number, pageSize: number): Observable<Prodlist[]> {
     var url = this.baseURL + 'api/Product/Products/' + urlId;
@@ -77,7 +81,7 @@ export class ProductService {
   }
 
   getImageRotators(rotatorId: number, pageSize: number): Observable<ImageRotators[]> {
-    var url = this.baseURL + 'api/Image/ImageRotators';
+    var url = this.baseURL + 'api/FrontPageImageRotators';
     var params = new HttpParams()
       .set("rotatorId", rotatorId.toString())
       .set("pageSize", pageSize.toString());
@@ -100,25 +104,21 @@ export class ProductService {
   getRelatedProducts(departmentId: number, itemGroupId: number, pageSize: number): Observable<RelatedProducts[]> {
     var url = this.baseURL + 'api/RelatedProducts';
     var params = new HttpParams()
+      .set("userId", this.userId)
       .set("departmentId", departmentId.toString())
       .set("itemGroupId", itemGroupId.toString())
       .set("pageSize", pageSize.toString())
     return this.http.get<RelatedProducts[]>(url, { params });
   }
 
-  getRecentlyViewed(userId: string, pageSize: number): Observable<RecentlyViewed[]> {
+  getRecentlyViewed(pageSize: number): Observable<RecentlyViewed[]> {
     var url = this.baseURL + 'api/RecentlyViewed';
     var params = new HttpParams()
-      .set("userId", userId)
+      .set("userId", this.userId)
       .set("pageSize", pageSize.toString())
     return this.http.get<RecentlyViewed[]>(url, { params });
-
   }
 
-  postRecentlyViewed(formBody: any) {
-    var url = this.baseURL + 'api/RecentlyViewed';
-    return this.http.post(url, formBody);
-  }
 
   submitContactUs(formBody: ContactUs) {
     var url = this.baseURL + 'api/Contact/Add';
@@ -139,5 +139,27 @@ export class ProductService {
       .set("query", query)
       .set("urlId", urlId)
     return this.http.get<Prodlist[]>(url, { params });
+  }
+
+  getUserId():Observable<any>{
+    var url = this.baseURL + 'api/User';
+    return this.http.get(url);
+  }
+
+  
+  insertRecentlyViewed(Id: string): Observable<any> {
+    var productId: number = 0;
+    var idstring: string[];
+    if (Id) {
+      idstring = Id.split('-');
+      if (idstring.length > 0) {
+        productId = Number(idstring[0]);
+      }
+    }
+    const headers = { 'content-type': 'application/json' };
+   
+    var url = this.baseURL + 'api/RecentlyViewed';
+
+    return this.http.post<any>(url, { "itemId": productId, "numOfViews":1, "userId": this.userId }, { 'headers': headers });
   }
 }

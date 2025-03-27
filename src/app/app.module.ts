@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { routes } from './app.routes'; // Import your routes
 import { HomeComponent } from './home/home.component';
 import { SearchComponent } from './search/search.component';
-import { ProductsComponent } from './products/products.component';
+import { ProductsComponent } from './to_be_deleted/products/products.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
 import { CategoryComponent } from './to_be_deleted/category/category.component';
 import { AddToCartComponent } from './add-to-cart/add-to-cart.component';
