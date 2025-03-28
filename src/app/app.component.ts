@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.anonymousUser.retrieveAnonymousUserId().subscribe(response => {
-      console.log(response);
+      // console.log(response);
   });
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {

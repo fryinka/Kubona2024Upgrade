@@ -14,12 +14,12 @@
                         </a>
                     </li>
                     <li>
-                        <a href="">
+                        <a href="https://twitter.com/ShopKubona">
                             <img src="assets/images/icon-tw.png" alt="" class="w-[22px]" />
                         </a>
                     </li>
                     <li>
-                        <a href="">
+                        <a href="https://www.youtube.com/@Shopkubona">
                             <img src="assets/images/icon-yt.png" alt="" class="w-[22px]" />
                         </a>
                     </li>
@@ -32,27 +32,6 @@
                     0703-611-0000
                 </a>
             </div>
-            <div class="md:col-span-4 col-span-12 md:block hidden">
-                <button id="dropdownAvatarNameButton" data-dropdown-toggle="dropdownAvatarName"
-                    class="flex items-center ml-auto pe-1 text-[14px] font-sm text-[#fff] rounded-full" type="button">
-                    <span class="sr-only">Open user menu</span>
-                    <img class="w-5 h-5 me-2 rounded-full" src="assets/images/flag-br.png" alt="user photo" />
-                    GBP
-                    <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 10 6">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="m1 1 4 4 4-4" />
-                    </svg>
-                </button>
-
-                <!-- Dropdown menu -->
-                <div id="dropdownAvatarName"
-                    class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-                    <div class="px-4 py-3 text-sm text-[#000]">
-                        <div class="font-medium">EURO</div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -63,10 +42,8 @@
             <!-- Mobile Menu -->
             <div class="md:col-span-2 col-span-2 md:hidden block">
                 <div class="flex flex-row items-center justify-center mt-[30px]">
-                    <!-- Adjusted margin-top -->
-                    <button (click)="toggleMenus()" aria-label="Menu Toggle" type="button" class="group">
-                        <div
-                            class="relative w-[20px] h-[50px] sm:absolute sm:top-[50px] sm:left-[10px] sm:w-[30px] sm:h-[50px]">
+                    <button (click)="toggleMenu()" aria-label="Menu Toggle" type="button" class="group">
+                        <div class="relative w-[20px] h-[50px]">
                             <span class="block absolute top-0 left-0 w-full h-[2px] bg-[#06402B] transition-transform"
                                 [ngClass]="{ 'rotate-45': isMenuOpen }"></span>
                             <span class="block absolute top-[6px] left-0 w-full h-[2px] bg-[#06402B] transition-opacity"
@@ -78,115 +55,121 @@
                     </button>
                 </div>
 
-                <!-- Mobile Menu -->
+                <!-- Backdrop to close menu when clicking outside -->
+                <div *ngIf="isMenuOpen" class="fixed inset-0 bg-black opacity-50 z-40" (click)="toggleMenu()"></div>
+
                 <nav [ngClass]="{ hidden: !isMenuOpen }"
                     class="fixed top-0 left-0 h-full w-[80%] z-50 bg-white py-5 shadow-lg">
-                    <!-- Back to Main Menu - shown when Men or Women dropdown is open -->
-                    <ul *ngIf="isMenDropdownOpen || isWomenDropdownOpen" class="flex flex-col gap-3 px-6">
-                        <li (click)="closeDropdown()"
-                            class="flex items-center cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-3 border-b border-gray-200">
-                            <span class="mr-2">&lt;</span> Back to Main Menu
-                        </li>
-                    </ul>
-
-                    <!-- Main Menu -->
                     <ul class="flex flex-col gap-3 px-6">
-                        <!-- MEN Dropdown -->
-                        <li (click)="toggleDropdown('menDropdown')" class="relative">
-                            <a
-                                class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] flex justify-between items-center py-3 border-b border-gray-200">
-                                Men
-                                <span [ngClass]="{ 'rotate-180': isMenDropdownOpen }"
-                                    class="transition-transform">&gt;</span>
-                            </a>
 
-                            <ul *ngIf="isMenDropdownOpen" class="pl-4 flex flex-col gap-2 bg-white z-50">
-                                <li>
-                                    <a (click)="navigateToMen()"
-                                        class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2">All</a>
+                        <!-- Men -->
+                        <li (click)="toggleDropdown('men')" class="relative">
+                            <a
+                                class="cursor-pointer text-[#000] flex justify-between items-center py-3 border-b border-gray-200">
+                                Men <span [ngClass]="{ 'rotate-180': activeDropdown === 'men' }">&gt;</span>
+                            </a>
+                            <ul *ngIf="activeDropdown === 'men'" class="pl-4 flex flex-col gap-2 bg-white">
+                                <li (click)="navigateToMen('70610-All-Men-Shoes', 'All Men Shoes'); toggleMenu()">All
                                 </li>
-                                <li>
-                                    <a (click)="navigateToMenNewArrivals()"
-                                        class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2">New
-                                        Arrivals</a>
-                                </li>
-                                <li *ngFor="let subCategory of mnCategories| slice:1; let i=index">
-                                    <a class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2" *ngIf="i>0"
-                                        (click)="navigateToMen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
-                                        {{ subCategory.description }}
-                                    </a>
+                                <li (click)="navigateToMenNewArrivals('70610-All-Men-Shoes', 'NewlyArrived Men Shoes'); toggleMenu()">New Arrivals</li>
+                                <li *ngFor="let subCategory of mnCategories | slice:1; let i=index"
+                                    (click)="navigateToMen(subCategory.destinationUrl, subCategory.description); toggleMenu()">
+                                    {{ subCategory.description }} ({{subCategory.totalCount}})
                                 </li>
                             </ul>
                         </li>
 
-                        <!-- WOMEN Dropdown -->
-                        <li (click)="toggleDropdown('womenDropdown')" class="relative">
+                        <!-- Women -->
+                        <li (click)="toggleDropdown('women')" class="relative">
                             <a
-                                class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] flex justify-between items-center py-3 border-b border-gray-200">
-                                Women
-                                <span [ngClass]="{ 'rotate-180': isWomenDropdownOpen }"
-                                    class="transition-transform">&gt;</span>
+                                class="cursor-pointer text-[#000] flex justify-between items-center py-3 border-b border-gray-200">
+                                Women <span [ngClass]="{ 'rotate-180': activeDropdown === 'women' }">&gt;</span>
                             </a>
-                            <ul *ngIf="isWomenDropdownOpen" class="pl-4 flex flex-col gap-2 bg-white z-50">
-                                <li>
-                                    <a (click)="navigateToWomen()"
-                                        class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2">All</a>
+                            <ul *ngIf="activeDropdown === 'women'" class="pl-4 flex flex-col gap-2 bg-white">
+                                <li (click)="navigateToMen('70710-Women-Shoes', 'All Women Shoes'); toggleMenu()">All
                                 </li>
-                                <li>
-                                    <a [routerLink]="['/category','70710-Women-Shoes','7']"
-                                        class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2">New
-                                        Arrivals</a>
-                                </li>
-                                <li *ngFor="let subCategory of wnCategories| slice:1; let i=index;">
-                                    <a class="cursor-pointer text-[#000] capitalize lg:text-[16px] text-[14px] py-2" *ngIf="i!=0"
-                                        (click)="navigateToWomen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
-                                        {{ subCategory.description }}
-                                    </a>
+                                <li (click)="navigateToMenNewArrivals('70710-Women-Shoes', 'NewlyArrived Women Shoes'); toggleMenu()">New Arrivals</li>
+                                <li *ngFor="let subCategory of wnCategories | slice:1; let i=index"
+                                    (click)="navigateToMen(subCategory.destinationUrl, subCategory.description); toggleMenu()">
+                                    {{ subCategory.description }} ({{subCategory.totalCount}})
                                 </li>
                             </ul>
                         </li>
 
-                        <li>
-                            <a (click)="navigateToAccessories()"
-                                class="cursor-pointer capitalize lg:text-[16px] text-[14px] py-3 border-b border-gray-200 flex justify-between">Accessories</a>
+                        <!-- Watches -->
+                        <li (click)="toggleDropdown('watches')" class="relative">
+                            <a
+                                class="cursor-pointer text-[#000] flex justify-between items-center py-3 border-b border-gray-200">
+                                Watches <span [ngClass]="{ 'rotate-180': activeDropdown === 'watches' }">&gt;</span>
+                            </a>
+                            <ul *ngIf="activeDropdown === 'watches'" class="pl-4 flex flex-col gap-2 bg-white">
+                                <li (click)="navigateToMen('70510-Watches', 'All Watches'); toggleMenu()">All</li>
+                                <li (click)="navigateToMenNewArrivals('70510-Watches', 'NewlyArrived Watches'); toggleMenu()">New Arrivals</li>
+                                <li *ngFor="let subCategory of waCategories | slice:1; let i=index"
+                                    (click)="navigateToMen(subCategory.destinationUrl, subCategory.description); toggleMenu()">
+                                    {{ subCategory.description }} ({{subCategory.totalCount}})
+                                </li>
+                            </ul>
                         </li>
 
-                        <!-- ABOUT US -->
-                        <li>
-                            <a [routerLink]="['/about-us']"
-                                class="cursor-pointer capitalize lg:text-[16px] text-[14px] py-3 border-b border-gray-200 flex justify-between">
-                                About
-                                <span></span>
+                        <!-- Handbags -->
+                        <li (click)="toggleDropdown('handbags')" class="relative">
+                            <a
+                                class="cursor-pointer text-[#000] flex justify-between items-center py-3 border-b border-gray-200">
+                                Handbags <span [ngClass]="{ 'rotate-180': activeDropdown === 'handbags' }">&gt;</span>
                             </a>
+                            <ul *ngIf="activeDropdown === 'handbags'" class="pl-4 flex flex-col gap-2 bg-white">
+                                <li (click)="navigateToMen('70010-Handbags', 'All Handbags'); toggleMenu()">All</li>
+                                <li (click)="navigateToMenNewArrivals('70010-Handbags', 'NewlyArrived Handbags'); toggleMenu()">New Arrivals</li>
+                                <li *ngFor="let subCategory of haCategories | slice:1; let i=index"
+                                    (click)="navigateToMen(subCategory.destinationUrl, subCategory.description); toggleMenu()">
+                                    {{ subCategory.description }} ({{subCategory.totalCount}})
+                                </li>
+                            </ul>
                         </li>
 
-                        <!-- CONTACT -->
-                        <li>
-                            <a [routerLink]="['/contact-us']"
-                                class="cursor-pointer capitalize lg:text-[16px] text-[14px] py-3 border-b border-gray-200 flex justify-between">
-                                Contact
-                                <span></span>
+                        <!-- Business Bags & Suitcases -->
+                        <li (click)="toggleDropdown('business')" class="relative">
+                            <a
+                                class="cursor-pointer text-[#000] flex justify-between items-center py-3 border-b border-gray-200">
+                                Business Bags & Suitcases <span
+                                    [ngClass]="{ 'rotate-180': activeDropdown === 'business' }">&gt;</span>
                             </a>
+                            <ul *ngIf="activeDropdown === 'business'" class="pl-4 flex flex-col gap-2 bg-white">
+                                <li (click)="navigateToMen('70210-Business-Bags', 'All Business Bags'); toggleMenu()">
+                                    All</li>
+                                <li (click)="navigateToMenNewArrivals('70210-Business-Bags', 'NewlyArrived Business Bags'); toggleMenu()">New Arrivals</li>
+                                <li *ngFor="let subCategory of bsCategories | slice:1; let i=index"
+                                    (click)="navigateToMen(subCategory.destinationUrl, subCategory.description); toggleMenu()">
+                                    {{ subCategory.description }} ({{subCategory.totalCount}})
+                                </li>
+                            </ul>
                         </li>
 
-                        <!-- FAQs -->
-                        <li>
-                            <a [routerLink]="['/faqs']"
-                                class="cursor-pointer capitalize lg:text-[16px] text-[14px] py-3 border-b border-gray-200 flex justify-between">
-                                FAQs
-                                <span></span>
+                        <!-- Accessories -->
+                        <li (click)="toggleDropdown('accessories')" class="relative">
+                            <a
+                                class="cursor-pointer text-[#000] flex justify-between items-center py-3 border-b border-gray-200">
+                                Accessories <span
+                                    [ngClass]="{ 'rotate-180': activeDropdown === 'accessories' }">&gt;</span>
                             </a>
+                            <ul *ngIf="activeDropdown === 'accessories'" class="pl-4 flex flex-col gap-2 bg-white">
+                                <li (click)="navigateToMen('70340-Accessories', 'All Accessories'); toggleMenu()">All
+                                </li>
+                                <li (click)="navigateToMenNewArrivals('70340-Accessories', 'NewlyArrived Accessories'); toggleMenu()">New Arrivals</li>
+                                <li *ngFor="let subCategory of asCategories | slice:1; let i=index"
+                                    (click)="navigateToMen(subCategory.destinationUrl, subCategory.description); toggleMenu()">
+                                    {{ subCategory.description }} ({{subCategory.totalCount}})
+                                </li>
+                            </ul>
                         </li>
+
+                        <!-- Additional Links -->
+                        <li><a [routerLink]="['/about']" (click)="closeMenu()">About</a></li>
+                        <li><a [routerLink]="['/contact']" (click)="closeMenu()">Contact</a></li>
+                        <li><a [routerLink]="['/faq']" (click)="closeMenu()">FAQs</a></li>
+
                     </ul>
-
-                    <!-- Social Media Section -->
-                    <div class="mt-6 px-6">
-                        <p class="capitalize text-[#000] lg:text-[16px] text-[14px]">
-                            Follow Us
-                        </p>
-                        <div class="flex gap-3 mt-2">
-                        </div>
-                    </div>
                 </nav>
             </div>
 
@@ -200,52 +183,146 @@
             <!-- Desktop Menu -->
             <div class="md:col-span-8 col-span-6 md:block hidden">
                 <ul class="flex items-center justify-center gap-x-3">
+
+                    <!-- Men Dropdown -->
                     <li (mouseenter)="toggleDropdown('menDropdown')" (mouseleave)="toggleDropdown('menDropdown')"
                         class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px] group relative">
                         Men
-                        <!-- <span [ngClass]="{ 'rotate-180': isMenDropdownOpen }" class="ml-2 transition-transform">▼</span> -->
-                        <ul *ngIf="isMenDropdownOpen" class="flex flex-col gap-2 absolute text-white bg-black z-50">
-                            <li (click)="navigateToMen()"
+                        <ul *ngIf="activeDropdown === 'menDropdown'"
+                            class="flex flex-col gap-2 absolute text-white bg-black z-50">
+                            <li (click)="navigateToMen('70610-All-Men-Shoes', 'All Men Shoes')"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
                                 All
                             </li>
-                            <li (click)="navigateToMenNewArrivals()"
+                            <li (click)="navigateToMenNewArrivals('70610-All-Men-Shoes', 'NewlyArrived Men Shoes')"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
                                 New Arrivals
                             </li>
-                            <li *ngFor="let subCategory of mnCategories | slice:1; let i=index;"
+                            <li *ngFor="let subCategory of mnCategories | slice:1;"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
-                                (click)="navigateToMen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
-                                {{ subCategory.description }}
+                                (click)="navigateToMen(subCategory.destinationUrl, subCategory.description)">
+                                {{ subCategory.description }} ({{ subCategory.totalCount }})
                             </li>
                         </ul>
                     </li>
+
+                    <!-- Women Dropdown -->
                     <li (mouseenter)="toggleDropdown('womenDropdown')" (mouseleave)="toggleDropdown('womenDropdown')"
                         class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px] relative">
                         Women
-                        <!-- <span [ngClass]="{ 'rotate-180': isWomenDropdownOpen }" class="ml-2 transition-transform">▼</span> -->
-                        <ul *ngIf="isWomenDropdownOpen" class="flex flex-col gap-2 absolute text-white bg-black z-50">
-                            <li (click)="navigateToWomen()"
+                        <ul *ngIf="activeDropdown === 'womenDropdown'"
+                            class="flex flex-col gap-2 absolute text-white bg-black z-50">
+                            <li (click)="navigateToMen('70710-Women-Shoes', 'All Women Shoes')"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
                                 All
                             </li>
-                            <li [routerLink]="['/category','70710-Women-Shoes','7']"
+                            <li (click)="navigateToMenNewArrivals('70710-Women-Shoes', 'NewlyArrived Women Shoes')"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
                                 New Arrivals
                             </li>
-                            <li *ngFor="let subCategory of wnCategories| slice:1; let i=index;"
+                            <li *ngFor="let subCategory of wnCategories | slice:1;"
                                 class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
-                                (click)="navigateToWomen(subCategory.departmentId, subCategory.description, subCategory.destinationUrl)">
-                                {{ subCategory.description }}
+                                (click)="navigateToMen(subCategory.destinationUrl, subCategory.description)">
+                                {{ subCategory.description }} ({{ subCategory.totalCount }})
                             </li>
                         </ul>
                     </li>
-                    <li (click)="navigateToAccessories()"
-                        class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px]">
-                        Accessories
+
+                    <!-- Watches Dropdown -->
+                    <li (mouseenter)="toggleDropdown('watchesDropdown')"
+                        (mouseleave)="toggleDropdown('watchesDropdown')"
+                        class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px] relative">
+                        Watches
+                        <ul *ngIf="activeDropdown === 'watchesDropdown'"
+                            class="flex flex-col gap-2 absolute text-white bg-black z-50">
+                            <li (click)="navigateToMen('70510-Watches', 'All Watches')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                All
+                            </li>
+                            <li (click)="navigateToMenNewArrivals('70510-Watches', 'NewlyArrived Watches')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                New Arrivals
+                            </li>
+                            <li *ngFor="let subCategory of waCategories | slice:1;"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
+                                (click)="navigateToMen(subCategory.destinationUrl, subCategory.description)">
+                                {{ subCategory.description }} ({{ subCategory.totalCount }})
+                            </li>
+                        </ul>
                     </li>
+
+                    <!-- Handbags Dropdown -->
+                    <li (mouseenter)="toggleDropdown('handbagsDropdown')"
+                        (mouseleave)="toggleDropdown('handbagsDropdown')"
+                        class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px] relative">
+                        Handbags
+                        <ul *ngIf="activeDropdown === 'handbagsDropdown'"
+                            class="flex flex-col gap-2 absolute text-white bg-black z-50">
+                            <li (click)="navigateToMen('70010-Handbags', 'All Handbags')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                All
+                            </li>
+                            <li (click)="navigateToMenNewArrivals('70010-Handbags', 'NewlyArrived Handbags')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                New Arrivals
+                            </li>
+                            <li *ngFor="let subCategory of haCategories | slice:1;"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
+                                (click)="navigateToMen(subCategory.destinationUrl, subCategory.description)">
+                                {{ subCategory.description }} ({{ subCategory.totalCount }})
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Business Bags & Suitcases Dropdown -->
+                    <li (mouseenter)="toggleDropdown('businessDropdown')"
+                        (mouseleave)="toggleDropdown('businessDropdown')"
+                        class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px] relative">
+                        Business Bags & Suitcases
+                        <ul *ngIf="activeDropdown === 'businessDropdown'"
+                            class="flex flex-col gap-2 absolute text-white bg-black z-50">
+                            <li (click)="navigateToMen('70210-Business-Bags', 'All Business Bags')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                All
+                            </li>
+                            <li (click)="navigateToMenNewArrivals('70210-Business-Bags', 'NewlyArrived Business Bags')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                New Arrivals
+                            </li>
+                            <li *ngFor="let subCategory of bsCategories | slice:1;"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
+                                (click)="navigateToMen(subCategory.destinationUrl, subCategory.description)">
+                                {{ subCategory.description }} ({{ subCategory.totalCount }})
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Accessories Dropdown -->
+                    <li (mouseenter)="toggleDropdown('accessoriesDropdown')"
+                        (mouseleave)="toggleDropdown('accessoriesDropdown')"
+                        class="font-bold cursor-pointer hover:bg-black hover:text-white capitalize lg:text-[16px] text-[14px] relative">
+                        Accessories
+                        <ul *ngIf="activeDropdown === 'accessoriesDropdown'"
+                            class="flex flex-col gap-2 absolute text-white bg-black z-50">
+                            <li (click)="navigateToMen('70340-Accessories', 'All Accessories')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                All
+                            </li>
+                            <li (click)="navigateToMenNewArrivals('70340-Accessories', 'NewlyArrived Accessories')"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]">
+                                New Arrivals
+                            </li>
+                            <li *ngFor="let subCategory of asCategories | slice:1;"
+                                class="hover:bg-white hover:text-black p-2 cursor-pointer capitalize lg:text-[16px] text-[14px]"
+                                (click)="navigateToMen(subCategory.destinationUrl, subCategory.description)">
+                                {{ subCategory.description }} ({{ subCategory.totalCount }})
+                            </li>
+                        </ul>
+                    </li>
+
                 </ul>
             </div>
+
 
             <!-- Search & Cart Icons -->
             <div class="md:col-span-2 col-span-3">

@@ -5,9 +5,9 @@
     {
       "name": "productApis",
       "urls": [
-        "https://friday.kubona.ng/api/Product/**",
-        "https://friday.kubona.ng/api/Product/Products/**",
-        "https://friday.kubona.ng/api/**"
+        "https://localhost:44397/api/Product/**",
+        "https://localhost:44397/api/Product/Products/**",
+        "https://localhost:44397/api/**"
       ],
       "cacheConfig": {
         "maxSize": 200,

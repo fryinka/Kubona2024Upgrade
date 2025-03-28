@@ -10,6 +10,8 @@ import { FlowbiteService } from "../../services/flowbite.service";
 import { ProductService } from "../../services/product.service";
 import { ColorsGroup, HeelHeightGroup, MaterialGroup, Prodlist, SizeGroup, StylesGroup } from "../../models/models";
 import { SeoService } from "../../services/seo.service";
+import { GoogleAnalyticsService } from "../../services/google-analytics.service";
+import { FacebookEventService } from "../../services/facebook-events.service";
 
 @Component({
   selector: 'app-prod-list',
@@ -96,7 +98,8 @@ export class ProdListComponent implements OnInit, AfterViewInit {
 
 
   constructor(private router: Router, private route: ActivatedRoute, private flowbiteService: FlowbiteService,
-    private productService: ProductService, @Inject(PLATFORM_ID) private platformId: Object, private seoService: SeoService) {
+    private productService: ProductService, @Inject(PLATFORM_ID) private platformId: Object, private seoService: SeoService, 
+    private googleService: GoogleAnalyticsService, private facebookService:FacebookEventService) {
   }
 
   onScroll(event: Event) {
@@ -118,6 +121,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
 
   viewProduct(productId: string) {
     this.router.navigate(["/product", productId]);
+    this.googleService.prodlistEventEmitter("product_view", "category_page", productId);
   }
 
   extractSizeNumber(sizeDesc: string | null): string[] {
@@ -178,7 +182,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
   onChange(event: Event) {
     let x = event.target as HTMLSelectElement;
     let destinationUrl = x.value;
-
+    // this.googleService.searchListEventEmitter("filter_links","category_page",eventLabel)
     this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
       this.router.navigate(["/category", destinationUrl]).then(() => { });
     });
@@ -302,6 +306,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
       this.isLoading = true;
       let big = this.prodlistsArr.splice(0, this.pageSize);
       if (big.length > 0) {
+        this.googleService.ga4GenEventEmitter("load_more", "category_page");
         let Arr = this.displayedProducts.concat(big);
         this.displayedProducts = Arr;
       }
@@ -362,8 +367,9 @@ export class ProdListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  navigateToCategory(destinationUrl?: string) {
+  navigateToCategory(description: string, destinationUrl: string ) {
     this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
+      this.googleService.searchListEventEmitter("filter_links", "category_page", description);
       this.router.navigate(["/category", destinationUrl]);
       this.getSubCategoryList();
       $('.owl-style').trigger('refresh.owl.carousel');

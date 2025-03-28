@@ -13,7 +13,7 @@ export class ProductService {
   userId: string = ""
 
   constructor(private http: HttpClient, private cookieService:CookieService) {
-    this.userId = cookieService.get('kubona_shopper');
+    
    }
 
   getProducts(urlId: string, lowerPrice: number, upperPrice: number, sortId: number, pageIndex: number, pageSize: number): Observable<Prodlist[]> {
@@ -76,7 +76,7 @@ export class ProductService {
   }
 
   getSlideShowImages(): Observable<SlideShowImages[]> {
-    var url = this.baseURL + 'api/Image/GetSlideShowImages';
+    var url = this.baseURL + 'api/FrontPageImageRotators/GetSlideShowImages';
     return this.http.get<SlideShowImages[]>(url);
   }
 
@@ -103,6 +103,7 @@ export class ProductService {
 
   getRelatedProducts(departmentId: number, itemGroupId: number, pageSize: number): Observable<RelatedProducts[]> {
     var url = this.baseURL + 'api/RelatedProducts';
+    this.userId = this.cookieService.get('kubona_shopper');
     var params = new HttpParams()
       .set("userId", this.userId)
       .set("departmentId", departmentId.toString())
@@ -112,6 +113,7 @@ export class ProductService {
   }
 
   getRecentlyViewed(pageSize: number): Observable<RecentlyViewed[]> {
+    this.userId = this.cookieService.get('kubona_shopper');
     var url = this.baseURL + 'api/RecentlyViewed';
     var params = new HttpParams()
       .set("userId", this.userId)
@@ -159,6 +161,7 @@ export class ProductService {
     const headers = { 'content-type': 'application/json' };
    
     var url = this.baseURL + 'api/RecentlyViewed';
+    this.userId = this.cookieService.get('kubona_shopper');
 
     return this.http.post<any>(url, { "itemId": productId, "numOfViews":1, "userId": this.userId }, { 'headers': headers });
   }

@@ -76,12 +76,7 @@
 
           <!-- Size Section -->
           <div class="mb-3 col-span-12 text-left mt-3">
-            <span *ngIf="
-                isAccessory
-                  ? productColors.length == 0
-                  : (!productColors || productColors?.length == 0) &&
-                    productSizes.length == 0
-              ">This Product is out of Stock</span>
+            <span *ngIf="productDetails.numAvailable <= 0">This Product is out of Stock</span>
 
             <ul *ngIf="productSizes.length > 0" class="flex flex-wrap gap-x-2 gap-y-3">
               <li class="mb-2" *ngFor="let item of productSizes" [class.cursor-not-allowed]="item.quantity == 0"

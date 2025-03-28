@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { CategoryService } from '../../to_be_deleted/category.service';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { CartService } from '../../services/cart.service';
 import { ProductService } from '../../services/product.service';
 import { forkJoin } from 'rxjs';
+import { DepartmentGroup } from '../../models/models';
+import { GoogleAnalyticsService } from '../../services/google-analytics.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,22 +16,20 @@ import { forkJoin } from 'rxjs';
 export class NavbarComponent implements OnInit {
 
   isMenuOpen = false;
-  isMobileMenuOpen = false;
-  isMenDropdownOpen = false;
-  isWomenDropdownOpen = false;
-  isMenDropdownOpenMobile = false;
-  isWomenDropdownOpenMobile = false;
+  activeDropdown: string | null = null;
 
-  mnCategories: any[] = [];
-  wnCategories: any[] = [];
-  asCategories: any[] = [];
-  waCategories: any[] = [];
-  bsCategories: any[] = [];
-  haCategories: any[] = [];
+  mnCategories: DepartmentGroup[] = [];
+  wnCategories: DepartmentGroup[] = [];
+  asCategories: DepartmentGroup[] = [];
+  waCategories: DepartmentGroup[] = [];
+  bsCategories: DepartmentGroup[] = [];
+  haCategories: DepartmentGroup[] = [];
 
   cartItemCount: number = 0;
 
-  constructor(private categoryService: CategoryService, private router: Router, private cartService: CartService, private productService: ProductService) { }
+  constructor(private router: Router, private cartService: CartService, private productService: ProductService,
+    private googleService: GoogleAnalyticsService
+  ) { }
   ngOnInit(): void {
 
     forkJoin({
@@ -52,122 +51,46 @@ export class NavbarComponent implements OnInit {
       error: (err) => console.error("There was an error!", err),
     });
     this.getCartItemCount();
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.isMenuOpen = false;
+        this.activeDropdown = null;
+      }
+    });
   }
-
-  toggleMobileMenu() {
-    this.isMobileMenuOpen = !this.isMobileMenuOpen;
-  }
-  closeDropdown() {
-    this.isMenDropdownOpen = false;
-    this.isWomenDropdownOpen = false;
-  }
-
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
-    if (this.isMenuOpen) {
-      this.isMenDropdownOpen = false;
-      this.isWomenDropdownOpen = false;
+    if (!this.isMenuOpen) {
+      this.closeDropdowns();
     }
-  }
-
-  menOpen = false;
-  womenOpen = false;
-
-  isSubMenuOpen: string | null = null;
-
-  toggleSubMenu(menu: string) {
-    this.isSubMenuOpen = this.isSubMenuOpen === menu ? null : menu;
-  }
-
-  toggleWomenMenu() {
-    this.womenOpen = !this.womenOpen;
-  }
-
-  isDropdownOpen: { [key: string]: boolean } = { men: false, women: false };
-
-  toggleMenus() {
-    this.isMenuOpen = !this.isMenuOpen;
-  }
-
-  showDropdown(department: string) {
-    this.isDropdownOpen[department] = true;
-  }
-
-  hideDropdown(department: string) {
-    this.isDropdownOpen[department] = false;
   }
 
   toggleDropdown(menu: string) {
-    if (menu === "menDropdown") {
-      this.isMenDropdownOpen = !this.isMenDropdownOpen;
-      if (this.isMenDropdownOpen) {
-        this.isWomenDropdownOpen = false;
-      }
-    } else if (menu === "womenDropdown") {
-      this.isWomenDropdownOpen = !this.isWomenDropdownOpen;
-      if (this.isWomenDropdownOpen) {
-        this.isMenDropdownOpen = false;
-      }
-    }
+    this.activeDropdown = this.activeDropdown === menu ? null : menu;
   }
 
-  navigateToMen(id?: string, categoryName?: string, destinationUrl?: string) {
-    this.toggleDropdown("menDropdown");
-    this.isMenuOpen = false; // Close the menu on selection
-    if (id) {
-      this.categoryService.setCategoryId(id);
-      const slug = categoryName
-        ? categoryName.toLowerCase().replace(/\s+/g, "-")
-        : null;
-      this.router.navigate(["category", destinationUrl]); // Navigate with 'id'
-    } else {
-      this.router.navigate(["/men"]); // Navigate without 'id'
-    }
+  closeDropdowns() {
+    this.activeDropdown = null;
+    this.isMenuOpen = false;
   }
 
-  navigateToMenNewArrivals() {
-    this.toggleDropdown("menDropdown");
-    this.isMenuOpen = false; // Close the menu on selection
-    this.navigateTo("/men/new-arrivals");
-    this.router.navigate(['/category', '70610', '7'])
+  navigateToMen(destinationUrl: string, description: string) {
+    this.router.navigate(["category", destinationUrl]).then(() => this.closeMenu());
+    this.googleService.menubarEventEmitter("menu_bar", "menu_links", description);
   }
 
-  navigateTo(url: string): void {
-    // this.isMenDropdownOpen = false;
-    // this.isWomenDropdownOpen = false;
-    this.isMenuOpen = false; // Close the menu on selection
-    // Your navigation logic
-    this.router.navigate([url]);
-    //this.isMenuOpen = false; // Close the menu after navigation
-    console.log("Navigating to", url);
+  navigateToMenNewArrivals(destinationUrl: string, description: string) {
+    this.router.navigate(['/category', destinationUrl, '7']).then(() => this.closeMenu());
+    this.googleService.menubarEventEmitter("menu_bar", "menu_links", description);
   }
 
-  navigateToWomen(id?: string, categoryName?: string, destinationUrl?: string) {
-    this.toggleDropdown("womenDropdown");
-    this.isMenuOpen = false; // Close the menu on selection
-    if (id) {
-      this.categoryService.setCategoryId(id);
-      const slug = categoryName
-        ? categoryName.toLowerCase().replace(/\s+/g, "-")
-        : null;
-      this.router.navigate(["/category", destinationUrl]); // Navigate with 'id'
-    } else {
-      this.router.navigate(["/category", "70710-Women-Shoes"]); // Navigate without 'id'
-    }
-  }
-
-  navigateToAccessories() {
-    this.router.navigate(["/category", "70340-Accessories"]);
-  }
-
-  navigateToAcc() {
-    this.isMenuOpen = false; // Close the menu on selection
-    this.router.navigate(["/accessories"]);
+  closeMenu() {
+    this.isMenuOpen = false;
+    this.activeDropdown = null;
   }
 
   navigateToCart() {
-    this.isMenuOpen = false; // Close the menu on selection
-    this.router.navigate(["/cart"]);
+    this.router.navigate(["/cart"]).then(() => this.closeMenu());;
   }
 
   getCartItemCount(): void {

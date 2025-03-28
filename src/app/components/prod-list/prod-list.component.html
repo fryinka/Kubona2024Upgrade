@@ -10,7 +10,7 @@
       <div *ngIf="!isCategoryLoading && subCategories.length > 0" class="col-span-12 mt-0" data-aos="fade-right">
         <div class="owl-carousel owl-style">
           <div class="item cursor-pointer" *ngFor="let item of subCategories" [ngStyle]="{ 'margin-top': '-20px' }"
-            (click)="navigateToCategory(item.destinationUrl)">
+            (click)="navigateToCategory(item.description, item.destinationUrl)">
             <div class="p-2">
               <ng-container *ngIf="item.imageUrl">
                 <img src="{{ item.imageUrl }}" [ngClass]="{
@@ -24,7 +24,7 @@
             </div>
             <span class="capitalize text-[12px] md:text-[16px] mt-2 block text-center">
               {{
-              item.description.replace("Men", "").replace("Shoes", "").trim()
+              item.description.replace("Men", "").replace("Shoes", "").replace("Women").trim()
               }}
             </span>
           </div>
@@ -164,7 +164,7 @@
               <img *ngIf="item.image1Url" src="{{ item.image1Url }}" alt="{{item.title}}"
                 class="w-full h-full object-contain" />
 
-              <img *ngIf="!item.image1Url" src="assets/images/placeholder.png" alt="Placeholder Image"
+              <img *ngIf="!item.image1Url" src="assets/images/placeholder.png" alt="{{item.title}}"
                 class="w-full h-auto object-cover" />
 
               <div class="px-4 pb-3 flex-1 flex flex-col justify-between">

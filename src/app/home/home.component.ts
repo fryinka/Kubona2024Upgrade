@@ -13,7 +13,7 @@ import { ImageRotators, Prodlist, Reviews, SlideShowImages } from "../models/mod
 import { GoogleAnalyticsService } from "../services/google-analytics.service";
 @Component({
     selector: "app-home",
-    imports: [CommonModule, ReactiveFormsModule, RouterModule, NewlyArrivedComponent,], // Include ReactiveFormsModule
+    imports: [CommonModule, ReactiveFormsModule, RouterModule,], // Include ReactiveFormsModule
     templateUrl: "./home.component.html",
     styleUrls: ["./home.component.css"],
     providers: [GoogleAnalyticsService]

@@ -6,7 +6,7 @@ import { NavigationEnd, Router } from "@angular/router";
 import { FlowbiteService } from "../services/flowbite.service";
 import { SeoService } from "../services/seo.service";
 import { ColorsGroup, MaterialGroup, Prodlist, SizeGroup, StylesGroup } from "../models/models";
-import { forkJoin } from "rxjs";
+import { debounceTime, distinctUntilChanged, forkJoin, Subject } from "rxjs";
 import { ProductService } from "../services/product.service";
 
 @Component({
@@ -27,6 +27,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
   hasMoreProducts = false;
   isProducts = false;
   isLoading = false; // <-- Add loading state
+  searchSubject = new Subject<string>();
 
   sizes: SizeGroup[] = [];
   selectedSize: string = "0";
@@ -88,18 +89,20 @@ export class SearchComponent implements OnInit, AfterViewInit {
 
     this.seoService.updateDescription('Product Search');
     this.seoService.updateTitle('Product Search - Kubona - Premium Italian Leather Shoes.');
+    this.searchSubject.pipe(debounceTime(300), distinctUntilChanged()).subscribe(() => {
+      this.getFilterProducts();
+    });
   }
 
   selectedSizeClick(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedSize = selectElement.value;
     // console.log("Selected Size:", this.selectedSize);
-    this.getFilterproducts();
+    this.getFilterProducts();
   }
 
   onSearchChange() {
-    // console.log(this.searchQuery);
-    this.getFilterproducts();
+    this.searchSubject.next(this.searchQuery);
   }
 
   viewProduct(productId: string) {
@@ -135,7 +138,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedColors = selectElement.value;
     console.log("Selected Color:", this.selectedColors);
-    this.getFilterproducts();
+    this.getFilterProducts();
   }
   getStyle() {
     this.productService.getStyleGroupBy("70000").subscribe({
@@ -151,7 +154,7 @@ export class SearchComponent implements OnInit, AfterViewInit {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedStyles = selectElement.value;
     console.log("Selected Style:", this.selectedStyles);
-    this.getFilterproducts();
+    this.getFilterProducts();
   }
   getMaterial() {
     this.productService.geMaterialGroupBy("70000").subscribe({
@@ -167,26 +170,19 @@ export class SearchComponent implements OnInit, AfterViewInit {
   onMaterialChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedMaterial = selectElement.value;
-    this.getFilterproducts();
+    this.getFilterProducts();
   }
   onSortChange(event: Event) {
     const selectElement = event.target as HTMLSelectElement;
     this.selectedSort = selectElement.value;
-    this.getFilterproducts();
+    this.getFilterProducts();
   }
 
-  getFilterproducts() {
-    const defaultVal = "0";
-
-    this.selectedSize ??= defaultVal;
-    this.selectedColors ??= defaultVal;
-    this.selectedStyles ??= defaultVal;
-    this.selectedMaterial ??= defaultVal;
-
+  getFilterProducts() {
     this.urlId = `0-${this.selectedSize}-${this.selectedColors}-${this.selectedStyles}-${this.selectedMaterial}`;
 
-    if (!this.searchQuery) {
-      alert("Please type to search");
+    if (!this.searchQuery.trim()) {
+      alert('Please type to search');
       return;
     }
 
@@ -194,14 +190,17 @@ export class SearchComponent implements OnInit, AfterViewInit {
 
     this.productService.searchProduct(this.urlId, this.searchQuery).subscribe({
       next: (res) => {
-        // console.log("Products", res);
         this.searchResults = res;
         this.loadProducts();
         this.isProducts = this.searchResults.length > 0;
       },
-      error: (err) => console.error("There was an error!", err),
+      error: (err) => console.error('There was an error!', err),
       complete: () => (this.isLoading = false),
     });
+  }
+
+  ngOnDestroy() {
+    this.searchSubject.unsubscribe();
   }
 
 

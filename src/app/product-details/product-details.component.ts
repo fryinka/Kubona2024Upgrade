@@ -9,9 +9,11 @@ import { ChangeDetectorRef } from "@angular/core";
 import { FlowbiteService } from "../services/flowbite.service";
 import { SeoService } from "../services/seo.service";
 import { ProductService } from "../services/product.service";
-import { Prodlist, ProductImages, RecentlyViewed, RelatedProducts, Sizelist } from "../models/models";
+import { Cartlist, Prodlist, ProductImages, RecentlyViewed, RelatedProducts, Sizelist } from "../models/models";
 import { AnonymousUserService } from "../services/anonUser.service";
 import { CookieService } from "ngx-cookie-service";
+import { GoogleAnalyticsService } from "../services/google-analytics.service";
+import { FacebookEventService } from "../services/facebook-events.service";
 
 @Component({
   selector: "app-product-details",
@@ -46,10 +48,12 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   showWomen: boolean = true;
   showMen: boolean = false;
   userId:string | null="";
+  internetPrice: number = 0;
+  departmentName: string = "";
 
   // Products Data
 
-  productTitle: string | null = null;
+  productTitle: string = "";
   productCategoryTitle: string | null = null;
   productCategoryName: string | null = null;
   productColor: string | null = null;
@@ -101,6 +105,8 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     private productService: ProductService,
     @Inject(PLATFORM_ID) private platformId: Object,
     private cookieService:CookieService,
+    private googleService:GoogleAnalyticsService,
+    private facebookService:FacebookEventService
   ) {
     this.randomId = this.generateRandomId();
     localStorage.setItem("GUID", this.randomId);
@@ -123,10 +129,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.getProductDetails();
     this.getproductImages();
     this.getproductSizes();
-    // this.recentlyViewedPost();
     this.selectedColorId = this.productDetails.colorDesc;
-    this.loadRecentlyViewed();
-    this.getUserId();
 
     setTimeout(() => {
       this.dataLoaded = true;
@@ -297,47 +300,10 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     }, 100); // Delay to ensure DOM updates
   }
 
-  addToCart() {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    if (this.productSize == null) {
-      alert("Please select size.");
-      return;
-    }
-
-    if (this.productColor !== null) {
-      if (this.selectedColorId !== null) {
-        this.productColor = this.selectedColorId;
-      } else {
-        //alert("Please select color.");
-        return;
-      }
-    }
-
-    const item = {
-      productId: this.productId,
-      itemGroupId: this.itemGroupId,
-      trackingId: this.trackingId,
-      itemgroupSizeId: this.itemGroupSizeId,
-      productTitle: this.productTitle,
-      productCategoryTitle: this.productCategoryTitle,
-      productCategoryName: this.productCategoryName,
-      productColor: this.productColor,
-      productPrice: this.productPrice,
-      productSize: this.productSize,
-      productImage: this.productImage,
-      productQty: 1,
-    };
-
-    cart.push(item);
-    this.cartService.addToCart(item).subscribe(response => {
-      console.log(response);
-      alert(response);
-    });
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }
 
   addToCartOld(hasSize: Boolean = true) {
+    // this.facebookService.addToCart(this.internetPrice, this.prodId, this.departmentName, this.productTitle);
+    // this.googleService.addToCartEventEmitter('add_to_cart', 'product_detail', this.prodId.toString(), this.internetPrice);
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     this.selectedColorId = this.productDetails.colorDesc;
 
@@ -356,7 +322,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     }
 
 
-    const item = {
+    const item:any = {
       productId: this.itemGroupId,
       productTitle: this.productTitle,
       productCategoryTitle: this.productCategoryTitle,
@@ -367,9 +333,10 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
       productImage: this.productImage,
       itemgroupId: this.itemGroupId,
       itemgroupSizeId: this.itemGroupSizeId,
-      trackingId: this.trackingId,
+      // trackingId: this.trackingId,
       productQty: 1,
-      sizeQty: this.selectedSizeQty
+      sizeQty: this.selectedSizeQty,
+
     };
     // Add new item to cart array
     cart.push(item);
@@ -397,16 +364,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     }
   }
 
-
-
-  loadRecentlyViewed() {
-    // Load recently viewed products from local storage or an API
-    const recentlyViewed = JSON.parse(
-      localStorage.getItem("recentlyViewed") || "[]"
-    );
-    this.recentlyViewed = recentlyViewed;
-    this.isRecentlyViewed = this.recentlyViewed.length > 0;
-  }
 
   viewProduct(productId: string) {
     this.router.navigateByUrl("/", { skipLocationChange: true }).then(() => {
@@ -501,22 +458,27 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
       this.productService.getProduct(this.productId).subscribe((res: any) => {
         this.productDetails = res;
         this.prodId = this.productDetails.itemGroupId;
+        let id:string = this.prodId + '-';
+        this.productService.insertRecentlyViewed(id).subscribe(response=>{
+          // console.log(response)
+          this.getRecentlyViewed();
+        });
+        this.getRecommendedProducts();
         this.productCategoryTitle = this.productDetails.departmentName;
         this.trackingId = this.productDetails.trackingId;
         this.productTitle = this.productDetails.title;
         this.isSimilarId = this.productDetails.similarId;
         this.departmentId = this.productDetails.departmentId;
+        this.departmentName = this.productDetails.departmentName;
+        this.internetPrice = this.productDetails.internetPrice;
         if (this.isSimilarId !== null) {
           this.getProductColors(this.isSimilarId);
         }
         this.productPrice = this.productDetails.internetPrice;
         this.seoService.updateTitle("Shop " + this.productTitle);
         this.seoService.updateDescription(this.productDetails.title);
-        this.productService.insertRecentlyViewed(this.prodId.toString()).subscribe(response=>{
-          // console.log(response)
-          this.getRecentlyViewed();
-        });
-        this.getRecommendedProducts();
+        this.googleService.viewContent(this.internetPrice, this.prodId, this.departmentName);
+        this.facebookService.viewContent(this.internetPrice, this.prodId, this.departmentName, this.productTitle);
       });
     }
   }
@@ -568,9 +530,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  getUserId(){
-    this.userId = this.cookieService.get('kubona_shopper');
-  }
+  
 
   initializeCarouselRecentlyViewed() {
     $("#recentlyViewedCarousel").owlCarousel({

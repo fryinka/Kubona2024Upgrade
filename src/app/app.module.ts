@@ -7,13 +7,11 @@ import { AppComponent } from './app.component';
 import { routes } from './app.routes'; // Import your routes
 import { HomeComponent } from './home/home.component';
 import { SearchComponent } from './search/search.component';
-import { ProductsComponent } from './to_be_deleted/products/products.component';
 import { ProductDetailsComponent } from './product-details/product-details.component';
-import { CategoryComponent } from './to_be_deleted/category/category.component';
 import { AddToCartComponent } from './add-to-cart/add-to-cart.component';
 import { CheckoutComponent } from './checkout/checkout.component';
 import { Util } from './util/util.component';
-import { HttpClientModule } from '@angular/common/http';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 import { routing}
 @NgModule({
@@ -21,9 +19,7 @@ import { routing}
     AppComponent,
     HomeComponent,
     SearchComponent,
-    ProductsComponent,
     ProductDetailsComponent,
-    CategoryComponent,
     AddToCartComponent,
     Util,
     CheckoutComponent // Declare your new component
@@ -42,5 +38,5 @@ import { routing}
   exports: [RouterModule],
   bootstrap: [AppComponent]
 })
-export class AppModule { }import { ServiceWorkerModule } from '@angular/service-worker';
+export class AppModule { }
  
