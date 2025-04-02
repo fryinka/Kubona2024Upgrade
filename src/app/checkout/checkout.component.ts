@@ -1,81 +1,169 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, NavigationExtras, Router } from "@angular/router";
 import { CommonModule } from "@angular/common";
 import { NumberToWordsPipe } from "../services/num2text.pipe";
 import { CartService } from "../services/cart.service";
+import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
+import { FacebookEventService } from "../services/facebook-events.service";
+import { GoogleAnalyticsService } from "../services/google-analytics.service";
+import { CookieService } from "ngx-cookie-service";
+import { ConversionsAPIService } from "../services/conversions-api.service";
+
 @Component({
   selector: "app-checkout",
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, NumberToWordsPipe], // Include ReactiveFormsModule
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, NumberToWordsPipe],
   templateUrl: "./checkout.component.html",
   styleUrls: ["./checkout.component.css"]
 })
 export class CheckoutComponent implements OnInit {
-  checkoutForm: FormGroup;
-  totalPrice: number = 0;
-  companyWhatsApp: string = "2347036110000";
-  orderId: number = 0;
-  transactionId: string = "";
-  expressCode: string = "";
-  orderDetails: any;
-  orderNotPlaced: boolean = false;
-  redirectingToWhatsAPP: boolean = false;
-  checkoutSuccess: boolean = false;
+  public checkoutForm: FormGroup;
+  public checkoutSuccess: boolean = false;
+  public submitted: boolean = false;
+  public whatAppUrl: string = "";
+  private pageIndex: number = 0;
+  private pageSize: number = 200;
+  public orderId: number = 0;
+  public orderItemId: number = 0;
+  public phoneNumber: string = "";
+  public total: number = 0;
+  public source: string = "";
+  public isValidFormSubmitted: boolean = false;
+  public Error: string = "";
+  public g_clid: string = "";
+  public fb_clid: string = "";
+  public related: any[] = [];
+  public dept = 0;
+  public prodId = 0;
+  public custExt: boolean = false;
+  public whatsappExt: boolean = false;
+  public gclid: string = "";
+  public fbclid: string = "";
+  public verifyNum: string = "";
+  private _fbc: string | null = "";
+  private _fbp: string | null = "";
+  private clientIP: string = "";
+  public orderedToday: boolean = false;
+  public redirectingToWhatsAPP: boolean = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private route: ActivatedRoute, private router: Router, private cartService: CartService,) {
+
+  constructor(private fb: FormBuilder, private route: ActivatedRoute, private router: Router,
+    private cartService: CartService, private breakpointObserver: BreakpointObserver, private facebookService: FacebookEventService,
+    private googleService: GoogleAnalyticsService, private cookieService: CookieService, private conversionsAPI: ConversionsAPIService
+  ) {
     this.checkoutForm = this.fb.group({
-      userEmail: ["", [Validators.required, Validators.email]], // Email validation
-      phoneNumber: ["", [Validators.required, Validators.pattern("^0?[7-9]?[0-9]{9}$")],], // Nigerian phone number validation
-      deliveryState: ["", Validators.required], // Required state selection
-      typicalSize: ["", Validators.required], // Required size selection
-      paymentOption: ["", Validators.required], // Required payment option
+      gsm: ["", [Validators.required, Validators.pattern("^0?[7-9]?[0-9]{9}$")]], // Nigerian phone number validation
+      gclid: [this.g_clid],
+      fbclid: [this.fb_clid],
     });
   }
 
   ngOnInit(): void {
-    this.totalPrice = Number(
-      this.route.snapshot.queryParamMap.get("totalPrice")
-    );
-
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    if (cart.length === 0) {
-      // Check if the cart array is empty
-      this.router.navigate(["/"]); // Navigate to the home route if the cart is empty
+    this.getActiveOrder();
+    const cookieGExists: boolean = this.cookieService.check("gclid");
+    const cookieFBExists: boolean = this.cookieService.check("fbclid");
+    const fbcExists: boolean = this.cookieService.check("_fbc");
+    const fbpExists: boolean = this.cookieService.check("_fbp");
+    if (cookieGExists) {
+      this.g_clid = this.cookieService.get("gclid");
     }
+    if (cookieFBExists) {
+      this.fb_clid = this.cookieService.get("fbclid");
+    }
+    this._fbc = fbcExists ? this.cookieService.get("_fbc") : null; //fbclid
+    this._fbp = fbpExists ? this.cookieService.get("_fbp") : null; //fbp - browser id
+    this.conversionsAPI.getIPAddress().subscribe((response: any) => {
+      this.clientIP = response;
+    }); //IP address
+
+    this.setBrowserSource();
+  }
+  getActiveOrder() {
+    this.cartService.getActiveOrderFromDB().subscribe(response => {
+      // console.log(response);
+      this.total = response.totalValue;
+      this.cookieService.set('norderId',response.orderId.toString());
+    });
   }
 
+  completeOrder() {
+    this.submitted = true;
+    const num = this.checkoutForm.controls["gsm"].value;
+    this.phoneNumber = num.length === 10 && !num.startsWith("0") ? "0" + num : num;
+    const gclid = this.checkoutForm.controls["gclid"].value;
+    const fbclid = this.checkoutForm.controls["fbclid"].value;
 
-  onCheckoutWhatsapp() {
     if (this.checkoutForm.invalid) {
-      this.checkoutForm.markAllAsTouched(); // Mark all fields as touched to show validation errors
+      this.Error = "PLEASE ENTER YOUR WHATSAPP NUMBER!";
       return;
-    } else if (this.checkoutForm.valid) {
-      const email = this.checkoutForm.get("userEmail")?.value;
-      const phoneNumber = this.checkoutForm.get("phoneNumber")?.value;
+    }
 
-      let productData = JSON.parse(localStorage.getItem("cart") || "[]");
+    this.cartService.checkExisting(this.phoneNumber).subscribe((response: any) => {
+      this.custExt = response;
+      const paymentOption = this.custExt ? 101 : 100;
+      this.cartService.checkoutOrder(this.source, this.phoneNumber, this.total, gclid, fbclid, this.custExt, paymentOption      )
+        .subscribe(          (result) => {
+            this.whatAppUrl = result.whatsAppUrl;
+            if (this.custExt) {
+              this.handleExistingCustomer();
+            } else {
+              this.handleNewCustomer();
+            }
+            // Clear the cart after a successful order
+            this.cartService.clearCart();
+          },
+          (error) => console.error(error)
+        );
+    });
+  }
 
-      productData = productData.map((v: any) => {
-        return {
-          ...v,
-          quantity: v.productQty,
-        };
-      });
-
-      this.cartService.onCheckoutWhatsapp(email, phoneNumber, productData).subscribe(
-        (response) => {
-          this.orderDetails = response;
-          this.orderId = this.orderDetails["orderId"];
-          this.transactionId = this.orderDetails["baed1d8c6c804b08"];
-          this.redirectingToWhatsAPP = true;
-          localStorage.removeItem("cart");
-            window.location.href = `https://wa.me/${this.companyWhatsApp}?text=Hello%2C%20I%20have%20just%20placed%20an%20order.%20My%20order%20ID%20is%20${this.orderId}.%20Thank%20you!`;
+  handleExistingCustomer() {
+    if (this.whatAppUrl) {
+      this.cookieService.set("WhatsappUrl", this.whatAppUrl);
+      this.cookieService.set("Phone", this.phoneNumber);
+      const navigationExtras: NavigationExtras = {
+        state: {
+          orderId: this.orderId,
+          total: this.total,
         },
-        (error) => {
-          this.orderNotPlaced = true;
-        }
-      );
+      };
+      this.router.navigate(["/thanks"], navigationExtras);
     }
   }
+
+  handleNewCustomer() {
+    if (this.whatAppUrl) {
+      const navigationExtras: NavigationExtras = {
+        state: {
+          orderId: this.orderId,
+          total: this.total,
+        },
+      };
+      this.router.navigate(["/verify"], navigationExtras);
+    }
+  }
+
+  triggerCheckoutEvents() {
+    this.facebookService.initiateCheckout(this.total, this.orderId);
+    this.googleService.ga4eventEmitter("begin_checkout", this.orderId.toString(), this.total);
+  }
+
+  setBrowserSource() {
+    this.breakpointObserver
+      .observe([Breakpoints.Handset, Breakpoints.Tablet, Breakpoints.Web])
+      .subscribe((result: { matches: boolean; breakpoints: Record<string, boolean> }) => {
+        if (result.matches) {
+          if (result.breakpoints["(max-width: 599.98px) and (orientation: portrait)"] ||
+            result.breakpoints["(max-width: 599.98px) and (orientation: landscape)"]) {
+            this.source = "Mobile";
+          } else if (result.breakpoints["(min-width: 1280px) and (orientation: portrait)"] ||
+            result.breakpoints["(min-width: 1280px) and (orientation: landscape)"]) {
+            this.source = "Desktop";
+          } else {
+            this.source = "Tablet";
+          }
+        }
+      });
+  }
+
 }

@@ -13,10 +13,11 @@ export class ConversionsAPIService {
   public access_token = "EAAB8pdVoRgoBO7ZAWlGzHuBZB8ZC8RJKjTJCv9PiK4FPyJ8yFBAloBcN0GuJVy4rIb9zyJoJfYl6e5HkVj6UJnlZAajsjTNTXa1pAZAAE9rfP6A5xY0xK5IF7PAGEKxWfwfRBkvI913THUPjW3BelcIgqdVUWQ7X48W0bx8haPxjpcYGLxo6QaAZARDkUQRXIrOQZDZD";
   public testCode: string = "TEST21659";
   public fbResponse: any;
+  baseUrl: string = "https://localhost:44397/";
 
-  constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) { }
+  constructor(private http: HttpClient,) { }
 
-  getEventData(eventName: string, eventTime: number, actionSource: string, eventId: string, eventSourceUrl: string, clientIp: string, clientUserAgent: string, fbc: string, fbp:string, em: string[], currency: string, value: string): any {
+  getEventData(eventName: string, eventTime: number, actionSource: string, eventId: string, eventSourceUrl: string, clientIp: string, clientUserAgent: string, fbc: string, fbp: string, em: string[], currency: string, value: string): any {
 
     const output =
       [
@@ -34,7 +35,7 @@ export class ConversionsAPIService {
             client_ip_address: clientIp.length > 0 ? clientIp : null,
             client_user_agent: clientUserAgent,
             fbc: fbc,
-            fbp:fbp,
+            fbp: fbp,
             em: em
           },
           custom_data: {
@@ -65,13 +66,13 @@ export class ConversionsAPIService {
   //     let requestBody = new FormData();
   //     requestBody.append('access_token', this.access_token);
   //     requestBody.append('content', facebookData);
-      
+
   //     //HTTP
   //     return this.http.post(this.facebookUrl + this.pixel_id + '/events', fields, { headers: header, params: params });
   //   }
   // }
-getIPAddress(){
-  var url = this.baseUrl + 'api/CheckOut/IPAddress';
-  return this.http.get(url, { responseType: 'text' });
-}
+  getIPAddress() {
+    var url = this.baseUrl + 'api/CheckOut/IPAddress';
+    return this.http.get(url, { responseType: 'text' });
+  }
 }

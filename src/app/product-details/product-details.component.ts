@@ -43,7 +43,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   selectedColorId: string | null = null;
   recommendedProducts: RelatedProducts[] = [];
   departmentId: number = 0;
-  randomId: any;
   loader: boolean = false;
   showWomen: boolean = true;
   showMen: boolean = false;
@@ -95,26 +94,14 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     this.selectedSizeQty = quantity;
   }
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private cartService: CartService,
-    private cdr: ChangeDetectorRef,
-    private flowbiteService: FlowbiteService,
-    private seoService: SeoService,
-    private productService: ProductService,
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private cookieService:CookieService,
-    private googleService:GoogleAnalyticsService,
-    private facebookService:FacebookEventService
+  constructor(private router: Router, private route: ActivatedRoute, private cartService: CartService,
+    private cdr: ChangeDetectorRef, private flowbiteService: FlowbiteService, private seoService: SeoService,
+    private productService: ProductService, @Inject(PLATFORM_ID) private platformId: Object,
+    private cookieService: CookieService, private googleService: GoogleAnalyticsService, private facebookService: FacebookEventService,
   ) {
-    this.randomId = this.generateRandomId();
-    localStorage.setItem("GUID", this.randomId);
+
   }
 
-  generateRandomId(): string {
-    return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-  }
 
   ngOnInit() {
     // Other initialization code
@@ -148,16 +135,6 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  addItemToCart(item: any) {
-    this.cartService.addToCart(item);
-    this.updateCartCount();
-  }
-
-  // Update the cart count after adding items
-  updateCartCount() {
-    this.cartCount = this.cartService.getCartCount();
-  }
-
   // Method to get and display the recently viewed products
   getRecentlyViewed() {
       this.productService.getRecentlyViewed(this.pageSize).subscribe({
@@ -181,6 +158,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
   selectColors(color: string, urlId: string, productId: string) {
+    alert(color);
     this.selectedColorId = color;
     this.isColorSelected = true;
     this.productDetails.colorDesc = color;
@@ -301,54 +279,63 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
   }
 
 
-  addToCartOld(hasSize: Boolean = true) {
+  addToCartOld(hasSize: boolean = true) {
     // this.facebookService.addToCart(this.internetPrice, this.prodId, this.departmentName, this.productTitle);
     // this.googleService.addToCartEventEmitter('add_to_cart', 'product_detail', this.prodId.toString(), this.internetPrice);
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
     this.selectedColorId = this.productDetails.colorDesc;
-
     if (this.productColors && this.selectedColorId === null) {
-      alert("Please select color.");
-      return;
+        alert("Please select color.");
+        return;
     } else if (this.selectedColorId !== null) {
-      this.productColor = this.selectedColorId;
+        this.productColor = this.selectedColorId;
     }
 
     if (hasSize) {
-      if (this.productSize == null) {
-        alert("Please select size.");
-        return;
-      }
+        if (this.productSize == null) {
+            alert("Please select size.");
+            return;
+        }
     }
 
-
-    const item:any = {
-      productId: this.itemGroupId,
-      productTitle: this.productTitle,
-      productCategoryTitle: this.productCategoryTitle,
-      productCategoryName: this.productCategoryName,
-      productColor: this.productColor,
-      productPrice: this.productPrice,
-      productSize: this.productSize,
-      productImage: this.productImage,
-      itemgroupId: this.itemGroupId,
-      itemgroupSizeId: this.itemGroupSizeId,
-      // trackingId: this.trackingId,
-      productQty: 1,
-      sizeQty: this.selectedSizeQty,
-
-    };
+    const item = {
+        productId: this.prodId,
+        productTitle: this.productTitle,
+        productCategoryTitle: this.productCategoryTitle,
+        productCategoryName: this.productCategoryName,
+        productColor: this.productColor,
+        productPrice: this.productPrice,
+        productSize: this.productSize,
+        productImage: this.productImage,
+        itemgroupId: this.itemGroupId,
+        itemgroupSizeId: this.itemGroupSizeId,
+        productQty: 1,
+        sizeQty: this.selectedSizeQty
+    }
     // Add new item to cart array
     cart.push(item);
-    this.cartService.addToCart(item);
-
-    // Store updated cart back to localStorage
-    localStorage.setItem("cart", JSON.stringify(cart));
+    this.cartService.addToCart(item).subscribe({
+        next: (orderId) => {
+            console.log('Add to cart successful. Order ID:', orderId);
+            // Update the orderId using the service
+            this.cartService.setOrderId(orderId);
+            // Update localStorage with the cart item
+            const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+            cart.push(item);
+            localStorage.setItem("cart", JSON.stringify(cart));
+            alert("Item added to cart");
+            this.router.navigate(["/cart"]);
+        },
+        error: (error) => {
+            console.error('Add to cart failed:', error);
+            alert("Add to cart failed.");
+        }
+    });
 
     // Optionally, provide feedback to user
     alert("Item added to cart");
     this.router.navigate(["/cart"]);
-  }
+}
 
   getproductImages() {
     if (this.productId) {

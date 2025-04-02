@@ -19,20 +19,19 @@ import { NumberToWordsPipe } from "../services/num2text.pipe";
 export class AddToCartComponent implements OnInit {
   cartItems: any[] = [];
   totalPrice: number = 0;
-  recommendedProducts: RelatedProducts[] = []; // Adjust type as needed
+  orderId: number | null = 0;
 
-  orderId: any;
-
-  constructor(private router: Router, private cartService: CartService, private productService: ProductService) {
-    this.orderId = this.generateOrderId();
+  constructor(private router: Router, private cartService: CartService,) {
   }
 
-  generateOrderId(): number {
-    return Math.floor(1000000 + Math.random() * 9000000);
+  generateOrderId() {
+    this.cartService.getOrderId().subscribe(response => {
+      this.orderId = response;
+    })
   }
 
   navigateToCheckout() {
-    this.router.navigate(['/whatsapp'], { queryParams: { totalPrice: this.totalPrice } });
+    this.router.navigate(['/whatsapp']);
   }
 
   hasItemsInCart(): boolean {
@@ -46,12 +45,11 @@ export class AddToCartComponent implements OnInit {
   viewProduct(productId: number) {
     this.router.navigate(["/product", productId]);
   }
+
   ngOnInit(): void {
     this.cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
     this.totalPrice = this.calculateTotalPrice();
-    this.fetchRecommendedProducts();
-
-    // console.log("cartItems", this.cartItems);
+    this.generateOrderId();
   }
 
   ngDoCheck(): void {
@@ -59,13 +57,6 @@ export class AddToCartComponent implements OnInit {
     this.totalPrice = this.calculateTotalPrice();
   }
 
-  fetchRecommendedProducts(): void {
-    this.productService.getRelatedProducts(70000, 0, 8).subscribe(response => {
-      this.recommendedProducts = response;
-    }, (error) => {
-      console.error("Error fetching recommended products:", error);
-    });
-  }
 
   calculateTotalPrice(): number {
     return this.cartItems.reduce((total, item) => {
@@ -117,49 +108,5 @@ export class AddToCartComponent implements OnInit {
   saveCart() {
     localStorage.setItem("cart", JSON.stringify(this.cartItems));
     this.router.navigate(["/cart"]);
-  }
-  initializeCarousel1() {
-    $(".owl-new-arrival").owlCarousel({
-      loop: true,
-      margin: 20,
-      nav: true,
-      navText: [
-        '<img src="assets/images/to-left.png" class="max-w-[35px]" alt="Prev">',
-        '<img src="assets/images/to-right.png" class="max-w-[35px]" alt="Next">',
-      ],
-      responsive: {
-        0: {
-          items: 2,
-        },
-        600: {
-          items: 2,
-        },
-        1000: {
-          items: 3,
-        },
-      },
-    });
-  }
-  initializeCarousel2() {
-    $(".owl-new-arrival2").owlCarousel({
-      loop: true,
-      margin: 20,
-      nav: true,
-      navText: [
-        '<img src="assets/images/to-left.png" class="max-w-[35px]" alt="Prev">',
-        '<img src="assets/images/to-right.png" class="max-w-[35px]" alt="Next">',
-      ],
-      responsive: {
-        0: {
-          items: 2,
-        },
-        600: {
-          items: 2,
-        },
-        1000: {
-          items: 3,
-        },
-      },
-    });
   }
 }

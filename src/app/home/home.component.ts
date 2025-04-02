@@ -96,7 +96,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   womenRelatedProducts: Prodlist[] = [];
   accRelatedProducts: any = [];
   slideShowImages: SlideShowImages[] = [];
-  allReviews: any[] = [];
+  // allReviews: any[] = [];
   allCategories: ImageRotators[] = [];
   allStyles: any = [];
   allStylesWomen: any = [];
@@ -118,7 +118,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.get_men_related_products();
     // this.get_acc_related_products();
     this.get_sliders();
-    this.get_reviews();
+    // this.get_reviews();
     this.get_categories();
     this.get_styles();
     this.get_sizes();
@@ -183,17 +183,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
     });
   }
 
-    get_reviews() {
-      this.productService.getReviews().subscribe({
-        next: (res) => {
-          this.allReviews = res;
-          setTimeout(() => this.initializeCarousel3(), 0);
-        },
-        error: (err) => {
-          console.error("There was an error!", err);
-        },
-      });      
-  }
+  //   get_reviews() {
+  //     this.productService.getReviews().subscribe({
+  //       next: (res) => {
+  //         this.allReviews = res;
+  //         setTimeout(() => this.initializeCarousel3(), 0);
+  //       },
+  //       error: (err) => {
+  //         console.error("There was an error!", err);
+  //       },
+  //     });      
+  // }
 
   get_sizes() {
     forkJoin({

@@ -17,6 +17,12 @@ import { ReturnExchangeComponent } from "./return-exchange/return-exchange.compo
 import { VacanciesComponent } from "./vacancies/vacancies.component";
 import { ReturnExchangeProcessComponent } from "./exchange-process/exchange-process.component";
 import { ProdListComponent } from "./components/prod-list/prod-list.component";
+import { ExistThanksComponent } from "./components/exist-thanks/exist-thanks.component";
+import { VerifyComponent } from "./components/verify/verify.component";
+import { InjectionToken } from "@angular/core";
+import { ExternalUrlRedirectResolver } from "./services/external-url-redirect.resolver";
+
+const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
 
 export const routes: Routes = [
   {
@@ -72,6 +78,29 @@ export const routes: Routes = [
       description: "Proceed to checkout and complete your purchase.",
     },
   },  
+  {
+    path: "thanks",
+    component: ExistThanksComponent,
+    data: {
+      title: "Thanks",
+      description: "Proceed to checkout and complete your purchase.",
+    },
+  },  
+  {
+    path: "verify",
+    component: VerifyComponent,
+    data: {
+      title: "Checkout",
+      description: "Proceed to checkout and complete your purchase.",
+    },
+  }, 
+  {
+    path: 'externalRedirect',
+    resolve: {
+      url: ExternalUrlRedirectResolver,
+    },
+    component: ExistThanksComponent,
+  },
   {
     path: "faq",
     component: FaqsComponent,

@@ -1,5 +1,5 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
 import { CookieService } from 'ngx-cookie-service';
@@ -10,6 +10,7 @@ import { Cartlist, CheckoutData } from '../models/models';
 })
 export class CartService {
   private cartItems: BehaviorSubject<Cartlist[]> = new BehaviorSubject<Cartlist[]>([]);
+  private orderId: BehaviorSubject<number | null> = new BehaviorSubject<number | null>(null); // Add orderId
   private isBrowser: boolean;
   baseURL: string = 'https://localhost:44397/';
 
@@ -17,56 +18,69 @@ export class CartService {
     private cookieService: CookieService) {
     this.isBrowser = isPlatformBrowser(this.platformId);
 
-    // Initialize cart only in the browser
     if (this.isBrowser) {
       const initialCart = this.getCartFromLocalStorage();
       this.cartItems.next(initialCart);
+      const storedOrderId = localStorage.getItem('orderId');
+      this.orderId.next(storedOrderId ? parseInt(storedOrderId, 10) : null); // Initialize orderId
     }
   }
 
-  // Initialize cart from localStorage
   private getCartFromLocalStorage(): any[] {
-    if (!this.isBrowser) return []; // SSR safe check
+    if (!this.isBrowser) return [];
     const storedCart = localStorage.getItem('cart');
     return storedCart ? JSON.parse(storedCart) : [];
   }
 
-  // Update localStorage whenever cart changes
   private updateLocalStorage(cart: any[]): void {
     if (this.isBrowser) {
       localStorage.setItem('cart', JSON.stringify(cart));
     }
   }
 
-  // Return cart items as an observable
   getCartItems(): Observable<any[]> {
     return this.cartItems.asObservable();
   }
 
-  // Get the number of items in the cart
+  getOrderId(): Observable<number | null> { // Add getOrderId method
+    return this.orderId.asObservable();
+  }
+
+  setOrderId(orderId: number | null): void { // Add setOrderId method
+    this.orderId.next(orderId);
+    if (this.isBrowser) {
+      localStorage.setItem('orderId', orderId ? orderId.toString() : '');
+    }
+  }
+
   getCartCount(): number {
     return this.cartItems.getValue().length;
   }
 
-  // Add an item to the cart and update localStorage
-  addToCart(item: any): Observable<any> {
+  addToCart(item: any): Observable<number> {
     const userId = this.cookieService.get('kubona_shopper');
     const currentItems = this.cartItems.getValue();
     const updatedItems = [...currentItems, item];
-    this.cartItems.next(updatedItems); // Update BehaviorSubject
-    this.updateLocalStorage(updatedItems); // Update localStorage
+    this.cartItems.next(updatedItems);
+    this.updateLocalStorage(updatedItems);
+
     const url = this.baseURL + 'api/Order';
     const headers = { 'content-type': 'application/json' };
-    alert("Code now here!")
-    return this.http.post<any>(url, { "productId": item.productId, "itemgroupSizeId": item.itemgroupSizeId , "userId":userId}, { 'headers': headers });
+
+    return this.http.post<number>(url, { "productId": item.productId, "itemgroupSizeId": item.itemgroupSizeId, "userId": userId }, { headers: headers })
+      .pipe(
+        catchError(error => {
+          console.error('Error adding to cart:', error);
+          return throwError(error);
+        })
+      );
   }
 
-  // Remove an item from the cart and update localStorage
   removeFromCart(item: any): void {
     const currentItems = this.cartItems.getValue();
     const updatedItems = currentItems.filter(cartItem => cartItem.productId !== item.productId);
-    this.cartItems.next(updatedItems); // Update BehaviorSubject
-    this.updateLocalStorage(updatedItems); // Update localStorage
+    this.cartItems.next(updatedItems);
+    this.updateLocalStorage(updatedItems);
   }
 
   onCheckoutWhatsapp(email: string, phoneNumber: string, productData: any) {
@@ -78,12 +92,12 @@ export class CartService {
   }
 
   getCartItemsFromDB<Cartlist>(pageNumber: number, pageSize: number): Observable<Cartlist[]> {
-
     var url = this.baseURL + 'api/Order';
+    var userId = this.cookieService.get('kubona_shopper');
     var params = new HttpParams()
+    .set("userId", userId)
     .set("pageNumber", pageNumber.toString())
     .set("pageSize", pageSize.toString())
-    
     return this.http.get<Cartlist[]>(url, { params });
   }
   
@@ -97,75 +111,20 @@ export class CartService {
     return this.http.get<any[]>(url);
   }
 
-  insertItemIntoOrder(productId: number, itemgroupSizeId: number): Observable<any> {
-
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      })
-    };
-    const headers = { 'content-type': 'application/json' };
-
-    var url = this.baseURL + 'api/Order';
-
-    return this.http.post<any>(url, { "productId": productId, "itemgroupSizeId": itemgroupSizeId }, { 'headers': headers });
-  }
-
-  // deleteItemInCart(cartItemId: number) {
-  //   if (window.confirm('Are you sure you want to delete the item?')) {
-  //     this.cartlist.splice(cartItemId, 1);
-  //   }
-  // }
-
-
-  // removeSingleItem(cartItemId:number): Observable<any> {
-  //     var url = this.baseURL + 'api/CartManage';
-  //   if (window.confirm('Are you sure you want to delete the item?')) {
-  //         return this.http.get(`${url}/${cartItemId}`);
-  //       } else {return null}
-  //     }
-    
-
-  //remove all items in cart
-  emptyCart() {
-    
-  }
-
-
-
-
-
-
-  getActiveOrder<ActiveOrder>(): Observable<ActiveOrder> {
-
+  
+  getActiveOrderFromDB(): Observable<any> {
+    var userId = this.cookieService.get('kubona_shopper');
     var url = this.baseURL + 'api/Order/ActiveOrder';
-    return this.http.get<ActiveOrder>(url);
-
-
-  }
-
-  checkout(source: string, customerGSM: string, total: number){
-
-
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json'
-      })
-    };
-    const headers = { 'content-type': 'application/json' };
-
-    var url = this.baseURL + 'api/CheckOut';
-
-    return this.http.post<CheckoutData>(url, { "source": source, "customerGSM": customerGSM, "total": total}, { 'headers': headers });
-
-    
+    var params = new HttpParams()
+    .set("userId", userId)
+    return this.http.get<any>(url,{params});
   }
 
   checkoutOrder(source: string, customerGSM: string, total: number, gclid: string, fbclid: string, exist: boolean, paymentOption:number) {
     var url = this.baseURL + 'api/CheckOut';
+    var userId = this.cookieService.get('kubona_shopper');
     const headers = { 'content-type': 'application/json' };
-    const body = { source: source, customerGSM: customerGSM, total: total, gclid: gclid, fbclid: fbclid, exist: exist, paymentOption: paymentOption }
+    const body = { source: source, customerGSM: customerGSM, total: total, gclid: gclid, fbclid: fbclid, exist: exist, paymentOption: paymentOption, userId:userId }
     return this.http.post<CheckoutData>(url, body, { headers: headers });
   }
 
@@ -220,4 +179,12 @@ export class CartService {
   }
 
 
+  clearCart(): void {
+    this.cartItems.next([]); // Clear BehaviorSubject
+    this.orderId.next(0);
+    if (this.isBrowser) {
+      localStorage.removeItem('cart'); // Clear localStorage
+      localStorage.removeItem('orderId');
+    }
+  }
 }

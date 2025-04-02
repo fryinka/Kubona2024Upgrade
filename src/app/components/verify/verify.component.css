@@ -1,0 +1,6 @@
+@media screen and (max-width: 600px) {
+    .bigPrice {
+        font-size: 20px;
+        text-align: center;
+    }
+}

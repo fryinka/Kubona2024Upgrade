@@ -184,44 +184,4 @@
     </button>
   </div>
 
-  <!-- Recommended Products Section -->
-  <div class="md:pb-12 pb-5 lg:px-0 px-3 mt-5 hidden">
-    <div class="max-w-6xl mx-auto">
-      <div class="grid grid-cols-12">
-        <div class="col-span-12">
-          <h2 class="text-[24px] font-bold mb-5">Recommended Products</h2>
-        </div>
-        <div class="col-span-12">
-          <div class="overflow-x-auto">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div class="flex-shrink-0 cursor-pointer" *ngFor="let item of recommendedProducts"
-                (click)="viewProduct(item.itemgroupId)">
-                <div class="bg-white border rounded-lg shadow-md overflow-hidden flex flex-col">
-                  <div class="relative flex-1">
-                    <img src="assets/images/buy-cart.png" class="absolute right-4 bottom-4 max-w-[50px]"
-                      alt="Buy Cart" />
-                    <img *ngIf="item.imageUrl" [src]="item.imageUrl" alt="Product Image"
-                      class="w-full h-full object-cover" />
-                  </div>
-                  <div class="p-4 flex flex-col flex-1">
-                    <h5 class="montserrat-500 text-[18px] capitalize truncate">
-                      {{ item.title }}
-                    </h5>
-                    <div class="mt-2 flex justify-between items-center">
-                      <div class="text-[16px] line-through text-[#a0a0a0]">
-                        {{ item.internetPrice | currency:'₦' :'symbol':'3.2'}}
-                      </div>
-                      <div class="text-[18px] text-[#000] font-bold">{{item.internetPrice | currency:'₦'
-                        :'symbol':'3.2'}}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
