@@ -9,7 +9,7 @@ import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-exist-thanks',
-  imports: [CommonModule,],
+  imports: [CommonModule],
   templateUrl: './exist-thanks.component.html',
   styleUrl: './exist-thanks.component.css'
 })
@@ -27,10 +27,9 @@ export class ExistThanksComponent implements OnInit {
   private clientIP: string | null = "";
   private data: any;
 
-
-  constructor(private cookieService: CookieService, private activatedRoute: ActivatedRoute, private router: Router,
-    private googleService: GoogleAnalyticsService, private facebookService: FacebookEventService, private conversionsAPI: ConversionsAPIService,
-    private orderService: CartService, @Inject(PLATFORM_ID) private platformId: Object,) {
+  constructor(private cookieService: CookieService, private activatedRoute: ActivatedRoute, private router: Router, private googleService: GoogleAnalyticsService,
+    private facebookService: FacebookEventService, private conversionsAPI: ConversionsAPIService, private orderService: CartService,
+    @Inject(PLATFORM_ID) private platformId: Object,) {
     this.activatedRoute.queryParamMap.subscribe(queryParams => {
       const navigation = this.router.getCurrentNavigation();
       if (navigation?.extras?.state) {
@@ -41,16 +40,17 @@ export class ExistThanksComponent implements OnInit {
     });
   }
 
-
   ngOnInit(): void {
-    this.orderId = Number(this.cookieService.get('norderId'))
-    this.userAgent = navigator.userAgent;
+    this.orderId = Number(this.cookieService.get('norderId'));
     if (isPlatformBrowser(this.platformId)) {
+      this.userAgent = navigator.userAgent;
       this.event_source_url = window.location.href;
     } else {
-      this.event_source_url = ''; // Or set a default value if needed
-      console.log('window object not available on the server.');
+      this.userAgent = ''; // Or a default value if needed
+      this.event_source_url = ''; // Or a default value if needed
+      console.log('window and navigator objects not available on the server.');
     }
+
     const fbcExists: boolean = this.cookieService.check('_fbc');
     const fbpExists: boolean = this.cookieService.check('_fbp');
     const phoneExists: boolean = this.cookieService.check('Phone');
@@ -79,16 +79,15 @@ export class ExistThanksComponent implements OnInit {
     this.cookieService.delete('norderId');
   }
 
-
   // sendConversionData() {
-  //   this.data = this.conversionsAPI.getEventData("Purchase", this.unixTime, "website", this.orderId.toString(), this.event_source_url, this.clientIP, this.userAgent, this._fbc, this._fbp, [null], "NGN", this.total.toString());
-  //   const send = JSON.stringify(this.data, null, 2);
-  //   this.conversionsAPI.sendToFB(send).subscribe(response => {
-  //     console.log(response);
-  //     this.cookieService.delete('Phone');
-  //     this.cookieService.delete('WhatsappUrl');
-  //   }, error => {
-  //     console.log(error);
-  //   });
+  //   this.data = this.conversionsAPI.getEventData("Purchase", this.unixTime, "website", this.orderId.toString(), this.event_source_url, this.clientIP, this.userAgent, this._fbc, this._fbp, [null], "NGN", this.total.toString());
+  //   const send = JSON.stringify(this.data, null, 2);
+  //   this.conversionsAPI.sendToFB(send).subscribe(response => {
+  //     console.log(response);
+  //     this.cookieService.delete('Phone');
+  //     this.cookieService.delete('WhatsappUrl');
+  //   }, error => {
+  //     console.log(error);
+  //   });
   // }
 }
