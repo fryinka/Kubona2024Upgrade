@@ -6,7 +6,7 @@
       "name": "productApis",
       "urls": [
         "https://admin.kubona.ng/api/Product/**",
-        "https://admin.kubona.ng/Product/Products/**",
+        "https://admin.kubona.ng/api/Product/Products/**",
         "https://admin.kubona.ng/api/**"
       ],
       "cacheConfig": {
