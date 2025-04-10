@@ -16,6 +16,9 @@ import { SeoService } from '../services/seo.service';
 export class HowToPlaceAnOrderComponent implements OnInit, AfterViewInit {
   dataLoaded = false;
   constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private flowbiteService: FlowbiteService, private seoService: SeoService) { }
+  ngAfterViewInit(): void {
+    throw new Error('Method not implemented.');
+  }
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here
