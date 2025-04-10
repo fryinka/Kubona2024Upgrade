@@ -427,6 +427,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
     AOS.init({
       duration: 1200,
       once: false,
@@ -438,6 +439,7 @@ export class ProdListComponent implements OnInit, AfterViewInit {
       }
     });
   }
+}
 
   getSubCategoryList() {
     this.route.paramMap.pipe(

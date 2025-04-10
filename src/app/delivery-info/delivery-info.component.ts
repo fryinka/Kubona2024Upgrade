@@ -5,6 +5,7 @@ import 'aos/dist/aos.css';
 import { NavigationEnd, Router } from '@angular/router';
 import { FlowbiteService } from '../services/flowbite.service';
 import { SeoService } from '../services/seo.service';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
     selector: 'app-delivery-info',
@@ -31,6 +32,7 @@ export class DeliveryInfoComponent implements OnInit ,AfterViewInit {
   
 
   ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
 
     AOS.init({
       duration: 1200, // Adjust animation duration if needed
@@ -43,7 +45,7 @@ export class DeliveryInfoComponent implements OnInit ,AfterViewInit {
         AOS.refresh();
       }
     });
-    
+  }
     
   }
 

@@ -30,6 +30,7 @@ export class ReturnExchangeComponent implements OnInit ,AfterViewInit {
   
 
   ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
 
     AOS.init({
       duration: 1200, // Adjust animation duration if needed
@@ -42,7 +43,7 @@ export class ReturnExchangeComponent implements OnInit ,AfterViewInit {
         AOS.refresh();
       }
     });
-    
+  }
     
   }
 

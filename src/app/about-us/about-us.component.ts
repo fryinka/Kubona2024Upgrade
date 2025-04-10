@@ -65,6 +65,7 @@ export class AboutUsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
     AOS.init({
       duration: 1200, // Adjust animation duration if needed
       once: false, // Whether animation should happen only once - while scrolling down
@@ -77,4 +78,5 @@ export class AboutUsComponent implements OnInit, AfterViewInit {
       }
     });
   }
+}
 }

@@ -1,4 +1,4 @@
-import { Component,AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender } from '@angular/core';
+import { Component, AfterViewInit, OnInit, Inject, PLATFORM_ID, afterNextRender } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 declare var $: any;
 import * as AOS from 'aos';
@@ -8,14 +8,14 @@ import { FlowbiteService } from '../services/flowbite.service';
 import { SeoService } from '../services/seo.service';
 
 @Component({
-    selector: 'app-how-to-place-an-order',
-    imports: [],
-    templateUrl: './how-to-place-an-order.component.html',
-    styleUrl: './how-to-place-an-order.component.css'
+  selector: 'app-how-to-place-an-order',
+  imports: [],
+  templateUrl: './how-to-place-an-order.component.html',
+  styleUrl: './how-to-place-an-order.component.css'
 })
-export class HowToPlaceAnOrderComponent  implements OnInit ,AfterViewInit {
+export class HowToPlaceAnOrderComponent implements OnInit, AfterViewInit {
   dataLoaded = false;
-  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private flowbiteService: FlowbiteService, private seoService:SeoService) {}
+  constructor(private router: Router, @Inject(PLATFORM_ID) private platformId: Object, private flowbiteService: FlowbiteService, private seoService: SeoService) { }
   ngOnInit() {
     this.flowbiteService.loadFlowbite((flowbite) => {
       // Your custom code here
@@ -28,26 +28,27 @@ export class HowToPlaceAnOrderComponent  implements OnInit ,AfterViewInit {
 
     this.seoService.updateDescription('How Kubona.ng works');
     this.seoService.updateTitle('How Kubona.ng works - Kubona - Premium Italian Leather Shoes.');
-    
+
   }
 
-  
 
-  ngAfterViewInit(): void {
 
-    AOS.init({
-      duration: 1200, // Adjust animation duration if needed
-      once: false, // Whether animation should happen only once - while scrolling down
-      mirror: false, // Whether elements should animate out while scrolling past them
-    });
+  nngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
 
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        AOS.refresh();
-      }
-    });
-    
-    
+      AOS.init({
+        duration: 1200, // Adjust animation duration if needed
+        once: false, // Whether animation should happen only once - while scrolling down
+        mirror: false, // Whether elements should animate out while scrolling past them
+      });
+
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          AOS.refresh();
+        }
+      });
+
+
+    }
   }
-
 }

@@ -419,7 +419,8 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
     AOS.init({
       duration: 1200, // Adjust animation duration if needed
       once: false, // Whether animation should happen only once - while scrolling down
@@ -439,6 +440,7 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
       }
     });
   }
+}
 
   getProductDetails() {
     if (this.productId) {

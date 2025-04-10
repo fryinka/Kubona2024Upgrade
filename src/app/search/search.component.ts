@@ -252,34 +252,36 @@ export class SearchComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    $(".owl-new-arrival-search").owlCarousel({
-      loop: true,
-      margin: 40,
-      infinite: true,
-      nav: false,
-      responsive: {
-        0: {
-          items: 1,
+    if (isPlatformBrowser(this.platformId)) {
+      $(".owl-new-arrival-search").owlCarousel({
+        loop: true,
+        margin: 40,
+        infinite: true,
+        nav: false,
+        responsive: {
+          0: {
+            items: 1,
+          },
+          600: {
+            items: 2,
+          },
+          1000: {
+            items: 3.78,
+          },
         },
-        600: {
-          items: 2,
-        },
-        1000: {
-          items: 3.78,
-        },
-      },
-    });
+      });
 
-    AOS.init({
-      duration: 1200, // Adjust animation duration if needed
-      once: false, // Whether animation should happen only once - while scrolling down
-      mirror: false, // Whether elements should animate out while scrolling past them
-    });
+      AOS.init({
+        duration: 1200, // Adjust animation duration if needed
+        once: false, // Whether animation should happen only once - while scrolling down
+        mirror: false, // Whether elements should animate out while scrolling past them
+      });
 
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        AOS.refresh();
-      }
-    });
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          AOS.refresh();
+        }
+      });
+    }
   }
 }

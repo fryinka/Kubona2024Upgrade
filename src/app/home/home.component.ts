@@ -1,22 +1,22 @@
-import {  Component,ViewChild, ElementRef,AfterViewInit,OnInit,} from "@angular/core";
-import { CommonModule } from "@angular/common";
-import {FormBuilder,FormGroup,Validators,ReactiveFormsModule,} from "@angular/forms"; // Import ReactiveFormsModule
+import { Component, ViewChild, ElementRef, AfterViewInit, OnInit, Inject, PLATFORM_ID, } from "@angular/core";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, } from "@angular/forms"; // Import ReactiveFormsModule
 declare var $: any;
 import * as AOS from "aos";
 import "aos/dist/aos.css";
-import { ActivatedRoute, NavigationEnd, Router, RouterModule } from "@angular/router";
-import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { ActivatedRoute, NavigationEnd, Router, RouterModule, } from "@angular/router";
 import { NewlyArrivedComponent } from "../components/newly-arrived/newly-arrived.component";
 import { ProductService } from "../services/product.service";
 import { forkJoin } from "rxjs";
 import { ImageRotators, Prodlist, Reviews, SlideShowImages } from "../models/models";
 import { GoogleAnalyticsService } from "../services/google-analytics.service";
+
 @Component({
-    selector: "app-home",
-    imports: [CommonModule, ReactiveFormsModule, RouterModule,], // Include ReactiveFormsModule
-    templateUrl: "./home.component.html",
-    styleUrls: ["./home.component.css"],
-    providers: [GoogleAnalyticsService]
+  selector: "app-home",
+  imports: [CommonModule, ReactiveFormsModule, RouterModule], // Include ReactiveFormsModule
+  templateUrl: "./home.component.html",
+  styleUrls: ["./home.component.css"],
+  providers: [GoogleAnalyticsService],
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   showMen: boolean = true;
@@ -42,7 +42,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   products: any;
   isProducts: boolean = false;
 
-  constructor(private router: Router, private httpClient: HttpClient, private fb: FormBuilder, private productService: ProductService, private googleService:GoogleAnalyticsService) {
+  constructor(private router: Router, private fb: FormBuilder, private productService: ProductService, private googleService: GoogleAnalyticsService,
+    @Inject(PLATFORM_ID) private platformId: Object) {
     this.newsletterForm = this.fb.group({
       email: ["", [Validators.required, Validators.email]],
     });
@@ -53,7 +54,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.selectedSize = sizeCode;
   }
 
-  
   extractSizeNumber(sizeDesc: string): string {
     const match = sizeDesc.match(/\d+/); // Match only the numbers
     return match ? match[0] : sizeDesc; // Return the matched number or original if none
@@ -152,20 +152,19 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   get_men_related_products() {
     forkJoin({
-      men: this.productService.getProducts("70610",0,0,7,0,8),
-      women: this.productService.getProducts("70710",0,0,7,0,8)
+      men: this.productService.getProducts("70610", 0, 0, 7, 0, 8),
+      women: this.productService.getProducts("70710", 0, 0, 7, 0, 8),
     }).subscribe({
       next: ({ men, women }) => {
-        this.menRelatedProducts=men;
-        this.womenRelatedProducts=women;
+        this.menRelatedProducts = men;
+        this.womenRelatedProducts = women;
         setTimeout(() => this.initializeCarousel5(), 0);
         setTimeout(() => this.initializeCarousel6(), 0);
-            },
+      },
       error: (err) => console.error("There was an error!", err),
     });
-
   }
-  
+
   get_sliders() {
     this.isLoadingSlider = true;
     this.productService.getSlideShowImages().subscribe({
@@ -179,30 +178,30 @@ export class HomeComponent implements OnInit, AfterViewInit {
       },
       complete: () => {
         this.isLoadingSlider = false;
-      }
+      },
     });
   }
 
-  //   get_reviews() {
-  //     this.productService.getReviews().subscribe({
-  //       next: (res) => {
-  //         this.allReviews = res;
-  //         setTimeout(() => this.initializeCarousel3(), 0);
-  //       },
-  //       error: (err) => {
-  //         console.error("There was an error!", err);
-  //       },
-  //     });      
+  //   get_reviews() {
+  //     this.productService.getReviews().subscribe({
+  //       next: (res) => {
+  //         this.allReviews = res;
+  //         setTimeout(() => this.initializeCarousel3(), 0);
+  //       },
+  //       error: (err) => {
+  //         console.error("There was an error!", err);
+  //       },
+  //     });
   // }
 
   get_sizes() {
     forkJoin({
       men: this.productService.getSizingGroupBy("70610"),
-      women: this.productService.getSizingGroupBy("70710")
+      women: this.productService.getSizingGroupBy("70710"),
     }).subscribe({
       next: ({ men, women }) => {
-        this.allSizes=men;
-        this.allSizesWomen=women;
+        this.allSizes = men;
+        this.allSizesWomen = women;
       },
       error: (err) => console.error("There was an error!", err),
     });
@@ -223,7 +222,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   get_styles() {
     forkJoin({
       men: this.productService.getStyleGroupBy("70610"),
-      women: this.productService.getStyleGroupBy("70710")
+      women: this.productService.getStyleGroupBy("70710"),
     }).subscribe({
       next: ({ men, women }) => {
         this.allStyles = men.concat(women);
@@ -232,22 +231,33 @@ export class HomeComponent implements OnInit, AfterViewInit {
       error: (err) => console.error("There was an error!", err),
     });
   }
-   
 
-  viewShopByStyle(destUrl: string, eventLabel:string) {
+  viewShopByStyle(destUrl: string, eventLabel: string) {
     this.router.navigate(["/category", destUrl]);
-    this.googleService.homepageEventEmitter("front_page", "shop_by_style", eventLabel);
+    this.googleService.homepageEventEmitter(
+      "front_page",
+      "shop_by_style",
+      eventLabel
+    );
   }
 
-  viewShopBySize(destUrl: string, sizeCode: number, eventLabel:string) {
-    let deptId = destUrl.split('-')[0];
+  viewShopBySize(destUrl: string, sizeCode: number, eventLabel: string) {
+    let deptId = destUrl.split("-")[0];
     this.router.navigate(["/category", `${deptId}-${sizeCode}-0-0-0-0`]);
-    this.googleService.homepageEventEmitter("front_page", "shop_by_size", eventLabel);
+    this.googleService.homepageEventEmitter(
+      "front_page",
+      "shop_by_size",
+      eventLabel
+    );
   }
 
-  viewShopByDepartments(routeId: string, eventLabel:string) {
+  viewShopByDepartments(routeId: string, eventLabel: string) {
     this.router.navigate(["/category", routeId]);
-    this.googleService.homepageEventEmitter("front_page", "widget_click", eventLabel);
+    this.googleService.homepageEventEmitter(
+      "front_page",
+      "widget_click",
+      eventLabel
+    );
   }
 
   initializeCarousel() {
@@ -276,26 +286,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     });
   }
 
-  onSubscribe() {
-    if (this.newsletterForm.valid) {
-      const email = this.newsletterForm.get("email")?.value;
-      const formBody2 = {
-        email: email,
-      };
-      this.httpClient.post("https://friday.kubona.ng/api/Contact/Subscribe/", formBody2).subscribe(
-        (response) => {
-          console.log(JSON.stringify(response));
-          this.newsletterSuccess = true;
-        },
-        (error) => {
-          console.error("Error submitting form", error);
-          this.newsletterSuccess = true;
-        }
-      );
-    } else {
-      console.log("Form is not valid");
-    }
-  }
+
 
   initializeCarousel2() {
     $(".owl-home-banner").owlCarousel({
@@ -462,69 +453,68 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.router.navigate(["/product"]);
   }
 
-
   ngAfterViewInit(): void {
-    AOS.init({
-      duration: 1200, // Adjust animation duration if needed
-      once: false, // Whether animation should happen only once - while scrolling down
-      mirror: false, // Whether elements should animate out while scrolling past them
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      AOS.init({
+        duration: 1200, // Adjust animation duration if needed
+        once: false, // Whether animation should happen only once - while scrolling down
+        mirror: false, // Whether elements should animate out while scrolling past them
+      });
 
-    this.router.events.subscribe((event: any) => {
-      if (event instanceof NavigationEnd) {
-        AOS.refresh();
+      this.router.events.subscribe((event: any) => {
+        if (event instanceof NavigationEnd) {
+          AOS.refresh();
+        }
+      });
+
+      this.router.events.subscribe((event) => {
+        if (event instanceof NavigationEnd) {
+          AOS.refresh();
+        }
+      });
+
+      const video = this.videoPlayer.nativeElement;
+
+      // Check if IntersectionObserver is supported
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                video
+                  .play()
+                  .then(() => {
+                    this.isPlaying = true;
+                  })
+                  .catch((error) => {
+                    console.error("Error attempting to play video:", error);
+                  });
+              } else {
+                video.pause();
+                this.isPlaying = false;
+              }
+            });
+          },
+          { threshold: 0.5 }
+        ); // Adjust threshold as needed
+
+        observer.observe(video);
+      } else {
+        // Fallback for browsers that do not support IntersectionObserver
+        console.warn("IntersectionObserver is not supported in this browser.");
+        // Optionally handle the fallback here
       }
-    });
 
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        AOS.refresh();
-      }
-    });
+      // Initialize Owl Carousel after view initialization
 
-    const video = this.videoPlayer.nativeElement;
+      // this.initializeCarousel5();
 
-    // Check if IntersectionObserver is supported
-    if ("IntersectionObserver" in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              video
-                .play()
-                .then(() => {
-                  this.isPlaying = true;
-                })
-                .catch((error) => {
-                  console.error("Error attempting to play video:", error);
-                });
-            } else {
-              video.pause();
-              this.isPlaying = false;
-            }
-          });
-        },
-        { threshold: 0.5 }
-      ); // Adjust threshold as needed
-
-      observer.observe(video);
-    } else {
-      // Fallback for browsers that do not support IntersectionObserver
-      console.warn("IntersectionObserver is not supported in this browser.");
-      // Optionally handle the fallback here
+      // this.initializeCarousel6()
     }
 
-    // Initialize Owl Carousel after view initialization
-
-    // this.initializeCarousel5();
-
-    // this.initializeCarousel6()
-
-    this.onSubscribe();
   }
 
   sendWidgetClickEvent(eventLocation: string, eventLabel: string) {
     this.googleService.homepageEventEmitter("front_page", eventLocation, eventLabel);
   }
-
 }

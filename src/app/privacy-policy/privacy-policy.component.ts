@@ -36,19 +36,20 @@ export class PrivacyPolicyComponent implements OnInit, AfterViewInit {
 
 
   ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
 
-    AOS.init({
-      duration: 1200, // Adjust animation duration if needed
-      once: false, // Whether animation should happen only once - while scrolling down
-      mirror: false, // Whether elements should animate out while scrolling past them
-    });
+      AOS.init({
+        duration: 1200, // Adjust animation duration if needed
+        once: false, // Whether animation should happen only once - while scrolling down
+        mirror: false, // Whether elements should animate out while scrolling past them
+      });
 
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        AOS.refresh();
-      }
-    });
-
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          AOS.refresh();
+        }
+      });
+    }
 
   }
 
