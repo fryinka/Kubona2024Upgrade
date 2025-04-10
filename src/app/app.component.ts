@@ -103,17 +103,22 @@ export class AppComponent implements OnInit {
 
 
   checkNetworkStatus() {
-    this.networkStatus = navigator.onLine;
-    this.networkStatus$ = merge(
-      of(null),
-      fromEvent(window, 'online'),
-      fromEvent(window, 'offline')
-    )
-      .pipe(map(() => navigator.onLine))
-      .subscribe(status => {
-        console.log('status', status);
-        this.networkStatus = status;
-      });
+      if (isPlatformBrowser(this.platformId)) {
+        this.networkStatus = navigator.onLine;
+        this.networkStatus$ = merge(
+          of(null),
+          fromEvent(window, 'online'),
+          fromEvent(window, 'offline')
+        )
+          .pipe(map(() => navigator.onLine))
+          .subscribe(status => {
+            console.log('status', status);
+            this.networkStatus = status;
+          });
+      } else {
+        console.log('Network status checks not performed on the server.');
+        this.networkStatus = true; // Assume online on server, or handle differently
+      }
   }
 
 
