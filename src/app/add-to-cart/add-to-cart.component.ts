@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { CommonModule } from "@angular/common";
+import { Component, OnInit, Inject, PLATFORM_ID } from "@angular/core";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 declare var $: any;
 import * as AOS from "aos";
@@ -20,14 +20,16 @@ export class AddToCartComponent implements OnInit {
   cartItems: any[] = [];
   totalPrice: number = 0;
   orderId: number | null = 0;
+  private platformId: Object;
 
-  constructor(private router: Router, private cartService: CartService,) {
+  constructor(private router: Router, private cartService: CartService, @Inject(PLATFORM_ID) platformId: Object,) {
+    this.platformId = platformId;
   }
 
   generateOrderId() {
     this.cartService.getOrderId().subscribe(response => {
       this.orderId = response;
-    })
+    });
   }
 
   navigateToCheckout() {
@@ -47,7 +49,12 @@ export class AddToCartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
+    if (isPlatformBrowser(this.platformId)) {
+      this.cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
+    } else {
+      this.cartItems = []; // Or provide a default value if needed
+      console.log('localStorage not available on the server.');
+    }
     this.totalPrice = this.calculateTotalPrice();
     this.generateOrderId();
   }
@@ -56,7 +63,6 @@ export class AddToCartComponent implements OnInit {
     // Recalculate total price whenever cartItems change
     this.totalPrice = this.calculateTotalPrice();
   }
-
 
   calculateTotalPrice(): number {
     return this.cartItems.reduce((total, item) => {
@@ -75,12 +81,10 @@ export class AddToCartComponent implements OnInit {
         item.productQty += 1;
         this.saveCart();
       } else {
-        // Replace this with a user-friendly error message (e.g., toast notification)
         alert('Cannot increase quantity: Maximum size quantity reached for selected size');
       }
     }
   }
-
 
   decreaseQuantity(itemId: number) {
     const item = this.cartItems.find((cartItem) => cartItem.id === itemId);
@@ -99,14 +103,19 @@ export class AddToCartComponent implements OnInit {
       (cartItem) => cartItem.id === itemId
     );
     if (index !== -1) {
-      this.cartItems.splice(index, 1); // Remove the item at the found index
+      this.cartItems.splice(index, 1);
       this.saveCart();
       this.cartService.removeFromCart(item);
     }
   }
 
   saveCart() {
-    localStorage.setItem("cart", JSON.stringify(this.cartItems));
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem("cart", JSON.stringify(this.cartItems));
+    } else {
+      console.log('Cart saving skipped on server.');
+      // Optionally, handle server-side cart persistence if needed
+    }
     this.router.navigate(["/cart"]);
   }
 }

@@ -280,25 +280,24 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
 
   addToCartOld(hasSize: boolean = true) {
-    // this.facebookService.addToCart(this.internetPrice, this.prodId, this.departmentName, this.productTitle);
-    // this.googleService.addToCartEventEmitter('add_to_cart', 'product_detail', this.prodId.toString(), this.internetPrice);
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    this.selectedColorId = this.productDetails.colorDesc;
-    if (this.productColors && this.selectedColorId === null) {
+    if (isPlatformBrowser(this.platformId)) {
+      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+      this.selectedColorId = this.productDetails.colorDesc;
+      if (this.productColors && this.selectedColorId === null) {
         alert("Please select color.");
         return;
-    } else if (this.selectedColorId !== null) {
+      } else if (this.selectedColorId !== null) {
         this.productColor = this.selectedColorId;
-    }
+      }
 
-    if (hasSize) {
+      if (hasSize) {
         if (this.productSize == null) {
-            alert("Please select size.");
-            return;
+          alert("Please select size.");
+          return;
         }
-    }
+      }
 
-    const item = {
+      const item = {
         productId: this.prodId,
         productTitle: this.productTitle,
         productCategoryTitle: this.productCategoryTitle,
@@ -311,31 +310,31 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
         itemgroupSizeId: this.itemGroupSizeId,
         productQty: 1,
         sizeQty: this.selectedSizeQty
-    }
-    // Add new item to cart array
-    cart.push(item);
-    this.cartService.addToCart(item).subscribe({
+      };
+
+      this.cartService.addToCart(item).subscribe({
         next: (orderId) => {
-            console.log('Add to cart successful. Order ID:', orderId);
-            // Update the orderId using the service
-            this.cartService.setOrderId(orderId);
-            // Update localStorage with the cart item
-            const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-            cart.push(item);
-            localStorage.setItem("cart", JSON.stringify(cart));
-            alert("Item added to cart");
-            this.router.navigate(["/cart"]);
+          console.log('Add to cart successful. Order ID:', orderId);
+          this.cartService.setOrderId(orderId);
+          const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+          cart.push(item);
+          localStorage.setItem("cart", JSON.stringify(cart));
+          alert("Item added to cart");
+          this.router.navigate(["/cart"]);
         },
         error: (error) => {
-            console.error('Add to cart failed:', error);
-            alert("Add to cart failed.");
+          console.error('Add to cart failed:', error);
+          alert("Add to cart failed.");
         }
-    });
+      });
 
-    // Optionally, provide feedback to user
-    alert("Item added to cart");
-    this.router.navigate(["/cart"]);
-}
+      alert("Item added to cart");
+      this.router.navigate(["/cart"]);
+    } else {
+      console.log('addToCartOld not executed on server.');
+      // Optionally, provide alternative server-side logic or error handling
+    }
+  }
 
   getproductImages() {
     if (this.productId) {
