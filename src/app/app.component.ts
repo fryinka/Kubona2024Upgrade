@@ -37,6 +37,7 @@ export class AppComponent implements OnInit {
   networkStatus: any;
   networkStatus$: Subscription = Subscription.EMPTY;
   cookieService = inject(CookieService)
+  private platformId = inject(PLATFORM_ID);
 
 
   constructor(private router: Router, private scrollService: ScrollService, private fb: FormBuilder, private activatedRoute: ActivatedRoute,
@@ -47,11 +48,20 @@ export class AppComponent implements OnInit {
     // subscribe to router events and send page views to Google Analytics
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        gtag('config', 'UA-1299523-10', { 'page_path': event.urlAfterRedirects });
-        gtag('config', '1062104035', { 'page_path': event.urlAfterRedirects });
-        fbq('track', 'PageView');
+        if (isPlatformBrowser(this.platformId)) {
+          if (typeof gtag === 'function') {
+            gtag('config', 'UA-1299523-10', { 'page_path': event.urlAfterRedirects });
+            gtag('config', '1062104035', { 'page_path': event.urlAfterRedirects });
+          } else {
+            console.warn('gtag function not found.');
+          }
+          if (typeof fbq === 'function') {
+            fbq('track', 'PageView');
+          } else {
+            console.warn('fbq function not found.');
+          }
+        }
       }
-
     });
   }
 
@@ -90,7 +100,7 @@ export class AppComponent implements OnInit {
 
   }
 
-  
+
 
   checkNetworkStatus() {
     this.networkStatus = navigator.onLine;
@@ -108,25 +118,25 @@ export class AppComponent implements OnInit {
 
 
   // onSubscribe() {
-  //   if (this.newsletterForm.valid) {
-  //     const email = this.newsletterForm.get("email")?.value;
-  //     const formBody = { email: email };
+  //   if (this.newsletterForm.valid) {
+  //     const email = this.newsletterForm.get("email")?.value;
+  //     const formBody = { email: email };
 
-  //     this.http
-  //       .post("https://friday.kubona.ng/api/Contact/Subscribe/", formBody)
-  //       .subscribe(
-  //         (response) => {
-  //           console.log(JSON.stringify(response));
-  //           this.newsletterSuccess = true;
-  //         },
-  //         (error) => {
-  //           console.error("Error submitting form", error);
-  //           this.newsletterSuccess = false;
-  //         }
-  //       );
-  //   } else {
-  //     console.log("Form is not valid");
-  //   }
+  //     this.http
+  //       .post("https://friday.kubona.ng/api/Contact/Subscribe/", formBody)
+  //       .subscribe(
+  //         (response) => {
+  //           console.log(JSON.stringify(response));
+  //           this.newsletterSuccess = true;
+  //         },
+  //         (error) => {
+  //           console.error("Error submitting form", error);
+  //           this.newsletterSuccess = false;
+  //         }
+  //       );
+  //   } else {
+  //     console.log("Form is not valid");
+  //   }
   // }
 
 }
