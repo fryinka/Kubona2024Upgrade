@@ -5,9 +5,9 @@
     {
       "name": "productApis",
       "urls": [
-        "https://localhost:44397/api/Product/**",
-        "https://localhost:44397/api/Product/Products/**",
-        "https://localhost:44397/api/**"
+        "https://admin.kubona.ng/api/Product/**",
+        "https://admin.kubona.ng/Product/Products/**",
+        "https://admin.kubona.ng/api/**"
       ],
       "cacheConfig": {
         "maxSize": 200,

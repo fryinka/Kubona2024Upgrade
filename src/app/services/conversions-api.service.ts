@@ -13,7 +13,7 @@ export class ConversionsAPIService {
   public access_token = "EAAB8pdVoRgoBO7ZAWlGzHuBZB8ZC8RJKjTJCv9PiK4FPyJ8yFBAloBcN0GuJVy4rIb9zyJoJfYl6e5HkVj6UJnlZAajsjTNTXa1pAZAAE9rfP6A5xY0xK5IF7PAGEKxWfwfRBkvI913THUPjW3BelcIgqdVUWQ7X48W0bx8haPxjpcYGLxo6QaAZARDkUQRXIrOQZDZD";
   public testCode: string = "TEST21659";
   public fbResponse: any;
-  baseUrl: string = "https://localhost:44397/";
+  baseUrl: string = "https://admin.kubona.ng/";
 
   constructor(private http: HttpClient,) { }
 

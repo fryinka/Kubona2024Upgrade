@@ -9,7 +9,7 @@ import { CookieService } from 'ngx-cookie-service';
 })
 export class ProductService {
 
-  baseURL: string = 'https://localhost:44397/';
+  baseURL: string = 'https://admin.kubona.ng/';
   userId: string = ""
 
   constructor(private http: HttpClient, private cookieService:CookieService) {

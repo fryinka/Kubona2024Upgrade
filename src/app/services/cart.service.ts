@@ -12,7 +12,7 @@ export class CartService {
   private cartItems: BehaviorSubject<Cartlist[]> = new BehaviorSubject<Cartlist[]>([]);
   private orderId: BehaviorSubject<number | null> = new BehaviorSubject<number | null>(null); // Add orderId
   private isBrowser: boolean;
-  baseURL: string = 'https://localhost:44397/';
+  baseURL: string = 'https://admin.kubona.ng/';
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient,
     private cookieService: CookieService) {

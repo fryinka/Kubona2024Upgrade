@@ -1,0 +1,18 @@
+{
+    "extends": "./tsconfig.app.json",
+    "compilerOptions": {
+      "module": "CommonJS", 
+      "outDir": "./dist/kubona-app/server", 
+      "target": "ES2022", 
+      "types": ["node"], 
+      "esModuleInterop": true, 
+      "skipLibCheck": true 
+    },
+    "files": [
+      "src/main.server.ts", 
+      "server.ts" 
+    ],
+    "angularCompilerOptions": {
+      "entryModule": "./src/app/app.server.module#AppServerModule"
+    }
+  }
