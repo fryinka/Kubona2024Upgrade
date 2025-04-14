@@ -280,61 +280,60 @@ export class ProductDetailsComponent implements OnInit, AfterViewInit {
 
 
   addToCartOld(hasSize: boolean = true) {
-    if (isPlatformBrowser(this.platformId)) {
-      const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-      this.selectedColorId = this.productDetails.colorDesc;
-      if (this.productColors && this.selectedColorId === null) {
-        alert("Please select color.");
-        return;
-      } else if (this.selectedColorId !== null) {
-        this.productColor = this.selectedColorId;
-      }
-
-      if (hasSize) {
-        if (this.productSize == null) {
-          alert("Please select size.");
-          return;
-        }
-      }
-
-      const item = {
-        productId: this.prodId,
-        productTitle: this.productTitle,
-        productCategoryTitle: this.productCategoryTitle,
-        productCategoryName: this.productCategoryName,
-        productColor: this.productColor,
-        productPrice: this.productPrice,
-        productSize: this.productSize,
-        productImage: this.productImage,
-        itemgroupId: this.itemGroupId,
-        itemgroupSizeId: this.itemGroupSizeId,
-        productQty: 1,
-        sizeQty: this.selectedSizeQty
-      };
-
-      this.cartService.addToCart(item).subscribe({
-        next: (orderId) => {
-          console.log('Add to cart successful. Order ID:', orderId);
-          this.cartService.setOrderId(orderId);
-          const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-          cart.push(item);
-          localStorage.setItem("cart", JSON.stringify(cart));
-          alert("Item added to cart");
-          this.router.navigate(["/cart"]);
-        },
-        error: (error) => {
-          console.error('Add to cart failed:', error);
-          alert("Add to cart failed.");
-        }
-      });
-
-      alert("Item added to cart");
-      this.router.navigate(["/cart"]);
-    } else {
-      console.log('addToCartOld not executed on server.');
-      // Optionally, provide alternative server-side logic or error handling
+    if (!isPlatformBrowser(this.platformId)) {
+      return; // Exit early if not running in the browser
     }
+
+    this.selectedColorId = this.productDetails.colorDesc;
+
+    // Validate color selection
+    if (this.productColors && this.selectedColorId === null) {
+      alert('Please select a color.');
+      return;
+    } else if (this.selectedColorId !== null) {
+      this.productColor = this.selectedColorId;
+    }
+
+    // Validate size selection
+    if (hasSize) {
+      if (this.productSize == null) {
+        alert('Please select a size.');
+        return;
+      }
+    }
+
+    // Prepare item object
+    const item = {
+      productId: this.prodId,
+      productTitle: this.productTitle,
+      productCategoryTitle: this.productCategoryTitle,
+      productCategoryName: this.productCategoryName,
+      productColor: this.productColor,
+      productPrice: this.productPrice,
+      productSize: this.productSize,
+      productImage: this.productImage,
+      itemgroupId: this.itemGroupId,
+      itemgroupSizeId: this.itemGroupSizeId,
+      productQty: 1,
+      sizeQty: this.selectedSizeQty
+    };
+
+    // Add item to cart via service
+    this.cartService.addToCart(item).subscribe({
+      next: (orderId) => {
+        console.log('Add to cart successful. Order ID:', orderId);
+        this.cartService.setOrderId(orderId);
+
+        alert('Item added to cart');
+        this.router.navigate(['/cart']);
+      },
+      error: (error) => {
+        console.error('Add to cart failed:', error);
+        alert('Failed to add item to cart.');
+      }
+    });
   }
+
 
   getproductImages() {
     if (this.productId) {

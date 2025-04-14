@@ -14,7 +14,7 @@ const COOKIE_NAME = 'kubona_shopper';
 })
 export class AnonymousUserService {
 
-    private apiUrl = 'https://admin.kubona.ng/api/User'; // API endpoint
+    private apiUrl = 'https://localhost:44397/api/User'; // API endpoint
 
     constructor(
         @Inject(PLATFORM_ID) private platformId: any, 

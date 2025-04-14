@@ -12,18 +12,12 @@ export class CartService {
   private cartItems: BehaviorSubject<Cartlist[]> = new BehaviorSubject<Cartlist[]>([]);
   private orderId: BehaviorSubject<number | null> = new BehaviorSubject<number | null>(null); // Add orderId
   private isBrowser: boolean;
-  baseURL: string = 'https://admin.kubona.ng/';
+  baseURL: string = 'https://localhost:44397/';
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object, private http: HttpClient,    private cookieService: CookieService) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
-
-    if (this.isBrowser) {
-      const initialCart = this.getCartFromLocalStorage();
-      this.cartItems.next(initialCart);
-      const storedOrderId = localStorage.getItem('orderId');
-      this.orderId.next(storedOrderId ? parseInt(storedOrderId, 10) : null); // Initialize orderId
+      this.isBrowser = isPlatformBrowser(this.platformId);
+      this.cartItems.next([]);
     }
-  }
 
   private getCartFromLocalStorage(): any[] {
     if (!this.isBrowser) return [];
@@ -57,27 +51,34 @@ export class CartService {
   }
 
   addToCart(item: any): Observable<number> {
+    if (!this.isBrowser) {
+      return throwError(() => new Error('Add to cart is disabled during SSR.'));
+    }
+
     const userId = this.cookieService.get('kubona_shopper');
     const currentItems = this.cartItems.getValue();
     const updatedItems = [...currentItems, item];
-    this.cartItems.next(updatedItems);
-    this.updateLocalStorage(updatedItems);
 
-    const url = this.baseURL + 'api/Order';
+    this.cartItems.next(updatedItems);
+
+    const url = `${this.baseURL}api/Order`;
     const headers = { 'content-type': 'application/json' };
 
-    return this.http.post<number>(url, { "productId": item.productId, "itemgroupSizeId": item.itemgroupSizeId, "userId": userId }, { headers: headers })
-      .pipe(
-        catchError(error => {
-          console.error('Error adding to cart:', error);
-          return throwError(error);
-        })
-      );
+    return this.http.post<number>(
+      url,
+      { productId: item.productId, itemgroupSizeId: item.itemgroupSizeId, userId },
+      { headers }
+    ).pipe(
+      catchError((error) => {
+        console.error('Error adding to cart:', error);
+        return throwError(() => new Error('Failed to add item to cart.'));
+      })
+    );
   }
 
-  removeFromCart(item: any): void {
+  removeFromCart(item: any){
     const currentItems = this.cartItems.getValue();
-    const updatedItems = currentItems.filter(cartItem => cartItem.productId !== item.productId);
+    const updatedItems = currentItems.filter(cartItem => cartItem.itemGroupId !== item.itemGroupId);
     this.cartItems.next(updatedItems);
     this.updateLocalStorage(updatedItems);
   }
